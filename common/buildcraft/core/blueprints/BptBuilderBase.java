@@ -233,10 +233,10 @@ public abstract class BptBuilderBase implements IAreaProvider {
 		nbt.setTag("builtList", builtList);
 
 		NBTTagList buildingList = new NBTTagList();
-
-		for (BuildingItem item : builder.getBuilders()) {
+		Iterator<BuildingItem> it = builder.getBuilders().iterator();
+		while(it.hasNext()) {
 			NBTTagCompound sub = new NBTTagCompound();
-			item.writeToNBT(sub);
+			it.next().writeToNBT(sub);
 			buildingList.appendTag(sub);
 		}
 

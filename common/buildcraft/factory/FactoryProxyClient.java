@@ -85,9 +85,9 @@ public class FactoryProxyClient extends FactoryProxy {
 	}
 
 	@Override
-	public EntityBlock newDrill(World w, double i, double j, double k, double l, double d, double e) {
-		EntityBlock eb = super.newDrill(w, i, j, k, l, d, e);
-//		eb.resource = drillTexture;
+	public EntityBlock newDrill(World w, float rotateX, float rotateY, float rotateZ) {
+		EntityBlock eb = super.newDrill(w, rotateX, rotateY, rotateZ);
+		eb.blockState = BuildCraftFactory.frameBlock.getDefaultState();
 		return eb;
 	}
 

@@ -14,24 +14,25 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import buildcraft.core.BlockBuildCraft;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.core.CoreConstants;
-import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.IFramePipeConnection;
 import buildcraft.core.utils.Utils;
 
@@ -48,6 +49,7 @@ public class BlockFrame extends Block implements IFramePipeConnection {
 	public BlockFrame() {
 		super(Material.glass);
 		setHardness(0.5F);
+		this.setDefaultState(getDefaultState().withProperty(UP_PROP, false).withProperty(DOWN_PROP, false).withProperty(EAST_PROP, false).withProperty(WEST_PROP, false).withProperty(NORTH_PROP, false).withProperty(SOUTH_PROP, false));
 	}
 
 	@Override
@@ -211,19 +213,19 @@ public class BlockFrame extends Block implements IFramePipeConnection {
 	}
 	
 	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock){
-		boolean oldUp = (Boolean) state.getValue(UP_PROP);
-		boolean oldDown = (Boolean) state.getValue(DOWN_PROP);
-		boolean oldNorth = (Boolean) state.getValue(NORTH_PROP);
-		boolean oldSouth = (Boolean) state.getValue(SOUTH_PROP);
-		boolean oldEast = (Boolean) state.getValue(EAST_PROP);
-		boolean oldWest = (Boolean) state.getValue(WEST_PROP);
-		Object newOrientation = null;
-		boolean up = Utils.checkLegacyPipesConnections(world, pos, pos.up());
-		boolean down = Utils.checkLegacyPipesConnections(world, pos, pos.down());
-		boolean north = Utils.checkLegacyPipesConnections(world, pos, pos.north());
-		boolean south = Utils.checkLegacyPipesConnections(world, pos, pos.south());
-		boolean east = Utils.checkLegacyPipesConnections(world, pos, pos.east());
-		boolean west = Utils.checkLegacyPipesConnections(world, pos, pos.west());
+//		boolean oldUp = (Boolean) state.getValue(UP_PROP);
+//		boolean oldDown = (Boolean) state.getValue(DOWN_PROP);
+//		boolean oldNorth = (Boolean) state.getValue(NORTH_PROP);
+//		boolean oldSouth = (Boolean) state.getValue(SOUTH_PROP);
+//		boolean oldEast = (Boolean) state.getValue(EAST_PROP);
+//		boolean oldWest = (Boolean) state.getValue(WEST_PROP);
+//		Object newOrientation = null;
+//		boolean up = Utils.checkLegacyPipesConnections(world, pos, pos.up());
+//		boolean down = Utils.checkLegacyPipesConnections(world, pos, pos.down());
+//		boolean north = Utils.checkLegacyPipesConnections(world, pos, pos.north());
+//		boolean south = Utils.checkLegacyPipesConnections(world, pos, pos.south());
+//		boolean east = Utils.checkLegacyPipesConnections(world, pos, pos.east());
+//		boolean west = Utils.checkLegacyPipesConnections(world, pos, pos.west());
 		
 //		if(oldUp != up)
 //		else if(oldDown != down)
@@ -232,5 +234,55 @@ public class BlockFrame extends Block implements IFramePipeConnection {
 //		else if(oldEast != east)
 //		else if
 	}
-
+	
+	public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos){
+        boolean oldUp = (Boolean) state.getValue(UP_PROP);
+        boolean oldDown = (Boolean) state.getValue(DOWN_PROP);
+        boolean oldNorth = (Boolean) state.getValue(NORTH_PROP);
+        boolean oldSouth = (Boolean) state.getValue(SOUTH_PROP);
+        boolean oldEast = (Boolean) state.getValue(EAST_PROP);
+        boolean oldWest = (Boolean) state.getValue(WEST_PROP);
+       
+        boolean up = Utils.checkLegacyPipesConnections(world, pos, pos.up());
+        boolean down = Utils.checkLegacyPipesConnections(world, pos, pos.down());
+        boolean north = Utils.checkLegacyPipesConnections(world, pos, pos.north());
+        boolean south = Utils.checkLegacyPipesConnections(world, pos, pos.south());
+        boolean east = Utils.checkLegacyPipesConnections(world, pos, pos.east());
+        boolean west = Utils.checkLegacyPipesConnections(world, pos, pos.west());
+       
+        int change = 0;
+        if(oldUp != up && ++change != 0);
+        if(oldDown != down && ++change != 0);
+        if(oldNorth != north && ++change != 0);
+        if(oldSouth != south && ++ change != 0);
+        if(oldWest != west && ++change != 0);
+        if(oldEast != east && ++change != 0);
+       
+        if (change != 0)
+        	state = state.withProperty(DOWN_PROP, down).withProperty(UP_PROP, up).withProperty(EAST_PROP, east).withProperty(WEST_PROP, west).withProperty(NORTH_PROP, north).withProperty(SOUTH_PROP, south);
+        
+        return state;
+	}
+	
+    @Override
+    public int getMetaFromState(IBlockState state){
+    	return 0;
+    }
+    
+	@Override
+	public boolean isNormalCube() {
+		return false;
+	}
+	
+    @SideOnly(Side.CLIENT)
+    public EnumWorldBlockLayer getBlockLayer()
+    {
+        return EnumWorldBlockLayer.CUTOUT;
+    }
+	
+	@Override
+    public BlockState createBlockState()
+    {
+        return new BlockState(this, new IProperty[] {UP_PROP, DOWN_PROP, EAST_PROP, WEST_PROP, NORTH_PROP, SOUTH_PROP});
+    }
 }

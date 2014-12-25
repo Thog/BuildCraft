@@ -125,6 +125,8 @@ public class CoreProxyClient extends CoreProxy {
 					type += property.getName() + "=";
 					if (state.getValue(property) instanceof Integer) {
 						type += ((Integer) state.getValue(property)).intValue();
+					} else if(state.getValue(property) instanceof Boolean){
+						type += ((Boolean)state.getValue(property));
 					} else {
 						type += ((IStringSerializable) state.getValue(property)).getName();
 					}

@@ -1,0 +1,42 @@
+{
+    "elements": [
+        {   "from": [ 4, 0, 4 ],
+            "to": [ 12, 12, 12 ],
+            "faces": {
+                "down":  { "texture": "#all", "cullface": "down" },
+                "up":    { "texture": "#all", "cullface": "up" },
+                "north": { "texture": "#all" },
+                "south": { "texture": "#all" },
+                "west":  { "texture": "#all" },
+                "east":  { "texture": "#all" }
+            }
+        },
+        {   "from": [ 0, 4, 4 ],
+            "to": [ 4, 12, 12 ],
+            "faces": {
+                "down":  { "texture": "#all", "cullface": "down" },
+                "up":    { "texture": "#all", "cullface": "up" },
+                "north": { "texture": "#all" },
+                "south": { "texture": "#all" },
+                "west":  { "texture": "#all" },
+                "east":  { "texture": "#all" }
+            }
+        },
+        {   "from": [ 4, 4, 0 ],
+            "to": [ 12, 12, 4 ],
+            "faces": {
+                "down":  { "texture": "#all", "cullface": "down" },
+                "up":    { "texture": "#all", "cullface": "up" },
+                "north": { "texture": "#all" },
+                "south": { "texture": "#all" },
+                "west":  { "texture": "#all" },
+                "east":  { "texture": "#all" }
+            }
+        }
+    ],
+    
+    "textures": {
+	"particle": "buildcraft:blocks/blockFrame",
+        "all": "buildcraft:blocks/blockFrame"
+    }
+}
