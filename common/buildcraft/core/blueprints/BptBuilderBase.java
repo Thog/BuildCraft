@@ -9,6 +9,7 @@
 package buildcraft.core.blueprints;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
@@ -174,12 +175,10 @@ public abstract class BptBuilderBase implements IAreaProvider {
 
 	public void removeDoneBuilders (TileAbstractBuilder builder) {
 		ArrayList<BuildingItem> items = builder.getBuilders();
-
-		for (int i = items.size() - 1; i >= 0; --i) {
-			if (items.get(i).isDone()) {
-				items.remove(i);
-			}
-		}
+		Iterator<BuildingItem> it = items.iterator();
+		while(it.hasNext())
+			if (it.next().isDone())
+				it.remove();
 	}
 
 	public boolean isDone(IBuildingItemsProvider builder) {

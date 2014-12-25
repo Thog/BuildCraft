@@ -8,6 +8,8 @@
  */
 package buildcraft.core.render;
 
+import java.util.Iterator;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -37,8 +39,9 @@ public class RenderBuildingItems {
 		GL11.glTranslated(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
 
 		if (provider.getBuilders() != null) {
-			for (BuildingItem i : provider.getBuilders()) {
-				doRenderItem(i, 1.0F);
+			Iterator<BuildingItem> it = provider.getBuilders().iterator();
+			while(it.hasNext()){
+				doRenderItem(it.next(), 1.0F);
 			}
 		}
 
