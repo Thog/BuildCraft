@@ -34,6 +34,7 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 		private TileMarker marker;
 
 		public TileWrapper() {
+			this.pos = BlockPos.ORIGIN;
 		}
 
 		public TileWrapper(BlockPos pos) {
@@ -41,7 +42,7 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 		}
 
 		public boolean isSet() {
-			return pos != null;
+			return pos != BlockPos.ORIGIN;
 		}
 
 		public TileMarker getMarker(World world) {
@@ -237,7 +238,7 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 		if (marker == null) {
 			return false;
 		}
-
+		
 		if (origin.isSet() && marker.origin.isSet()) {
 			return false;
 		}
@@ -306,7 +307,6 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 			o.zMin = pos.getZ();
 			o.zMax = origin.vect[2].pos.getZ();
 		}
-
 		lasers = Utils.createLaserBox(worldObj, o.xMin, o.yMin, o.zMin, o.xMax, o.yMax, o.zMax, LaserKind.Red);
 	}
 
