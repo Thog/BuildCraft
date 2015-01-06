@@ -224,6 +224,7 @@ public class BuildCraftFactory extends BuildCraftMod {
 		}
 
 		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.register(FactoryProxy.proxy);
 	}
 	
 	public static void loadRecipes() {

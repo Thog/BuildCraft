@@ -33,15 +33,16 @@ public class FactoryProxy {
 	}
 
 	public EntityBlock newPumpTube(World w) {
-        return new EntityBlock(w);
-    }
+		return new EntityBlock(w);
+	}
 
-	public EntityBlock newDrill(World w, float rotateX, float rotateY, float rotateZ) {
-        return new EntityBlock(w, 0, 0, 0, 1, 1 ,1);
-    }
+	public EntityBlock newDrill(World w, double i, double j, double k,
+			double l, double d, double e) {
+		return new EntityBlock(w, i, j, k, l, d, e);
+	}
 
 	public EntityBlock newDrillHead(World w, double i, double j, double k,
 			double l, double d, double e) {
-        return new EntityBlock(w, i, j, k, l, d, e);
-    }
+		return new EntityBlock(w, i, j, k, l, d, e);
+	}
 }

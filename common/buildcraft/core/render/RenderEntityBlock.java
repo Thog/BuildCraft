@@ -18,27 +18,27 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
 import buildcraft.core.EntityBlock;
 
-//TODO (1.8): Rewrite
 public final class RenderEntityBlock extends Render {
 
 	public static RenderEntityBlock INSTANCE = new RenderEntityBlock();
-	//protected RenderBlocks renderBlocks;
+	protected RenderBlocks renderBlocks;
 
 	private RenderEntityBlock() {
 		super(Minecraft.getMinecraft().getRenderManager());
-		//renderBlocks = field_147909_c;
+		renderBlocks = new RenderBlocks();
 	}
 
 	@Override
@@ -54,22 +54,22 @@ public final class RenderEntityBlock extends Render {
 		public double maxX;
 		public double maxY;
 		public double maxZ;
-		public IBlockState blockState = Blocks.sand.getDefaultState();
-		public ResourceLocation resource;
-		//public IIcon texture = null;
-		//public IIcon[] textureArray = null;
+		public Block baseBlock = Blocks.sand;
+		public TextureAtlasSprite texture = null;
+		public TextureAtlasSprite[] textureArray = null;
 		public boolean[] renderSide = new boolean[6];
 		public float light = -1f;
 		public int brightness = -1;
+		public IBlockState blockState;
 
 		public RenderInfo() {
 			setRenderAllSides();
 		}
 
-		public RenderInfo(IBlockState state /*,*IIcon[] texture*/) {
+		public RenderInfo(Block template, TextureAtlasSprite[] texture) {
 			this();
-			this.blockState = state;
-			//this.textureArray = texture;
+			this.baseBlock = template;
+			this.textureArray = texture;
 		}
 
 		public RenderInfo(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
@@ -78,7 +78,7 @@ public final class RenderEntityBlock extends Render {
 		}
 
 		public float getBlockBrightness(IBlockAccess iblockaccess, BlockPos pos) {
-			return blockState.getBlock().getMixedBrightnessForBlock(iblockaccess, pos);
+			return baseBlock.getMixedBrightnessForBlock(iblockaccess, pos);
 		}
 
 		public final void setBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
@@ -121,7 +121,7 @@ public final class RenderEntityBlock extends Render {
 			maxZ = 1 - temp;
 		}
 
-		/*public IIcon getBlockTextureFromSide(int i) {
+		public TextureAtlasSprite getBlockTextureFromSide(int i) {
 			if (texture != null) {
 				return texture;
 			}
@@ -129,7 +129,7 @@ public final class RenderEntityBlock extends Render {
 			int index = i;
 
 			if (textureArray == null || textureArray.length == 0) {
-				return baseBlock.getBlockTextureFromSide(index);
+				return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(baseBlock.getUnlocalizedName());
 			} else {
 				if (index >= textureArray.length) {
 					index = 0;
@@ -137,25 +137,23 @@ public final class RenderEntityBlock extends Render {
 
 				return textureArray[index];
 			}
-		}*/
+		}
 	}
 
 	@Override
-	public void doRender(Entity entity, double i, double j, double k, float f, float f1) {
-		doRenderBlock((EntityBlock) entity, i, j, k);
+	public void doRender(Entity entity, double x, double y, double z, float f, float f1) {
+		doRenderBlock((EntityBlock) entity, x, y, z);
 	}
 
-	public void doRenderBlock(EntityBlock entity, double i, double j, double k) {
+	public void doRenderBlock(EntityBlock entity, double x, double y, double z) {
 		if (entity.isDead) {
 			return;
 		}
 
 		shadowSize = entity.shadowSize;
-		World world = entity.worldObj;
 		RenderInfo util = new RenderInfo();
-		if(entity.blockState != null)
-			util.blockState = entity.blockState;
-		util.resource = entity.resource;
+		util.texture = entity.texture;
+		bindTexture(TextureMap.locationBlocksTexture);
 
 		for (int iBase = 0; iBase < entity.iSize; ++iBase) {
 			for (int jBase = 0; jBase < entity.jSize; ++jBase) {
@@ -172,49 +170,67 @@ public final class RenderEntityBlock extends Render {
 					util.maxX = remainX > 1.0 ? 1.0 : remainX;
 					util.maxY = remainY > 1.0 ? 1.0 : remainY;
 					util.maxZ = remainZ > 1.0 ? 1.0 : remainZ;
-					//GlStateManager.enableTexture2D();
-					GlStateManager.enableRescaleNormal();
+
 					GL11.glPushMatrix();
-					GL11.glTranslatef((float) i, (float) j, (float) k);
+					GL11.glTranslatef((float) x, (float) y, (float) z);
 					GL11.glRotatef(entity.rotationX, 1, 0, 0);
 					GL11.glRotatef(entity.rotationY, 0, 1, 0);
 					GL11.glRotatef(entity.rotationZ, 0, 0, 1);
 					GL11.glTranslatef(iBase, jBase, kBase);
 
-					int lightX, lightY, lightZ;
-
-					lightX = (int) (Math.floor(entity.posX) + iBase);
-					lightY = (int) (Math.floor(entity.posY) + jBase);
-					lightZ = (int) (Math.floor(entity.posZ) + kBase);
-
-					GL11.glDisable(2896 /* GL_LIGHTING */);
-					
-					renderBlock(util, world, 0, 0, 0, new BlockPos(lightX, lightY, lightZ), false, true);
-					GL11.glEnable(2896 /* GL_LIGHTING */);
+					renderBlock(util);
 					GL11.glPopMatrix();
-					GlStateManager.disableRescaleNormal();
 
 				}
 			}
 		}
 	}
 
-	public void renderBlock(RenderInfo info, IBlockAccess blockAccess, int x, int y, int z, boolean doLight, boolean doTessellating) {
-		renderBlock(info, blockAccess, x, y, z, new BlockPos(x, y, z), doLight, doTessellating);
-	}
-
-	public void renderBlock(RenderInfo info, IBlockAccess blockAccess, double x, double y, double z, BlockPos lightPos, boolean doLight, boolean doTessellating) {
-
+	public void renderBlock(RenderInfo info) {
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer renderer = tessellator.getWorldRenderer();
-		BlockRendererDispatcher renderBlocks = Minecraft.getMinecraft().getBlockRendererDispatcher();
-		BlockPos pos = new BlockPos(x, y, z);
-		renderer.startDrawingQuads();
-		renderer.setVertexFormat(DefaultVertexFormats.BLOCK);
-		renderer.setTranslation((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
+		renderBlocks.worldRenderer = renderer;
+		if(info.blockState != null){
+			BlockRendererDispatcher renderBlocks = Minecraft.getMinecraft().getBlockRendererDispatcher();
+			BlockPos pos = BlockPos.ORIGIN;
+			renderer.startDrawingQuads();
+			renderer.setVertexFormat(DefaultVertexFormats.BLOCK);
+			renderer.setTranslation((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
+			GlStateManager.scale(info.maxX - info.minX, info.maxY - info.minY, info.maxZ - info.minZ);
+			renderBlocks.renderBlock(info.blockState, pos, Minecraft.getMinecraft().theWorld, renderer);
+			tessellator.draw();
+		}
+		else{
 
-        GlStateManager.scale(info.maxX - info.minX, info.maxY - info.minY, info.maxZ - info.minZ);
-		renderBlocks.renderBlock(info.blockState, pos, blockAccess, renderer);
-		tessellator.draw();
+			renderer.startDrawingQuads();
+			
+			renderBlocks.setRenderBounds(info.minX, info.minY, info.minZ, info.maxX, info.maxY, info.maxZ);
+
+			if (info.renderSide[0]) {
+				renderer.setNormal(0, -1, 0);
+				renderBlocks.renderFaceYNeg(0, 0, 0, info.getBlockTextureFromSide(0));
+			}
+			if (info.renderSide[1]) {
+				renderer.setNormal(0, 1, 0);
+				renderBlocks.renderFaceYPos(0, 0, 0, info.getBlockTextureFromSide(1));
+			}
+			if (info.renderSide[2]) {
+				renderer.setNormal(0, 0, -1);
+				renderBlocks.renderFaceZNeg(0, 0, 0, info.getBlockTextureFromSide(2));
+			}
+			if (info.renderSide[3]) {
+				renderer.setNormal(0, 0, 1);
+				renderBlocks.renderFaceZPos(0, 0, 0, info.getBlockTextureFromSide(3));
+			}
+			if (info.renderSide[4]) {
+				renderer.setNormal(-1, 0, 0);
+				renderBlocks.renderFaceXNeg(0, 0, 0, info.getBlockTextureFromSide(4));
+			}
+			if (info.renderSide[5]) {
+				renderer.setNormal(1, 0, 0);
+				renderBlocks.renderFaceXPos(0, 0, 0, info.getBlockTextureFromSide(5));
+			}
+			tessellator.draw();
+		}
 	}
 }

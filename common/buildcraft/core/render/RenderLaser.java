@@ -84,8 +84,7 @@ public class RenderLaser extends Render {
 					block.maxY = maxSize / 2F - diff;
 					block.maxZ = maxSize / 2F - diff;
 
-					RenderEntityBlock.INSTANCE.renderBlock(block, world, 0, 0,
-							0, false, true);
+					RenderEntityBlock.INSTANCE.renderBlock(block);
 
 					GL11.glEndList();
 				}
