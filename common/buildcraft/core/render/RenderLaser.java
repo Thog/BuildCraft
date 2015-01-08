@@ -12,8 +12,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -58,14 +60,13 @@ public class RenderLaser extends Render {
 	private static void initScaledBoxes (World world) {
 		if (scaledBoxes == null) {
 			scaledBoxes = new int [100][20];
-
 			for (int size = 0; size < 100; ++size) {
 				for (int i = 0; i < 20; ++i) {
 					scaledBoxes[size][i] = GLAllocation.generateDisplayLists(1);
 					GL11.glNewList(scaledBoxes[size][i], GL11.GL_COMPILE);
 
 					RenderInfo block = new RenderInfo();
-
+					block.texture = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
 					float minSize = 0.2F * size / 100F;
 					float maxSize = 0.4F * size / 100F;
 					//float minSize = 0.1F;
@@ -103,19 +104,19 @@ public class RenderLaser extends Render {
 			return;
 		}
 
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 		GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
 		GL11.glDisable(GL11.GL_LIGHTING);
 
 		Position offset = laser.renderOffset();
-		GL11.glTranslated(x + offset.x, y + offset.y, z + offset.z);
+		GlStateManager.translate(x + offset.x, y + offset.y, z + offset.z);
 
 		// FIXME: WARNING! not using getBox (laser) will kill laser movement.
 		// we can use some other method for the animation though.
 		doRenderLaser(laser.worldObj, renderManager.renderEngine, laser.data, laser.getTexture());
 
 		GL11.glPopAttrib();
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 
 	public static void doRenderLaserWave(World world, TextureManager textureManager, LaserData laser, ResourceLocation texture) {
@@ -123,18 +124,17 @@ public class RenderLaser extends Render {
 			return;
 		}
 
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 
-		GL11.glTranslated(laser.head.x, laser.head.y, laser.head.z);
+		GlStateManager.translate(laser.head.x, laser.head.y, laser.head.z);
 		laser.update();
 
-		GL11.glRotatef((float) laser.angleZ, 0, 1, 0);
-		GL11.glRotatef((float) laser.angleY, 0, 0, 1);
+		GlStateManager.rotate((float) laser.angleZ, 0, 1, 0);
+		GlStateManager.rotate((float) laser.angleY, 0, 0, 1);
 
 		textureManager.bindTexture(texture);
 
 		int indexList = 0;
-
 		initScaledBoxes(world);
 
 		double x1 = laser.wavePosition;
@@ -146,14 +146,14 @@ public class RenderLaser extends Render {
 		for (double i = x1; i <= x2 && i <= laser.renderSize; i += STEP) {
 			GL11.glCallList(scaledBoxes [(int) (laser.waveSize * 99F)][indexList]);
 			indexList = (indexList + 1) % scaledBoxes [0].length;
-			GL11.glTranslated(STEP, 0, 0);
+			GlStateManager.translate(STEP, 0, 0);
 		}
 
 		if (x2 < x3) {
 			doRenderLaserLine(x3 - x2, laser.laserTexAnimation);
 		}
 
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 
 
@@ -163,41 +163,38 @@ public class RenderLaser extends Render {
 			return;
 		}
 
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 
-		GL11.glTranslated(laser.head.x, laser.head.y, laser.head.z);
+		GlStateManager.translate(laser.head.x, laser.head.y, laser.head.z);
 		laser.update();
-
-		GL11.glRotatef((float) laser.angleZ, 0, 1, 0);
-		GL11.glRotatef((float) laser.angleY, 0, 0, 1);
-
+		
+		GlStateManager.rotate((float) laser.angleZ, 0, 1, 0);
+		GlStateManager.rotate((float) laser.angleY, 0, 0, 1);
 		textureManager.bindTexture(texture);
-
 		initScaledBoxes(world);
-
+		
 		doRenderLaserLine(laser.renderSize, laser.laserTexAnimation);
 
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 
 	private static void doRenderLaserLine(double len, int texId) {
 		float lasti = 0;
-
 		if (len - 1 > 0) {
 			for (float i = 0; i <= len - 1; i += 1) {
 				getBox(texId).render(1F / 16F);
-				GL11.glTranslated(1, 0, 0);
+				GlStateManager.translate(1, 0, 0);
 				lasti = i;
 			}
 			lasti++;
 		}
 
-		GL11.glPushMatrix();
-		GL11.glScalef((float) len - lasti, 1, 1);
+		GlStateManager.pushMatrix();
+		GlStateManager.scale((float) len - lasti, 1, 1);
 		getBox(texId).render(1F / 16F);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 
-		GL11.glTranslated((float) (len - lasti), 0, 0);
+		GlStateManager.translate((float) (len - lasti), 0, 0);
 	}
 
 	@Override

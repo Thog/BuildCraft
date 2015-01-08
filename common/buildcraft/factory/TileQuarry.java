@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.EnumFaceDirection;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -449,7 +448,6 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
 		nbttagcompound.setTag("bpt", bptNBT);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void positionReached() {
 		if (worldObj.isRemote) {
 			return;
@@ -550,9 +548,7 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
 		xSize = a.xMax() - a.xMin() + 1;
 		int ySize = a.yMax() - a.yMin() + 1;
 		zSize = a.zMax() - a.zMin() + 1;
-
 		box.initialize(a);
-
 		if (ySize < 5) {
 			ySize = 5;
 			box.yMax = box.yMin + ySize - 1;
@@ -582,14 +578,14 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
 				zMin = pos.getZ() - 9 - 2;
 				break;
 			}
-
-			box.initialize(xMin, pos.getX(), zMin, xMin + xSize - 1, pos.getX() + ySize - 1, zMin + zSize - 1);
+			box.initialize(xMin, pos.getY(), zMin, xMin + xSize - 1, pos.getY() + ySize - 1, zMin + zSize - 1);
 		}
 
 		a.removeFromWorld();
 		if (chunkTicket != null) {
 			forceChunkLoading(chunkTicket);
 		}
+		
 
 		sendNetworkUpdate();
 	}

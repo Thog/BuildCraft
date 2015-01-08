@@ -8,6 +8,7 @@
  */
 package buildcraft.core.render;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -33,10 +34,13 @@ public final class RenderBox {
 
 		for (LaserData l : box.lasersData) {
 			l.update();
+			
 			GL11.glPushMatrix();
+			GlStateManager.enableTexture2D();
 			GL11.glTranslated(0.5F, 0.5F, 0.5F);
 			RenderLaser.doRenderLaser(world, t, l, texture);
 			GL11.glPopMatrix();
+
 		}
 
 		GL11.glEnable(2896 /* GL_LIGHTING */);

@@ -21,13 +21,12 @@ import buildcraft.core.IBoxesProvider;
 
 public class RenderBoxProvider extends TileEntitySpecialRenderer {
 
-	private static final ResourceLocation LASER_RED = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_1.png");
-	private static final ResourceLocation LASER_YELLOW = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_2.png");
-	private static final ResourceLocation LASER_GREEN = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_3.png");
-	private static final ResourceLocation LASER_BLUE = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_4.png");
-	private static final ResourceLocation STRIPES = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/stripes.png");
-	private static final ResourceLocation BLUE_STRIPES = new ResourceLocation("buildcraft",
-			DefaultProps.TEXTURE_PATH_ENTITIES + "/blue_stripes.png");
+	public static final ResourceLocation LASER_RED = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_1.png");
+	public static final ResourceLocation LASER_YELLOW = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_2.png");
+	public static final ResourceLocation LASER_GREEN = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_3.png");
+	public static final ResourceLocation LASER_BLUE = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/laser_4.png");
+	public static final ResourceLocation STRIPES = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/stripes.png");
+	public static final ResourceLocation BLUE_STRIPES = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/blue_stripes.png");
 
 	public RenderBoxProvider() {
 	}

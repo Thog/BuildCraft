@@ -1,9 +1,15 @@
+/**
+ * Copyright (c) 2011-2014, SpaceToad and the BuildCraft Team
+ * http://www.mod-buildcraft.com
+ *
+ * BuildCraft is distributed under the terms of the Minecraft Mod Public
+ * License 1.0, or MMPL. Please check the contents of the license located in
+ * http://www.mod-buildcraft.com/MMPL-1.0.txt
+ */
 package buildcraft.core.render;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.world.World;
 
 public class RenderBlocks {
 
@@ -33,14 +39,11 @@ public class RenderBlocks {
 
 	public boolean enableAO;
 	public boolean renderAllFaces;
-	private Minecraft minecraftRB;
-	private World world;
 
 	public RenderBlocks() {
 		this.renderMaxX = 1.0;
 		this.renderMaxY = 1.0;
 		this.renderMaxZ = 1.0;
-		this.minecraftRB = Minecraft.getMinecraft();
 	}
 
 	public RenderBlocks(WorldRenderer renderer) {

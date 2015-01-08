@@ -205,7 +205,7 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 
 		if (!origin.isSet() || !origin.vect[n].isSet()) {
 			for (int j = 1; j < maxSize; ++j) {
-				coords.add(n == 0 ? j : 0, n == 1 ? j : 0, n == 2 ? j : 0);
+				coords = coords.add(n == 0 ? j : 0, n == 1 ? j : 0, n == 2 ? j : 0);
 
 				Block block = worldObj.getBlockState(coords).getBlock();
 
@@ -217,7 +217,7 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 					}
 				}
 
-				coords.add(n == 0 ? (-2 * j) : 0, n == 1 ? (-2 * j) : 0, n == 2 ? (-2 * j) : 0);
+				coords = coords.add(n == 0 ? (-2 * j) : 0, n == 1 ? (-2 * j) : 0, n == 2 ? (-2 * j) : 0);
 
 				block = worldObj.getBlockState(coords).getBlock();
 
@@ -229,7 +229,7 @@ public class TileMarker extends TileBuildCraft implements IAreaProvider {
 					}
 				}
 
-				coords.add(n == 0 ? j : 0, n == 1 ? j : 0, n == 2 ? j : 0);
+				coords = coords.add(n == 0 ? j : 0, n == 1 ? j : 0, n == 2 ? j : 0);
 			}
 		}
 	}

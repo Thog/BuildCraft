@@ -10,16 +10,18 @@ package buildcraft;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.ForgeChunkManager.Ticket;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
@@ -27,14 +29,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.builders.schematics.SchematicIgnoreState;
 import buildcraft.core.DefaultProps;
@@ -55,7 +49,6 @@ import buildcraft.factory.BlockQuarry;
 import buildcraft.factory.BlockRefinery;
 import buildcraft.factory.BlockTank;
 import buildcraft.factory.FactoryProxy;
-import buildcraft.factory.FactoryProxyClient;
 import buildcraft.factory.GuiHandler;
 import buildcraft.factory.PumpDimensionList;
 import buildcraft.factory.TileAutoWorkbench;
@@ -70,6 +63,8 @@ import buildcraft.factory.network.PacketHandlerFactory;
 import buildcraft.factory.schematics.SchematicPump;
 import buildcraft.factory.schematics.SchematicRefinery;
 import buildcraft.factory.schematics.SchematicTank;
+
+import com.google.common.collect.Lists;
 
 @Mod(name = "BuildCraft Factory", version = Version.VERSION, useMetadata = false, modid = "BuildCraftFactory", dependencies = DefaultProps.DEPENDENCY_CORE)
 public class BuildCraftFactory extends BuildCraftMod {

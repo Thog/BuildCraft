@@ -195,7 +195,7 @@ public final class RenderEntityBlock extends Render {
 			BlockPos pos = BlockPos.ORIGIN;
 			renderer.startDrawingQuads();
 			renderer.setVertexFormat(DefaultVertexFormats.BLOCK);
-			renderer.setTranslation((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
+			renderer.setTranslation(0, 0, 0);
 			GlStateManager.scale(info.maxX - info.minX, info.maxY - info.minY, info.maxZ - info.minZ);
 			renderBlocks.renderBlock(info.blockState, pos, Minecraft.getMinecraft().theWorld, renderer);
 			tessellator.draw();
@@ -205,32 +205,51 @@ public final class RenderEntityBlock extends Render {
 			renderer.startDrawingQuads();
 			
 			renderBlocks.setRenderBounds(info.minX, info.minY, info.minZ, info.maxX, info.maxY, info.maxZ);
-
+			
 			if (info.renderSide[0]) {
 				renderer.setNormal(0, -1, 0);
+				renderBlocks.setRenderFromInside(true);
+				renderBlocks.renderFaceYNeg(0, 0, 0, info.getBlockTextureFromSide(0));
+				renderBlocks.setRenderFromInside(false);
 				renderBlocks.renderFaceYNeg(0, 0, 0, info.getBlockTextureFromSide(0));
 			}
 			if (info.renderSide[1]) {
 				renderer.setNormal(0, 1, 0);
+				renderBlocks.setRenderFromInside(true);
+				renderBlocks.renderFaceYPos(0, 0, 0, info.getBlockTextureFromSide(1));
+				renderBlocks.setRenderFromInside(false);
 				renderBlocks.renderFaceYPos(0, 0, 0, info.getBlockTextureFromSide(1));
 			}
 			if (info.renderSide[2]) {
 				renderer.setNormal(0, 0, -1);
+				renderBlocks.setRenderFromInside(true);
+				renderBlocks.renderFaceZNeg(0, 0, 0, info.getBlockTextureFromSide(2));
+				renderBlocks.setRenderFromInside(false);
 				renderBlocks.renderFaceZNeg(0, 0, 0, info.getBlockTextureFromSide(2));
 			}
 			if (info.renderSide[3]) {
 				renderer.setNormal(0, 0, 1);
+				renderBlocks.setRenderFromInside(true);
+				renderBlocks.renderFaceZPos(0, 0, 0, info.getBlockTextureFromSide(3));
+				renderBlocks.setRenderFromInside(false);
 				renderBlocks.renderFaceZPos(0, 0, 0, info.getBlockTextureFromSide(3));
 			}
 			if (info.renderSide[4]) {
 				renderer.setNormal(-1, 0, 0);
+				renderBlocks.setRenderFromInside(true);
+				renderBlocks.renderFaceXNeg(0, 0, 0, info.getBlockTextureFromSide(4));
+				renderBlocks.setRenderFromInside(false);
 				renderBlocks.renderFaceXNeg(0, 0, 0, info.getBlockTextureFromSide(4));
 			}
 			if (info.renderSide[5]) {
 				renderer.setNormal(1, 0, 0);
+				renderBlocks.setRenderFromInside(true);
+				renderBlocks.renderFaceXPos(0, 0, 0, info.getBlockTextureFromSide(5));
+				renderBlocks.setRenderFromInside(false);
 				renderBlocks.renderFaceXPos(0, 0, 0, info.getBlockTextureFromSide(5));
 			}
 			tessellator.draw();
+			
 		}
 	}
 }

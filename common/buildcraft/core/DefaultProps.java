@@ -21,7 +21,7 @@ public final class DefaultProps {
 
 	public static String TEXTURE_PATH_GUI = "textures/gui";
 	public static String TEXTURE_PATH_BLOCKS = "buildcraft:textures/blocks";
-	public static String TEXTURE_PATH_ENTITIES = "textures/entities";
+	public static String TEXTURE_PATH_ENTITIES = "buildcraft:textures/entities";
 
 	public static final String DEFAULT_LANGUAGE = "en_US";
 

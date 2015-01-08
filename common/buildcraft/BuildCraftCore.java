@@ -13,14 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashSet;
-import java.util.TreeMap;
 import java.util.UUID;
-
-import com.mojang.authlib.GameProfile;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
@@ -33,7 +26,17 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.AchievementPage;
+import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -46,20 +49,15 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.AchievementPage;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.oredict.OreDictionary;
+
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
+
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.BuildCraftAPI;
-import buildcraft.api.core.EnumColor;
 import buildcraft.api.core.IWorldProperty;
 import buildcraft.api.core.JavaTools;
 import buildcraft.api.fuels.BuildcraftFuelRegistry;
@@ -90,7 +88,6 @@ import buildcraft.core.blueprints.SchematicRegistry;
 import buildcraft.core.network.BuildCraftChannelHandler;
 import buildcraft.core.network.EntityIds;
 import buildcraft.core.network.PacketHandler;
-import buildcraft.core.network.PacketUpdate;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.core.recipes.AssemblyRecipeManager;
 import buildcraft.core.recipes.IntegrationRecipeManager;
@@ -123,6 +120,8 @@ import buildcraft.core.utils.WorldPropertyIsSoft;
 import buildcraft.core.utils.WorldPropertyIsWood;
 import buildcraft.energy.fuels.CoolantManager;
 import buildcraft.energy.fuels.FuelManager;
+
+import com.mojang.authlib.GameProfile;
 
 @Mod(name = "BuildCraft", version = Version.VERSION, useMetadata = false, modid = "BuildCraftCore", acceptedMinecraftVersions = "[1.8]", dependencies = "required-after:Forge@[10.13.0.1207,)")
 public class BuildCraftCore extends BuildCraftMod {
@@ -420,10 +419,25 @@ public class BuildCraftCore extends BuildCraftMod {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onModelBakeEvent(ModelBakeEvent event) {
-		BuildCraftCore.redLaserTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blockRedLaser");
-		BuildCraftCore.blueLaserTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blockBlueLaser");
-		BuildCraftCore.stripesLaserTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blockStripesLaser");
-		BuildCraftCore.transparentTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blockTransparentLaser");
+		redLaserTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blocks/blockRedLaser");
+		blueLaserTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blocks/blockBlueLaser");
+		stripesLaserTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blocks/blockStripesLaser");
+		transparentTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("buildcraft:blocks/blockTransparentLaser");
+	}
+	
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		if (event.map == Minecraft.getMinecraft().getTextureMapBlocks()) {
+			redLaserTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockRedLaser"));
+			blueLaserTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockBlueLaser"));
+			stripesLaserTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockStripesLaser"));
+			transparentTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockTransparentLaser"));
+			event.map.setTextureEntry("buildcraft:blocks/blockRedLaser", redLaserTexture);
+			event.map.setTextureEntry("buildcraft:blocks/blockBlueLaser", blueLaserTexture);
+			event.map.setTextureEntry("buildcraft:blocks/blockStripesLaser", stripesLaserTexture);
+			event.map.setTextureEntry("buildcraft:blocks/blockTransparentLaser", transparentTexture);
+		}
 	}
 
 	public void loadRecipes() {
@@ -491,8 +505,8 @@ public class BuildCraftCore extends BuildCraftMod {
 		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelviewF);
 		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projectionF);
 		GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
-		float f = (viewport.get(0) + viewport.get(2)) / 2;
-		float f1 = (viewport.get(1) + viewport.get(3)) / 2;
+		//float f = (viewport.get(0) + viewport.get(2)) / 2;
+		//float f1 = (viewport.get(1) + viewport.get(3)) / 2;
 
 		float x = Mouse.getX();
 		float y = Mouse.getY();
