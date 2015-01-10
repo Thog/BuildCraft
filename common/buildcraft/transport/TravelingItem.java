@@ -165,14 +165,18 @@ public class TravelingItem {
 
 	/* SAVING & LOADING */
 	public void readFromNBT(NBTTagCompound data) {
+		int inputValue = data.getByte("input");
+		int outputValue = data.getByte("output");
 		setPosition(data.getDouble("x"), data.getDouble("y"), data.getDouble("z"));
 
 		setSpeed(data.getFloat("speed"));
 		setItemStack(ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")));
 
 		toCenter = data.getBoolean("toCenter");
-		input = EnumFacing.getFront(data.getByte("input"));
-		output = EnumFacing.getFront(data.getByte("output"));
+		if(inputValue != -1)
+			input = EnumFacing.getFront(inputValue);
+		if(outputValue != -1)
+			output = EnumFacing.getFront(outputValue);
 
 		byte c = data.getByte("color");
 		if (c != -1) {
@@ -185,6 +189,14 @@ public class TravelingItem {
 	}
 
 	public void writeToNBT(NBTTagCompound data) {
+		int inputValue = -1;
+		int outputValue = -1;
+		
+		if(input != null)
+			inputValue = input.ordinal();
+		if(output != null)
+			outputValue = output.ordinal();
+		
 		data.setDouble("x", xCoord);
 		data.setDouble("y", yCoord);
 		data.setDouble("z", zCoord);
@@ -194,8 +206,8 @@ public class TravelingItem {
 		data.setTag("Item", itemStackTag);
 
 		data.setBoolean("toCenter", toCenter);
-		data.setByte("input", (byte) input.ordinal());
-		data.setByte("output", (byte) output.ordinal());
+		data.setByte("input", (byte) inputValue);
+		data.setByte("output", (byte) outputValue);
 
 		data.setByte("color", color != null ? (byte) color.ordinal() : -1);
 

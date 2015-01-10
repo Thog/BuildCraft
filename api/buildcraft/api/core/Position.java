@@ -66,6 +66,7 @@ public class Position implements ISerializable {
 	}
 
 	public void moveRight(double step) {
+		if(orientation == null) return;
 		switch (orientation) {
 		case SOUTH:
 			x = x - step;
@@ -88,6 +89,7 @@ public class Position implements ISerializable {
 	}
 
 	public void moveForwards(double step) {
+		if(orientation == null) return;
 		switch (orientation) {
 		case UP:
 			y = y + step;
@@ -116,6 +118,7 @@ public class Position implements ISerializable {
 	}
 
 	public void moveUp(double step) {
+		if(orientation == null) return;
 		switch (orientation) {
 		case SOUTH:
 		case NORTH:

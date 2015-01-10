@@ -9,35 +9,31 @@
 package buildcraft.transport.render;
 
 import java.util.HashMap;
-
-import com.google.common.collect.Maps;
-
-import org.lwjgl.opengl.GL11;
+import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+
+import org.lwjgl.opengl.GL11;
+
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftCore.RenderMode;
-import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.EnumColor;
 import buildcraft.api.gates.IGateExpansion;
 import buildcraft.api.transport.IPipeTile.PipeType;
@@ -47,10 +43,8 @@ import buildcraft.core.DefaultProps;
 import buildcraft.core.render.RenderEntityBlock;
 import buildcraft.core.render.RenderEntityBlock.RenderInfo;
 import buildcraft.core.render.RenderUtils;
-import buildcraft.core.utils.MatrixTranformations;
 import buildcraft.transport.Gate;
 import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeRenderState;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.PipeTransportItems;
@@ -58,11 +52,13 @@ import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TravelingItem;
 
+import com.google.common.collect.Maps;
+
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
 	public static final float DISPLAY_MULTIPLIER = 0.1f;
 	public static final int POWER_STAGES = 100;
 
-	public static final ResourceLocation STRIPES_TEXTURE = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/stripes.png");
+	public static final ResourceLocation STRIPES_TEXTURE = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/stripes.png");
 
 	private static final int LIQUID_STAGES = 40;
 	private static final int MAX_ITEMS_TO_RENDER = 10;
@@ -749,7 +745,9 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 		float light = pipe.container.getWorld().getLightBrightness(pipe.container.getPos());
 
 		int count = 0;
-		for (TravelingItem item : pipe.transport.items) {
+		Iterator<TravelingItem> it = pipe.transport.items.iterator();
+		while(it.hasNext()) {
+			TravelingItem item = it.next();
 			if (count >= MAX_ITEMS_TO_RENDER) {
 				break;
 			}

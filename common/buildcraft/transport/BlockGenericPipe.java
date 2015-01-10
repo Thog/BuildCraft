@@ -292,7 +292,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IModelRegister 
 		RaytraceResult raytraceResult = doRayTrace(world, pos, origin, direction);
 
 		if (raytraceResult == null) {
-			return null;
+			return super.collisionRayTrace(world, pos, origin, direction);
 		} else {
 			return raytraceResult.movingObjectPosition;
 		}

@@ -65,16 +65,12 @@ import buildcraft.transport.gates.StatementSlot;
 public class EntityRobot extends EntityRobotBase implements
 		IEntityAdditionalSpawnData, IInventory, IFluidHandler, ICommandReceiver {
 
-	public static final ResourceLocation ROBOT_BASE = new ResourceLocation("buildcraft",
-			DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_base.png");
-	public static final ResourceLocation ROBOT_BUILDER = new ResourceLocation("buildcraft",
-			DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_builder.png");
-	public static final ResourceLocation ROBOT_TRANSPORT = new ResourceLocation("buildcraft",
-			DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_picker.png");
-	public static final ResourceLocation ROBOT_FACTORY = new ResourceLocation("buildcraft",
-			DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_factory.png");
+	public static final ResourceLocation ROBOT_BASE = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_base.png");
+	public static final ResourceLocation ROBOT_BUILDER = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_builder.png");
+	public static final ResourceLocation ROBOT_TRANSPORT = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_picker.png");
+	public static final ResourceLocation ROBOT_FACTORY = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_factory.png");
 
-	private static ResourceLocation defaultTexture = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_base.png");
+	private static ResourceLocation defaultTexture = new ResourceLocation(DefaultProps.TEXTURE_PATH_ENTITIES + "/robot_base.png");
 
 	public SafeTimeTracker scanForTasks = new SafeTimeTracker (40, 10);
 

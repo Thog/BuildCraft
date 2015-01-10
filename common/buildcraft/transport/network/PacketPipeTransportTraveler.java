@@ -48,8 +48,8 @@ public class PacketPipeTransportTraveler extends BuildCraftPacket {
 
 		data.writeShort(item.id);
 
-		data.writeByte((byte) item.input.ordinal());
-		data.writeByte((byte) item.output.ordinal());
+		data.writeByte(item.input != null ? item.input.ordinal() : -1);
+		data.writeByte(item.output != null ? item.output.ordinal() : -1);
 
 		data.writeByte(item.color != null ? item.color.ordinal() : -1);
 
@@ -67,9 +67,12 @@ public class PacketPipeTransportTraveler extends BuildCraftPacket {
 		pos = new BlockPos(MathHelper.floor_float(itemX), MathHelper.floor_float(itemY), MathHelper.floor_float(itemZ));
 
 		this.entityId = data.readShort();
-
-		this.input = EnumFacing.getFront(data.readByte());
-		this.output = EnumFacing.getFront(data.readByte());
+		byte i = data.readByte();
+		byte o = data.readByte();
+		if(i != -1)
+			this.input = EnumFacing.getFront(i);
+		if(o != -1)
+			this.output = EnumFacing.getFront(o);
 
 		byte c = data.readByte();
 		if (c != -1) {
