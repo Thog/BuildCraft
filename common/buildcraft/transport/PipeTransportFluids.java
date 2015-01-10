@@ -156,9 +156,9 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler 
 	public byte initClient = 0;
 	public int travelDelay = 12;
 	public int flowRate;
-	public FluidStack[] renderCache = new FluidStack[orientations.length];
-	public int[] colorRenderCache = new int[orientations.length];
-	public final PipeSection[] internalTanks = new PipeSection[orientations.length];
+	public FluidStack[] renderCache = new FluidStack[orientations.length + 1];
+	public int[] colorRenderCache = new int[orientations.length + 1];
+	public final PipeSection[] internalTanks = new PipeSection[orientations.length + 1];
 	private final TransferState[] transferState = new TransferState[directions.length];
 	private final int[] inputPerTick = new int[directions.length];
 	private final short[] inputTTL = new short[]{0, 0, 0, 0, 0, 0};
@@ -174,6 +174,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler 
 				transferState[direction.ordinal()] = TransferState.None;
 			}
 		}
+		internalTanks[6] = new PipeSection(getCapacity());
 	}
 
     public void initFromPipe(Class<? extends Pipe> pipeClass) {
