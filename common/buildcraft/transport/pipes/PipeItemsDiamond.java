@@ -57,6 +57,7 @@ public class PipeItemsDiamond extends Pipe<PipeTransportItems> implements IDiamo
 
 	@Override
 	public int getIconIndex(EnumFacing direction) {
+		if(direction == null) return PipeIconProvider.TYPE.PipeItemsDiamond_Center.ordinal();
 		switch (direction) {
 			case DOWN:
 				return PipeIconProvider.TYPE.PipeItemsDiamond_Down.ordinal();

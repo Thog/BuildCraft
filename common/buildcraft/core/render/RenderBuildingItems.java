@@ -39,10 +39,11 @@ public class RenderBuildingItems {
 		GL11.glTranslated(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
 
 		if (provider.getBuilders() != null) {
-			Iterator<BuildingItem> it = provider.getBuilders().iterator();
-			while(it.hasNext()){
-				doRenderItem(it.next(), 1.0F);
+			for(int i = 0; i < provider.getBuilders().size(); i++)
+			{
+				doRenderItem(provider.getBuilders().get(i), 1.0F);
 			}
+				
 		}
 
 		GL11.glPopMatrix();
