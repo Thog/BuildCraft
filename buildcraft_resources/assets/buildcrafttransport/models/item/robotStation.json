@@ -1,0 +1,6 @@
+{
+    "parent": "buildcrafttransport:item/pipePlugBase",
+    "textures": {
+        "texture": "buildcraft:blocks/pipeRobotStation"
+    }
+}
