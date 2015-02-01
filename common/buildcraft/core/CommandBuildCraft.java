@@ -32,7 +32,7 @@ public class CommandBuildCraft extends CommandBase {
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/" + this.getName() + " help";
 	}
 
@@ -51,7 +51,7 @@ public class CommandBuildCraft extends CommandBase {
 	public void execute(ICommandSender sender, String[] arguments) throws WrongUsageException {
 
 		if (arguments.length <= 0) {
-			throw new WrongUsageException("Type '" + this.getCommandUsage(sender) + "' for help.");
+			throw new WrongUsageException("Type '" + this.getUsage(sender) + "' for help.");
 		}
 
 		if (arguments[0].matches("version")) {
@@ -64,7 +64,7 @@ public class CommandBuildCraft extends CommandBase {
 			return;
 		}
 
-		throw new WrongUsageException(this.getCommandUsage(sender));
+		throw new WrongUsageException(this.getUsage(sender));
 	}
 
 	private void commandVersion(ICommandSender sender, String[] arguments) {
