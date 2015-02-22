@@ -29,7 +29,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
@@ -38,6 +37,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.BuildCraftCore;
+import buildcraft.api.core.BuildCraftProperties;
+import buildcraft.api.enums.EnumEngineType;
 import buildcraft.api.events.BlockInteractionEvent;
 import buildcraft.core.BlockBuildCraft;
 import buildcraft.core.ICustomHighlight;
@@ -46,20 +47,7 @@ import buildcraft.core.utils.IModelRegister;
 import buildcraft.core.utils.ModelHelper;
 
 public class BlockEngine extends BlockBuildCraft implements ICustomHighlight, IModelRegister {
-	public enum EngineType implements IStringSerializable {
-		WOOD, STONE, IRON, CREATIVE;
-
-		public static EngineType getType(IBlockState state) {
-			return (EngineType) state.getValue(TYPE);
-		}
-
-		@Override
-		public String getName() {
-			return name();
-		}
-	};
-
-	public static final PropertyEnum TYPE = PropertyEnum.create("type", EngineType.class);
+	public static final PropertyEnum TYPE = BuildCraftProperties.ENGINE_TYPE;
 
 	private static final AxisAlignedBB[][] boxes = {
 			{AxisAlignedBB.fromBounds(0.0, 0.5, 0.0, 1.0, 1.0, 1.0), AxisAlignedBB.fromBounds(0.25, 0.0, 0.25, 0.75, 0.5, 0.75)}, // -Y
@@ -240,7 +228,7 @@ public class BlockEngine extends BlockBuildCraft implements ICustomHighlight, IM
 
 	@Override
 	public int damageDropped(IBlockState state) {
-		return EngineType.getType(state).ordinal();
+		return EnumEngineType.getType(state).ordinal();
 	}
 
 	@SuppressWarnings({"all"})

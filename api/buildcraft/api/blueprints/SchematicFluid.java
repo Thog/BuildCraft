@@ -10,11 +10,9 @@ package buildcraft.api.blueprints;
 
 import java.util.LinkedList;
 
-import buildcraft.core.BlockBuildCraft;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 
 public class SchematicFluid extends SchematicBlock {
@@ -40,7 +38,7 @@ public class SchematicFluid extends SchematicBlock {
 	@Override
 	public boolean isAlreadyBuilt(IBuilderContext context, BlockPos pos) {
 		if (getMetaData() == 0) {
-			return state == context.world().getBlockState(pos) && ((Integer)context.world().getBlockState(pos).getValue(BlockLiquid.LEVEL)) == 0;
+			return state == context.world().getBlockState(pos) && ((Integer) context.world().getBlockState(pos).getValue(BlockLiquid.LEVEL)) == 0;
 		} else {
 			return state == context.world().getBlockState(pos);
 		}
@@ -84,8 +82,7 @@ public class SchematicFluid extends SchematicBlock {
 	}
 	
 	@Override
-	public int getMetaData()
-	{
-		return ((Integer)state.getValue(BlockLiquid.LEVEL));
+	public int getMetaData() {
+		return (Integer) state.getValue(BlockLiquid.LEVEL);
 	}
 }

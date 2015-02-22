@@ -8,17 +8,13 @@
  */
 package buildcraft.core;
 
-import java.util.Comparator;
 import java.util.Random;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
@@ -33,10 +29,8 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import buildcraft.api.core.EnumColor;
+import buildcraft.api.core.BuildCraftProperties;
 import buildcraft.api.events.BlockPlacedDownEvent;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.utils.Utils;
@@ -46,10 +40,10 @@ public abstract class BlockBuildCraft extends BlockContainer {
 	protected static boolean keepInventory = false;
 	protected final Random rand = new Random();
 	
-	public static final PropertyDirection FACING_PROP = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-	public static final PropertyDirection FACING_6_PROP = PropertyDirection.create("facing");
+	public static final PropertyDirection FACING_PROP = BuildCraftProperties.BLOCK_FACING;
+	public static final PropertyDirection FACING_6_PROP = BuildCraftProperties.BLOCK_FACING_6;
 
-	public static final IProperty COLOR_PROP = PropertyEnum.create("color", EnumColor.class, EnumColor.VALUES);
+	public static final PropertyEnum COLOR_PROP = BuildCraftProperties.BLOCK_COLOR;
 
 	protected final IProperty[] properties;
 
@@ -61,7 +55,7 @@ public abstract class BlockBuildCraft extends BlockContainer {
 	}
 
 	protected BlockBuildCraft(Material material, CreativeTabBuildCraft creativeTab) {
-		this(material, creativeTab, new IProperty[]{});
+		this(material, creativeTab, new IProperty[0]);
 	}
 
 	protected BlockBuildCraft(Material material, IProperty[] properties) {

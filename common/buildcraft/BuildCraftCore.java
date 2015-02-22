@@ -60,6 +60,8 @@ import buildcraft.api.core.BCLog;
 import buildcraft.api.core.BuildCraftAPI;
 import buildcraft.api.core.IWorldProperty;
 import buildcraft.api.core.JavaTools;
+import buildcraft.api.enums.EnumColor;
+import buildcraft.api.enums.EnumSpring;
 import buildcraft.api.fuels.BuildcraftFuelRegistry;
 import buildcraft.api.recipes.BuildcraftRecipeRegistry;
 import buildcraft.api.statements.IActionExternal;
@@ -286,7 +288,7 @@ public class BuildCraftCore extends BuildCraftMod {
 			modifyWorld = modifyWorldProp.getBoolean(true);
 
 			if (BuildCraftCore.modifyWorld) {
-				BlockSpring.EnumSpring.WATER.canGen = BuildCraftCore.mainConfiguration.get("worldgen", "waterSpring", true).getBoolean(true);
+				EnumSpring.WATER.canGen = BuildCraftCore.mainConfiguration.get("worldgen", "waterSpring", true).getBoolean(true);
 				springBlock = new BlockSpring().setUnlocalizedName("eternalSpring");
 				CoreProxy.proxy.registerBlock(springBlock, ItemSpring.class);
 			}
