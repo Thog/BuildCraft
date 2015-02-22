@@ -1,5 +1,5 @@
 {
-    "parent": "minecraft:block/cube_all",
+    "parent": "buildcraftcore:block/defaultcube_all",
     "textures": {
         "particle": "buildcraft:blocks/autoWorkbench_side",
         "up": "buildcraft:blocks/autoWorkbench_top",

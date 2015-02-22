@@ -1,5 +1,5 @@
 {
-    "parent": "minecraft:block/cube_all",
+    "parent": "buildcraftcore:block/defaultcube_all",
     "textures": {
         "all": "minecraft:blocks/bedrock"
     }

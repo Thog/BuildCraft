@@ -1,5 +1,5 @@
 {
-    "parent": "block/cube",
+    "parent": "buildcraftcore:block/defaultcube",
     "textures": {
         "particle": "buildcraft:blocks/builder_side",
         "down": "buildcraft:blocks/builder_side",
