@@ -8,5 +8,12 @@
         "east": "buildcraft:blocks/quarry_front",
         "south": "buildcraft:blocks/quarry_side",
         "west": "buildcraft:blocks/quarry_side"
+    },
+    "display": {
+      "gui": {
+        "rotation": [ 0, 90, 0 ],
+        "translation": [ 0, 0, 0 ],
+        "scale": [ 1, 1, 1 ]
+      }
     }
 }
