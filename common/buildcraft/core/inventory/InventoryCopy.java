@@ -72,8 +72,8 @@ public class InventoryCopy implements IInventory {
 	}
 
 	@Override
-	public String getName() {
-		return orignal.getName();
+	public String getCommandSenderName() {
+		return orignal.getCommandSenderName();
 	}
 
 	@Override

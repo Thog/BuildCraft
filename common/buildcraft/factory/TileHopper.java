@@ -146,8 +146,8 @@ public class TileHopper extends TileBuildCraft implements IInventory, IHopper {
 	}
 
 	@Override
-	public String getName() {
-		return inventory.getName();
+	public String getCommandSenderName() {
+		return inventory.getCommandSenderName();
 	}
 
 	@Override

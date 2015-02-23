@@ -174,7 +174,7 @@ public class TileIntegrationTable extends TileLaserTableBase implements IFlexibl
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "tile.integrationTableBlock.name";
 	}
 

@@ -694,7 +694,7 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "";
 	}
 

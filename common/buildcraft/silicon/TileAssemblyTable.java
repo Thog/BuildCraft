@@ -361,7 +361,7 @@ public class TileAssemblyTable extends TileLaserTableBase implements IInventory,
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "tile.assemblyTableBlock.name";
 	}
 }

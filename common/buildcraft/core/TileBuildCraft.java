@@ -224,7 +224,7 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
 
 	public IChatComponent getDisplayName() {
 		if (this instanceof IInventory) {
-			return new ChatComponentTranslation(((IInventory) this).getName());
+			return new ChatComponentTranslation(((IInventory) this).getCommandSenderName());
 		} else {
 			return null;
 		}

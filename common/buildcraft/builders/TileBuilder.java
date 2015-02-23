@@ -471,7 +471,7 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "Builder";
 	}
 

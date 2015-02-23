@@ -321,7 +321,7 @@ public class TileArchitect extends TileBuildCraft implements IInventory, IBoxPro
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "Template";
 	}
 }

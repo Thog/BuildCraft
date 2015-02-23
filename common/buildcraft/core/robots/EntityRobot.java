@@ -607,7 +607,7 @@ public class EntityRobot extends EntityRobotBase implements
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return null;
 	}
 

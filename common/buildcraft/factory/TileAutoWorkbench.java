@@ -97,7 +97,7 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "";
 	}
 

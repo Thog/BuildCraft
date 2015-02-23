@@ -29,7 +29,7 @@ public abstract class InventoryWrapper implements ISidedInventory {
 	@Override public ItemStack decrStackSize(int slotIndex, int amount) { return inventory.decrStackSize(slotIndex, amount); }
 	@Override public ItemStack getStackInSlotOnClosing(int slotIndex) { return inventory.getStackInSlotOnClosing(slotIndex); }
 	@Override public void setInventorySlotContents(int slotIndex, ItemStack itemstack) { inventory.setInventorySlotContents(slotIndex, itemstack); }
-	@Override public String getName() { return inventory.getName(); }
+	@Override public String getCommandSenderName() { return inventory.getCommandSenderName(); }
 	@Override public int getInventoryStackLimit() { return inventory.getInventoryStackLimit(); }
 	@Override public void markDirty() { inventory.markDirty(); }
 	@Override public boolean isUseableByPlayer(EntityPlayer entityplayer) { return inventory.isUseableByPlayer(entityplayer); }

@@ -162,7 +162,7 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "Filler";
 	}
 

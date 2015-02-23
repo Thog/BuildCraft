@@ -59,7 +59,7 @@ public class TileChargingTable extends TileLaserTableBase implements IHasWork {
     }
 
     @Override
-    public String getName() {
+    public String getCommandSenderName() {
         return "tile.chargingTableBlock.name";
     }
 

@@ -463,7 +463,8 @@ public class TileAdvancedCraftingTable extends TileLaserTableBase implements IIn
 		return slot < 15;
 	}
 
-	public String getName() {
+    @Override
+	public String getCommandSenderName() {
 		return "tile.assemblyWorkbenchBlock.name";
 	}
 }

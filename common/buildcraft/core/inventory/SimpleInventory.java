@@ -75,7 +75,7 @@ public class SimpleInventory implements IInventory, INBTTagable {
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return name;
 	}
 
@@ -203,6 +203,6 @@ public class SimpleInventory implements IInventory, INBTTagable {
 
 	@Override
 	public IChatComponent getDisplayName() {
-		return new ChatComponentText(getName());
+		return new ChatComponentText(getCommandSenderName());
 	}
 }

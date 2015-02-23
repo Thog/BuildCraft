@@ -410,7 +410,7 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "";
 	}
 }

@@ -89,8 +89,8 @@ public class TileRequester extends TileBuildCraft implements IInventory, IReques
 	}
 
 	@Override
-	public String getName() {
-		return inv.getName();
+	public String getCommandSenderName() {
+		return inv.getCommandSenderName();
 	}
 
 	@Override

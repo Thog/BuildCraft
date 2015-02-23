@@ -54,8 +54,8 @@ public class TileFilteredBuffer extends TileBuildCraft implements IInventory {
 	}
 
 	@Override
-	public String getName() {
-		return inventoryStorage.getName();
+	public String getCommandSenderName() {
+		return inventoryStorage.getCommandSenderName();
 	}
 
 	@Override
@@ -151,6 +151,6 @@ public class TileFilteredBuffer extends TileBuildCraft implements IInventory {
 
 	@Override
 	public IChatComponent getDisplayName() {
-		return new ChatComponentText(this.getName());
+		return new ChatComponentText(this.getCommandSenderName());
 	}
 }

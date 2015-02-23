@@ -60,7 +60,7 @@ public abstract class TileEngineWithInventory extends TileEngine implements IInv
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return "Engine";
 	}
 

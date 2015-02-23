@@ -253,7 +253,7 @@ public class TileUrbanist extends TileBuildCraft implements IInventory, IBoxesPr
 	}
 
 	@Override
-	public String getName() {
+	public String getCommandSenderName() {
 		return null;
 	}
 
