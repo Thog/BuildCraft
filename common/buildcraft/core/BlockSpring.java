@@ -11,21 +11,28 @@ package buildcraft.core;
 import java.util.List;
 import java.util.Random;
 
+import buildcraft.core.utils.IModelRegister;
+import buildcraft.core.utils.ModelHelper;
+import buildcraft.core.utils.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import buildcraft.api.core.BuildCraftProperties;
 import buildcraft.api.enums.EnumSpring;
 
-public class BlockSpring extends Block {
+public class BlockSpring extends Block implements IModelRegister{
 
 	public static final Random rand = new Random();
 	public static final PropertyEnum TYPE = BuildCraftProperties.SPRING_TYPE;
@@ -99,6 +106,14 @@ public class BlockSpring extends Block {
 		}
 		world.setBlockState(pos.up(), spring.liquidBlock.getDefaultState());
 	}
+
+	@Override
+	public void registerModels() {
+		Item item = ItemBlock.getItemFromBlock(this);
+		ModelHelper.registerItemModel(item, 0, "");
+		ModelHelper.registerItemModel(item, 1, "");
+	}
+
 
 	// TODO: 1.7.10 - Prevents updates on chunk generation
 	//@Override
