@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 import java.util.HashSet;
 import java.util.UUID;
 
+import buildcraft.core.utils.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.Minecraft;
@@ -109,17 +110,6 @@ import buildcraft.core.statements.TriggerInventory;
 import buildcraft.core.statements.TriggerInventoryLevel;
 import buildcraft.core.statements.TriggerMachine;
 import buildcraft.core.statements.TriggerRedstoneInput;
-import buildcraft.core.utils.ColorUtils;
-import buildcraft.core.utils.CraftingHandler;
-import buildcraft.core.utils.WorldPropertyIsDirt;
-import buildcraft.core.utils.WorldPropertyIsFarmland;
-import buildcraft.core.utils.WorldPropertyIsFluidSource;
-import buildcraft.core.utils.WorldPropertyIsHarvestable;
-import buildcraft.core.utils.WorldPropertyIsLeaf;
-import buildcraft.core.utils.WorldPropertyIsOre;
-import buildcraft.core.utils.WorldPropertyIsShoveled;
-import buildcraft.core.utils.WorldPropertyIsSoft;
-import buildcraft.core.utils.WorldPropertyIsWood;
 import buildcraft.energy.fuels.CoolantManager;
 import buildcraft.energy.fuels.FuelManager;
 
@@ -431,14 +421,10 @@ public class BuildCraftCore extends BuildCraftMod {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		if (event.map == Minecraft.getMinecraft().getTextureMapBlocks()) {
-			redLaserTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockRedLaser"));
-			blueLaserTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockBlueLaser"));
-			stripesLaserTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockStripesLaser"));
-			transparentTexture = event.map.registerSprite(new ResourceLocation("buildcraft:blocks/blockTransparentLaser"));
-			event.map.setTextureEntry("buildcraft:blocks/blockRedLaser", redLaserTexture);
-			event.map.setTextureEntry("buildcraft:blocks/blockBlueLaser", blueLaserTexture);
-			event.map.setTextureEntry("buildcraft:blocks/blockStripesLaser", stripesLaserTexture);
-			event.map.setTextureEntry("buildcraft:blocks/blockTransparentLaser", transparentTexture);
+			redLaserTexture = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/blockRedLaser");
+			blueLaserTexture = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/blockBlueLaser");
+			stripesLaserTexture = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/blockStripesLaser");
+			transparentTexture = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/blockTransparentLaser");
 		}
 	}
 

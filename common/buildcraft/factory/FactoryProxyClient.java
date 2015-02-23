@@ -10,6 +10,7 @@ package buildcraft.factory;
 
 import java.lang.reflect.Method;
 
+import buildcraft.core.utils.TextureMapHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
@@ -44,13 +45,9 @@ public class FactoryProxyClient extends FactoryProxy {
 	@SubscribeEvent
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		if (event.map == Minecraft.getMinecraft().getTextureMapBlocks()) {
-			pumpTexture = event.map.registerSprite(pumpResource);
-			drillTexture = event.map.registerSprite(drillResource);
-			drillHeadTexture = event.map.registerSprite(drillHeadResource);
-			event.map.setTextureEntry(pumpResource.toString(), pumpTexture);
-			event.map.setTextureEntry(drillResource.toString(), drillTexture);
-			event.map.setTextureEntry(drillHeadResource.toString(),
-					drillHeadTexture);
+			pumpTexture = TextureMapHelper.registerSprite(event.map, pumpResource);
+			drillTexture = TextureMapHelper.registerSprite(event.map, drillResource);
+			drillHeadTexture = TextureMapHelper.registerSprite(event.map, drillHeadResource);
 		}
 	}
 

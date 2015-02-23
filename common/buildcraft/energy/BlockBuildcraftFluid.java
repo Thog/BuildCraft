@@ -165,11 +165,6 @@ public class BlockBuildcraftFluid extends BlockFluidClassic {
 	}
 
 	@Override
-	public int getRenderType() {
-		return 3;
-	}
-
-	@Override
 	protected void flowIntoBlock(World world, BlockPos pos, int meta)
 	{
 		if (meta < 0) return;

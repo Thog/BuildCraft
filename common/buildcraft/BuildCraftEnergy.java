@@ -10,6 +10,10 @@ package buildcraft;
 
 import java.util.Set;
 
+import buildcraft.core.utils.TextureMapHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.block.Block;
@@ -111,6 +115,12 @@ public class BuildCraftEnergy extends BuildCraftMod {
 	private static Fluid buildcraftFluidOil;
 	private static Fluid buildcraftFluidFuel;
 	private static Fluid buildcraftFluidRedPlasma;
+	private TextureAtlasSprite oilStillSprite;
+	private TextureAtlasSprite oilFlowSprite;
+	private TextureAtlasSprite fuelStillSprite;
+	private TextureAtlasSprite fuelFlowSprite;
+	private TextureAtlasSprite redPlasmaStillSprite;
+	private TextureAtlasSprite redPlasmaFlowSprite;
 
 
 	@Mod.EventHandler
@@ -342,15 +352,28 @@ public class BuildCraftEnergy extends BuildCraftMod {
 		}
 	}
 
-	/*@SubscribeEvent
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		if (event.map == Minecraft.getMinecraft().getTextureMapBlocks()) {
+			oilStillSprite = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/oil_still");
+			oilFlowSprite = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/oil_flow");
+			fuelStillSprite = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/fuel_still");
+			fuelFlowSprite = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/fuel_flow");
+			redPlasmaStillSprite = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/redPlasma_still");
+			redPlasmaFlowSprite = TextureMapHelper.registerSprite(event.map, "buildcraft:blocks/redPlasma_flow");
+		}
+	}
+
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void textureHook(TextureStitchEvent.Post event) {
-		if (event.map.getTextureType() == 0) {
-			buildcraftFluidOil.setIcons(blockOil.getBlockTextureFromSide(1), blockOil.getBlockTextureFromSide(2));
-			buildcraftFluidFuel.setIcons(blockFuel.getBlockTextureFromSide(1), blockFuel.getBlockTextureFromSide(2));
-			buildcraftFluidRedPlasma.setIcons(blockRedPlasma.getBlockTextureFromSide(1), blockRedPlasma.getBlockTextureFromSide(2));
+		if (event.map == Minecraft.getMinecraft().getTextureMapBlocks()) {
+			buildcraftFluidOil.setIcons(oilStillSprite, oilFlowSprite);
+			buildcraftFluidFuel.setIcons(fuelStillSprite, fuelFlowSprite);
+			buildcraftFluidRedPlasma.setIcons(redPlasmaStillSprite, redPlasmaFlowSprite);
 		}
-	}*/
+	}
 
 	public static void loadRecipes() {
 		CoreProxy.proxy.addCraftingRecipe(new ItemStack(engineBlock, 1, 0),
