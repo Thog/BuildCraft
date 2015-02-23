@@ -8,7 +8,11 @@
  */
 package buildcraft.transport;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.logging.log4j.Level;
 
@@ -120,8 +124,7 @@ public class PipeTransportItems extends PipeTransport {
 			}
 
 			int numItems = 0;
-			for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-				TravelingItem travellingItem = iterator.next();
+			for (TravelingItem travellingItem : items) {
 				ItemStack stack = travellingItem.getItemStack();
 				if (stack != null && stack.stackSize > 0) {
 					numItems += stack.stackSize;
@@ -250,8 +253,7 @@ public class PipeTransportItems extends PipeTransport {
 		}
 
 		items.iterating = true;
-		for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : items) {
 			if (item.getContainer() != this.container) {
 				items.scheduleRemoval(item);
 				continue;
@@ -403,8 +405,7 @@ public class PipeTransportItems extends PipeTransport {
 
 		NBTTagList nbttaglist = new NBTTagList();
 
-		for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : items) {
 			NBTTagCompound dataTag = new NBTTagCompound();
 			nbttaglist.appendTag(dataTag);
 			item.writeToNBT(dataTag);
@@ -458,8 +459,7 @@ public class PipeTransportItems extends PipeTransport {
 
 	public int getNumberOfItems() {
 		int num = 0;
-		for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : items) {
 			if (item.getItemStack() == null) {
 				continue;
 			}
@@ -493,13 +493,11 @@ public class PipeTransportItems extends PipeTransport {
 	 * nbt and no contribution controlling them
 	 */
 	public void groupEntities() {
-		for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : items) {
 			if (item.isCorrupted()) {
 				continue;
 			}
-			for (final Iterator<TravelingItem> itOther = items.iterator(); itOther.hasNext();) {
-				TravelingItem otherItem = itOther.next();
+			for (TravelingItem otherItem : items) {
 				if (item.tryMergeInto(otherItem)) {
 					break;
 				}
@@ -511,8 +509,7 @@ public class PipeTransportItems extends PipeTransport {
 	public void dropContents() {
 		groupEntities();
 
-		for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : items) {
 			if (!item.isCorrupted()) {
 				container.pipe.dropItem(item.getItemStack());
 			}
@@ -526,8 +523,7 @@ public class PipeTransportItems extends PipeTransport {
 
 		ArrayList<ItemStack> itemsDropped = new ArrayList<ItemStack>(items.size());
 
-		for (final Iterator<TravelingItem> iterator = items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : items) {
 			if (!item.isCorrupted()) {
 				itemsDropped.add(item.getItemStack());
 			}

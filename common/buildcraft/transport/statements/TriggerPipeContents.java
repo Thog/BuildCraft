@@ -8,7 +8,6 @@
  */
 package buildcraft.transport.statements;
 
-import java.util.Iterator;
 import java.util.Locale;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -82,8 +81,7 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
 				return transportItems.items.isEmpty();
 			} else if (kind == PipeContents.containsItems) {
 				if (parameter != null && parameter.getItemStack() != null) {
-					for (final Iterator<TravelingItem> iterator = transportItems.items.iterator(); iterator.hasNext();) {
-						TravelingItem item = iterator.next();
+					for (TravelingItem item : transportItems.items) {
 						if (StackHelper.isMatchingItemOrList(parameter.getItemStack(), item.getItemStack())) {
 							return true;
 						}

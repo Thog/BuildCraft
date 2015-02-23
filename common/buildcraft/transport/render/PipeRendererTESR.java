@@ -745,8 +745,7 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 		float light = pipe.container.getWorld().getLightBrightness(pipe.container.getPos());
 
 		int count = 0;
-		for (final Iterator<TravelingItem> iterator = pipe.transport.items.iterator(); iterator.hasNext();) {
-			TravelingItem item = iterator.next();
+		for (TravelingItem item : pipe.transport.items) {
 			if (count >= MAX_ITEMS_TO_RENDER) {
 				break;
 			}
