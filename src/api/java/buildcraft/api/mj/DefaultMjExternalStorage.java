@@ -20,26 +20,33 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     }
 
     @Override
-    public double recievePower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+    public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
         EnumMjType otherType = from.getType();
         if (!otherType.givesPowerTo(type) || !type.acceptsPowerFrom(otherType)) {
             return mj;
         }
-        return storage.givePower(world, mj, simulate);
+        if (mj < 0) {// Not a way to extract power
+            return mj;
+        }
+        return storage.insertPower(world, mj, simulate);
     }
 
     @Override
-    public double takePower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
+    public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
         EnumMjType otherType = to.getType();
         if (!otherType.acceptsPowerFrom(type) || !type.givesPowerTo(otherType)) {
             return 0;
         }
-        return storage.takePower(world, minMj, maxMj, simulate);
+        if (minMj < 0 || maxMj < 0) {// Not a way to insert power
+            return 0;
+        }
+        return storage.extractPower(world, minMj, maxMj, simulate);
     }
 
     @Override
-    public double getFlow() {
+    public double getSuction() {
         double filled = storage.currentPower() / storage.maxPower();
+        filled = 1 - filled;
         return filled / getType().getFlowDivisor();
     }
 

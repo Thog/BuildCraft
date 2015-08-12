@@ -3,7 +3,11 @@ package buildcraft.api.mj;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-public class DefaultMjInternalStorage implements IMjInternalStorage {
+import buildcraft.api.core.ISerializable;
+
+import io.netty.buffer.ByteBuf;
+
+public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializable {
     // TODO (PASS 1): Tweak DefaultMjInternalStorage values to tested ones.
     public static final long MACHNE_LOSS_DELAY = 600;
     public static final double MACHINE_LOSS_RATE = 1;
@@ -42,7 +46,7 @@ public class DefaultMjInternalStorage implements IMjInternalStorage {
     }
 
     @Override
-    public double takePower(World world, double min, double max, boolean simulate) {
+    public double extractPower(World world, double min, double max, boolean simulate) {
         if (power < min) {
             return 0;
         }
@@ -57,7 +61,7 @@ public class DefaultMjInternalStorage implements IMjInternalStorage {
     }
 
     @Override
-    public double givePower(World world, double mj, boolean simulate) {
+    public double insertPower(World world, double mj, boolean simulate) {
         if (power == maxPower) {
             return mj;
         }
@@ -105,5 +109,17 @@ public class DefaultMjInternalStorage implements IMjInternalStorage {
     public void readFromNBT(NBTTagCompound nbt) {
         power = nbt.getDouble("mj");
         lastRecievedPower = nbt.getLong("lastRecievedPower");
+    }
+
+    // ISerializable
+
+    @Override
+    public void writeData(ByteBuf data) {
+        data.writeDouble(power);
+    }
+
+    @Override
+    public void readData(ByteBuf data) {
+        power = data.readDouble();
     }
 }

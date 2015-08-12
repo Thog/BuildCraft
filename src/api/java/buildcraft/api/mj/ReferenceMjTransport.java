@@ -10,15 +10,19 @@ import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-/** This particular reference implemtation is not mean to be used, rather is a base example that you can follow to
- * properly implement a machine that transports power. */
+/** This particular reference implemtation is not mean to be used, rather is an example that you can follow to properly
+ * implement a tile entity that transports power. */
 public final class ReferenceMjTransport extends TileEntity implements IMjHandler, IUpdatePlayerListBox {
-    private final IMjExternalStorage externalStorage;
-    private final IMjInternalStorage internalStorage;
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
 
     public ReferenceMjTransport() {
         // Create our storage things
         externalStorage = new DefaultMjExternalStorage(EnumMjType.TRANSPORT);
+        // Max power stored = 40MJ
+        // Minimum power required to activate = 20MJ
+        // How long to wait before losing power = 20 ticks
+        // How much power to lose when ^ is true = 1 MJ / tick
         internalStorage = new DefaultMjInternalStorage(40, 2, 20, 1);
         externalStorage.setInternalStorage(internalStorage);
     }
@@ -34,17 +38,18 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
         if (internalStorage.tick(getWorld())) {
             // Take some power (between 1 and 20, ideally the highest available power though)
             // This transport can push up to 20mj/t to all surrounding machines
-            double mj = internalStorage.takePower(getWorld(), 1, 20, false);
+            double mj = internalStorage.extractPower(getWorld(), 1, 20, false);
             double excess = transferPower(mj);
-            internalStorage.givePower(getWorld(), excess, false);
+            // Put the excess power back into the internal storage
+            internalStorage.insertPower(getWorld(), excess, false);
         }
     }
 
     private double transferPower(double mj) {
-        double thisFlow = externalStorage.getFlow();
-        double totalFlow = 0;
+        double thisSuction = externalStorage.getSuction();
+        double totalSuction = 0;
         // Setup cache maps
-        EnumMap<EnumFacing, Double> flowMap = Maps.newEnumMap(EnumFacing.class);
+        EnumMap<EnumFacing, Double> suctionMap = Maps.newEnumMap(EnumFacing.class);
         EnumMap<EnumFacing, IMjExternalStorage> storageMap = Maps.newEnumMap(EnumFacing.class);
         // Test all faces
         for (EnumFacing face : EnumFacing.values()) {
@@ -56,25 +61,30 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
             // Get the external storage
             IMjHandler handler = (IMjHandler) tile;
             IMjExternalStorage storage = handler.getMjStorage();
-            double otherFlow = storage.getFlow();
+            double otherSuction = storage.getSuction();
             // Only flow into things that require power more than we do, or if they are a machine (as they always
             // require power more than transports do)
-            if (otherFlow < thisFlow || storage.getType() == EnumMjType.MACHINE) {
-                flowMap.put(face, otherFlow);
+            if (otherSuction > thisSuction || storage.getType() == EnumMjType.MACHINE) {
+                suctionMap.put(face, otherSuction);
                 storageMap.put(face, storage);
-                totalFlow += otherFlow;
+                totalSuction += otherSuction;
             }
         }
+
+        if (suctionMap.size() == 0) {// No devices requesting power, don't bother trying
+            return mj;
+        }
+
         double overflow = 0;
 
-        for (Entry<EnumFacing, Double> entry : flowMap.entrySet()) {
+        for (Entry<EnumFacing, Double> entry : suctionMap.entrySet()) {
             EnumFacing face = entry.getKey();
-            double flow = entry.getValue();
+            double suction = entry.getValue();
             // Only transfer amounts related to how much they actually need it.
-            double balance = flow / totalFlow;
+            double balance = suction / totalSuction;
             double toGive = mj * balance;
             IMjExternalStorage storage = storageMap.get(face);
-            overflow += storage.recievePower(getWorld(), face, getMjStorage(), toGive, false);
+            overflow += storage.insertPower(getWorld(), face, getMjStorage(), toGive, false);
         }
         return overflow;
     }

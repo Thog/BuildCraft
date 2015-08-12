@@ -27,7 +27,7 @@ public final class ReferenceMjMachine extends TileEntity implements IMjHandler, 
         // Check if we should activate
         if (internalStorage.tick(getWorld())) {
             // Take some power (between 2 and 4, ideally the highest available power though)
-            double mj = internalStorage.takePower(getWorld(), 2, 4, false);
+            double mj = internalStorage.extractPower(getWorld(), 2, 4, false);
             doAThing(mj);
         }
     }

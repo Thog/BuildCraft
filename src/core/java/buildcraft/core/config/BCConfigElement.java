@@ -1,8 +1,9 @@
 package buildcraft.core.config;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
@@ -27,7 +28,7 @@ public class BCConfigElement<T> extends ConfigElement {
     @Override
     public List<IConfigElement> getChildElements() {
         if (!isProp) {
-            List<IConfigElement> elements = new ArrayList<IConfigElement>();
+            List<IConfigElement> elements = Lists.newArrayList();
             Iterator<ConfigCategory> ccI = cat.getChildren().iterator();
             Iterator<Property> pI = cat.getOrderedValues().iterator();
 
@@ -37,6 +38,7 @@ public class BCConfigElement<T> extends ConfigElement {
                     continue;
                 }
 
+                @SuppressWarnings("rawtypes")
                 ConfigElement temp = new BCConfigElement(child);
                 if (temp.showInGui()) {
                     elements.add(temp);

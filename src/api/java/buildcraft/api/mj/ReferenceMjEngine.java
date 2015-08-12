@@ -25,16 +25,16 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
     @Override
     public void update() {
         if (hasItemsToBurn()) {
-            internalStorage.givePower(getWorld(), 1, false);
+            internalStorage.insertPower(getWorld(), 1, false);
         }
         // Check if we should give out power
         if (internalStorage.tick(getWorld())) {
             // Take some power (between 2 and 4, ideally the highest available power though)
-            double mj = internalStorage.takePower(getWorld(), 10, 20, false);
+            double mj = internalStorage.extractPower(getWorld(), 10, 20, false);
             // Power the above tile
             double left = powerAbove(mj);
             // Give back how much power was not given to the above one back.
-            internalStorage.givePower(getWorld(), left, false);
+            internalStorage.insertPower(getWorld(), left, false);
         }
     }
 
@@ -57,7 +57,7 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
             // Get the external storage we can try to give power to
             IMjExternalStorage storage = handler.getMjStorage();
             // Try and give it power
-            double leftover = storage.recievePower(getWorld(), EnumFacing.UP, getMjStorage(), mj, false);
+            double leftover = storage.insertPower(getWorld(), EnumFacing.UP, getMjStorage(), mj, false);
             // Return whatever was leftover back
             return leftover;
         }

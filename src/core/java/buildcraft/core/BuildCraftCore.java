@@ -88,7 +88,6 @@ import buildcraft.core.config.BuildCraftConfiguration;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.crops.CropHandlerPlantable;
 import buildcraft.core.crops.CropHandlerReeds;
-import buildcraft.core.item.ItemDebugger;
 import buildcraft.core.item.ItemList;
 import buildcraft.core.item.ItemMapLocation;
 import buildcraft.core.item.ItemPaintbrush;
@@ -166,7 +165,6 @@ public class BuildCraftCore extends BuildCraftMod {
     public static Item diamondGearItem;
     public static Item wrenchItem;
     public static Item mapLocationItem;
-    public static Item debuggerItem;
     public static ItemPaintbrush paintbrushItem;
     public static ItemList listItem;
     public static ItemTablet tabletItem;
@@ -281,9 +279,6 @@ public class BuildCraftCore extends BuildCraftMod {
 
             listItem = (ItemList) ((new ItemList()).setUnlocalizedName("list"));
             CoreProxy.proxy.registerItem(listItem);
-
-            debuggerItem = (ItemDebugger) ((new ItemDebugger())).setUnlocalizedName("debugger");
-            CoreProxy.proxy.registerItem(debuggerItem);
 
             if (BuildCraftCore.modifyWorld) {
                 EnumSpring.WATER.canGen = BuildCraftCore.mainConfigManager.get("worldgen.generateWaterSprings").getBoolean();

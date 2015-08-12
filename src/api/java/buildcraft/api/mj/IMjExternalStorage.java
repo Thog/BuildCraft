@@ -3,20 +3,14 @@ package buildcraft.api.mj;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/** Use this store an */
+/** Use this as a wrapper around the actual storage device: it should defer to an instance of IMjInternalStorage for the
+ * logic of power, but implement all of the checks necessary to make sure that the caller is allowed to take power (It
+ * should check sides, and make sure that the caller is of the correct type- so that an engine is not trying to take
+ * power from it. */
 public interface IMjExternalStorage {
     /** @return The type of this storage device. Depending on what it is, different actions will be taken when accepting
-     *         power and receiving power. Can never be null. */
+     *         power and receiving power. Should never return null. */
     EnumMjType getType();
-
-    /** @param flowDirection The direction that the power should flow (If you are pulling from an engine below, this
-     *            would be EnumFacing.UP). If you don't know which direction it is, it is safe to pass null.
-     * @param from
-     * @param mj
-     * @param simulate
-     * @return The overflow power that could not be inserted into storage. Will equal <code>mj</code> if this storage is
-     *         full, or cannot recieve power from that direction. */
-    double recievePower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate);
 
     /** @param flowDirection The direction that the power should flow (If you are pulling from an engine below, this
      *            would be EnumFacing.UP). If you don't know which direction it is, it is safe to pass null.
@@ -27,15 +21,25 @@ public interface IMjExternalStorage {
      * @param simulate If true, nothing internally will be changed, but it will pretend that power was take from it (You
      *            can use this to test if it has enough power)
      * @return The amount of Mj that was removed from storage. */
-    double takePower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate);
+    double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate);
 
-    /** @return The amount of power that is "pushing out" of this device, or that is resisting power flowing into this
-     *         device. The default implementation returns values between 0 and 1. This should never return values less
-     *         than 0. */
-    double getFlow();
+    /** @param flowDirection The direction that the power should flow (If you are pulling from an engine below, this
+     *            would be EnumFacing.UP). If you don't know which direction it is, it is safe to pass null.
+     * @param from
+     * @param mj
+     * @param simulate
+     * @return The overflow power that could not be inserted into storage. Will equal <code>mj</code> if this storage is
+     *         full, or cannot receive power from that direction. */
+    double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate);
+
+    /** @return The amount of power that is "pulling in" to this device, or that is sucking power into this device. The
+     *         default implementation returns values between 0 and 1. This should never return values less than 0.
+     *         Higher values mean more suction, lower values mean less suction */
+    double getSuction();
 
     /** This should be called before any other methods are called, as they all usually rely on this object. This is only
-     * mean to be called during initialisation of the tile entity anyway.
+     * mean to be called during initialisation of the tile entity. Specifically, this is for an external implementation
+     * (Usually DefaultMjExternalStorage) to use a separate class for storing power. (Usually DefaultMjInternalStorage)
      * 
      * @param storage The storage to set. If a storage has already been set (usually by the tile entity that created
      *            this) it will throw an IllegalArgumentException. */

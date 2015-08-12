@@ -18,13 +18,13 @@ public interface IMjInternalStorage {
      * @param simulate If true, then only pretend you took power from this device (essentially this will run without
      *            side effects)
      * @return The amount of power taken from storage. */
-    double takePower(World world, double min, double max, boolean simulate);
+    double extractPower(World world, double min, double max, boolean simulate);
 
     /** @param mj The amount of MJ to give to this device
      * @param simulate If true, then only pretend you gave this device any power (essentially this will run without side
      *            effects)
      * @return The amount of overflow power that this device could not accept */
-    double givePower(World world, double mj, boolean simulate);
+    double insertPower(World world, double mj, boolean simulate);
 
     /** This should be called every tick from the tile entity.
      * 
