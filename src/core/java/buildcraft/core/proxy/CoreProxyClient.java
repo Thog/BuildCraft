@@ -97,7 +97,6 @@ public class CoreProxyClient extends CoreProxy {
     public void initializeEntityRendering() {
         RenderingRegistry.registerEntityRenderingHandler(EntityResizableCuboid.class, RenderResizableCuboid.INSTANCE);
         RenderingRegistry.registerEntityRenderingHandler(EntityLaser.class, new RenderLaser());
-        EnumColor.registerIcons();
 
         for (Block block : blocksToRegisterRenderersFor) {
             if (block instanceof IModelRegister) {

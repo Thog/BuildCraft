@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IInvSlot;
@@ -90,7 +91,7 @@ public class TilePackager extends TileBuildCraft implements ISidedInventory {
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             return;
         }
@@ -349,15 +350,13 @@ public class TilePackager extends TileBuildCraft implements ISidedInventory {
         for (int i = 0; i < 9; i++) {
             if (isPatternSlotSet(i)) {
                 if (requirements[i] == null) {
-                    BCLog.logger.error("(Recipe Packager) At " + xCoord + ", " + yCoord + ", " + zCoord + " requirement " + i
-                        + " was null! THIS SHOULD NOT HAPPEN!");
+                    BCLog.logger.error("(Recipe Packager) At " + getPos() + " requirement " + i + " was null! THIS SHOULD NOT HAPPEN!");
                     broken = true;
                     continue;
                 }
                 ItemStack usedStack = requirements[i].decrStackSize(1);
                 if (usedStack == null) {
-                    BCLog.logger.error("(Recipe Packager) At " + xCoord + ", " + yCoord + ", " + zCoord + " stack at slot " + i
-                        + " was too small! THIS SHOULD NOT HAPPEN!");
+                    BCLog.logger.error("(Recipe Packager) At " + getPos() + " stack at slot " + i + " was too small! THIS SHOULD NOT HAPPEN!");
                     broken = true;
                     continue;
                 }
@@ -438,7 +437,7 @@ public class TilePackager extends TileBuildCraft implements ISidedInventory {
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return false;
     }
 
@@ -453,13 +452,13 @@ public class TilePackager extends TileBuildCraft implements ISidedInventory {
     }
 
     @Override
-    public void openInventory() {
-        visibleInventory.openInventory();
+    public void openInventory(EntityPlayer player) {
+        visibleInventory.openInventory(player);
     }
 
     @Override
-    public void closeInventory() {
-        visibleInventory.closeInventory();
+    public void closeInventory(EntityPlayer player) {
+        visibleInventory.closeInventory(player);
     }
 
     @Override
@@ -471,13 +470,13 @@ public class TilePackager extends TileBuildCraft implements ISidedInventory {
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
+    public int[] getSlotsForFace(EnumFacing face) {
         return SLOTS;
     }
 
     @Override
-    public boolean canInsertItem(int slot, ItemStack stack, int side) {
-        if (side >= 2) {
+    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing face) {
+        if (face.getAxis() != Axis.Y) {
             if (slot >= 9) {
                 return false;
             }
@@ -504,7 +503,7 @@ public class TilePackager extends TileBuildCraft implements ISidedInventory {
     }
 
     @Override
-    public boolean canExtractItem(int slot, ItemStack stack, int side) {
+    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing face) {
         return slot == 11;
     }
 }

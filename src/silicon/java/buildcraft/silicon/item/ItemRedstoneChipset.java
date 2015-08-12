@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -59,10 +58,10 @@ public class ItemRedstoneChipset extends ItemBuildCraft {
         setMaxDamage(0);
     }
 
-    @Override
-    public TextureAtlasSprite getIconFromDamage(int damage) {
-        return Chipset.fromOrdinal(damage).icon;
-    }
+    // @Override
+    // public TextureAtlasSprite getIconFromDamage(int damage) {
+    // return Chipset.fromOrdinal(damage).icon;
+    // }
 
     @Override
     public String getUnlocalizedName(ItemStack stack) {
@@ -78,17 +77,17 @@ public class ItemRedstoneChipset extends ItemBuildCraft {
         }
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(TextureAtlasSpriteRegister par1IconRegister) {
-        for (Chipset chipset : Chipset.VALUES) {
-            chipset.icon = par1IconRegister.registerIcon("buildcraftsilicon:chipset/" + chipset.getChipsetName());
-        }
-    }
+    // @Override
+    // @SideOnly(Side.CLIENT)
+    // public void registerIcons(TextureAtlasSpriteRegister par1IconRegister) {
+    // for (Chipset chipset : Chipset.VALUES) {
+    // chipset.icon = par1IconRegister.registerIcon("buildcraftsilicon:chipset/" + chipset.getChipsetName());
+    // }
+    // }
 
-    public void registerItemStacks() {
-        for (Chipset chipset : Chipset.VALUES) {
-            GameRegistry.registerCustomItemStack(chipset.getChipsetName(), chipset.getStack());
-        }
-    }
+    // public void registerItemStacks() {
+    // for (Chipset chipset : Chipset.VALUES) {
+    // GameRegistry.registerCustomItemStack(chipset.getChipsetName(), chipset.getStack());
+    // }
+    // }
 }

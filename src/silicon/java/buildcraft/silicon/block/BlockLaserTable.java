@@ -7,21 +7,23 @@ package buildcraft.silicon.block;
 import java.util.List;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import buildcraft.api.enums.EnumLaserTableType;
 import buildcraft.api.power.ILaserTargetBlock;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.silicon.BuildCraftSilicon;
-import buildcraft.silicon.SiliconProxy;
 import buildcraft.silicon.tile.TileAdvancedCraftingTable;
 import buildcraft.silicon.tile.TileAssemblyTable;
 import buildcraft.silicon.tile.TileChargingTable;
@@ -30,16 +32,14 @@ import buildcraft.silicon.tile.TileProgrammingTable;
 import buildcraft.silicon.tile.TileStampingTable;
 
 public class BlockLaserTable extends BlockBuildCraft implements ILaserTargetBlock {
-    protected static final int TABLE_MAX = 6;
+    public static final int TABLE_MAX = 6;
 
     public BlockLaserTable() {
-        super(Material.iron);
+        super(Material.iron, LASER_TABLE_TYPE);
 
         setBlockBounds(0, 0, 0, 1, 8F / 16F, 1);
         setHardness(10F);
         setCreativeTab(BCCreativeTab.get("main"));
-        setPassCount(2);
-        setAlphaPass(true);
     }
 
     @Override
@@ -48,18 +48,9 @@ public class BlockLaserTable extends BlockBuildCraft implements ILaserTargetBloc
     }
 
     @Override
-    public boolean renderAsNormalBlock() {
-        return false;
-    }
-
-    @Override
-    public int getRenderType() {
-        return SiliconProxy.laserTableModel;
-    }
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer entityplayer, int par6, float par7, float par8, float par9) {
-        if (super.onBlockActivated(world, pos, entityplayer, par6, par7, par8, par9)) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer entityplayer, EnumFacing side, float par7, float par8,
+            float par9) {
+        if (super.onBlockActivated(world, pos, state, entityplayer, side, par7, par8, par9)) {
             return true;
         }
 
@@ -69,26 +60,27 @@ public class BlockLaserTable extends BlockBuildCraft implements ILaserTargetBloc
         }
 
         if (!world.isRemote) {
-            int meta = world.getBlockMetadata(pos);
-            entityplayer.openGui(BuildCraftSilicon.instance, meta, world, pos);
+            int ord = LASER_TABLE_TYPE.getValue(state).ordinal();
+            entityplayer.openGui(BuildCraftSilicon.instance, ord, world, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
     }
 
     @Override
-    public TileEntity createTileEntity(World world, int metadata) {
-        switch (metadata) {
-            case 0:
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        EnumLaserTableType tableType = LASER_TABLE_TYPE.getValue(state);
+        switch (tableType) {
+            case ASSEMBLY_TABLE:
                 return new TileAssemblyTable();
-            case 1:
+            case ADVANCED_CRAFTING_TABLE:
                 return new TileAdvancedCraftingTable();
-            case 2:
+            case INTEGRATION_TABLE:
                 return new TileIntegrationTable();
-            case 3:
+            case CHARGING_TABLE:
                 return new TileChargingTable();
-            case 4:
+            case PROGRAMMING_TABLE:
                 return new TileProgrammingTable();
-            case 5:
+            case STAMPING_TABLE:
                 return new TileStampingTable();
         }
         return null;
@@ -100,8 +92,8 @@ public class BlockLaserTable extends BlockBuildCraft implements ILaserTargetBloc
     }
 
     @Override
-    public int damageDropped(int par1) {
-        return par1;
+    public int damageDropped(IBlockState state) {
+        return LASER_TABLE_TYPE.getValue(state).ordinal();
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -113,10 +105,12 @@ public class BlockLaserTable extends BlockBuildCraft implements ILaserTargetBloc
         }
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public String[] getIconBlockNames() {
-        return new String[] { "BuildCraft|Silicon:assemblyTable", "BuildCraft|Silicon:advancedCraftingTable", "BuildCraft|Silicon:integrationTable",
-            "BuildCraft|Silicon:chargingTable", "BuildCraft|Silicon:programmingTable", "BuildCraft|Silicon:stampingTable" };
-    }
+    // @Override
+    // @SideOnly(Side.CLIENT)
+    // public String[] getIconBlockNames() {
+    // return new String[] { "BuildCraft|Silicon:assemblyTable", "BuildCraft|Silicon:advancedCraftingTable",
+    // "BuildCraft|Silicon:integrationTable",
+    // "BuildCraft|Silicon:chargingTable", "BuildCraft|Silicon:programmingTable", "BuildCraft|Silicon:stampingTable" };
+    // }
+    // TODO (PASS 0): Give the laser table a block model
 }

@@ -37,8 +37,8 @@ public class TileIntegrationTable extends TileLaserTableBase {
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
 
         if (worldObj.isRemote) {
             return;
@@ -202,7 +202,7 @@ public class TileIntegrationTable extends TileLaserTableBase {
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return false;
     }
 

@@ -50,7 +50,7 @@ class UrbanistToolFiller extends UrbanistToolArea {
 
         @SideOnly(Side.CLIENT)
         @Override
-        public TextureAtlasSprite getIcon() {
+        public TextureAtlasSprite getSprite() {
             if (index < patterns.size()) {
                 return getPattern().getGuiSprite();
             } else {

@@ -10,7 +10,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.recipes.BuildcraftRecipeRegistry;
@@ -40,13 +40,12 @@ public class TileProgrammingTable extends TileLaserTableBase implements IInvento
     }
 
     @Override
-    public boolean canUpdate() {
-        return !FMLCommonHandler.instance().getEffectiveSide().isClient();
-    }
+    public void update() {
+        super.update();
 
-    @Override
-    public void updateEntity() { // WARNING: run only server-side, see canUpdate()
-        super.updateEntity();
+        if (worldObj.isRemote) {
+            return;
+        }
 
         if (queuedNetworkUpdate) {
             sendNetworkUpdate();
@@ -70,11 +69,11 @@ public class TileProgrammingTable extends TileLaserTableBase implements IInvento
                     this.decrStackSize(0, remaining.stackSize);
 
                     if (remaining.stackSize > 0) {
-                        remaining.stackSize -= Utils.addToRandomInventoryAround(worldObj, xCoord, yCoord, zCoord, remaining);
+                        remaining.stackSize -= Utils.addToRandomInventoryAround(worldObj, getPos(), remaining);
                     }
 
                     if (remaining.stackSize > 0) {
-                        remaining.stackSize -= Utils.addToRandomInjectableAround(worldObj, xCoord, yCoord, zCoord, null, remaining);
+                        remaining.stackSize -= Utils.addToRandomInjectableAround(worldObj, getPos(), null, remaining);
                     }
 
                     if (remaining.stackSize > 0) {
@@ -220,22 +219,22 @@ public class TileProgrammingTable extends TileLaserTableBase implements IInvento
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return false;
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
+    public int[] getSlotsForFace(EnumFacing face) {
         return new int[] { 0, 1 };
     }
 
     @Override
-    public boolean canInsertItem(int slot, ItemStack stack, int side) {
+    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
         return slot == 0;
     }
 
     @Override
-    public boolean canExtractItem(int slot, ItemStack stack, int side) {
+    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
         return slot == 1;
     }
 }

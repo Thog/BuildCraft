@@ -10,8 +10,8 @@ import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.lib.gui.ContainerDummy;
@@ -39,18 +39,17 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
     private SlotCrafting craftSlot;
     private final LocalInventoryCrafting crafting = new LocalInventoryCrafting();
 
-    @Override
-    public boolean canUpdate() {
-        return !FMLCommonHandler.instance().getEffectiveSide().isClient();
-    }
-
     public WeakReference<EntityPlayer> getInternalPlayer() {
-        return CoreProxy.proxy.getBuildCraftPlayer((WorldServer) worldObj, xCoord, yCoord + 1, zCoord);
+        return CoreProxy.proxy.getBuildCraftPlayer((WorldServer) worldObj, getPos().up());
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
+
+        if (worldObj.isRemote) {
+            return;
+        }
 
         if (getEnergy() >= getRequiredEnergy()) {
             ItemStack input = this.getStackInSlot(0);
@@ -124,11 +123,11 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
                     }
 
                     if (output.stackSize > 0) {
-                        output.stackSize -= Utils.addToRandomInventoryAround(worldObj, xCoord, yCoord, zCoord, output);
+                        output.stackSize -= Utils.addToRandomInventoryAround(worldObj, getPos(), output);
                     }
 
                     if (output.stackSize > 0) {
-                        InvUtils.dropItems(worldObj, output, xCoord, yCoord + 1, zCoord);
+                        InvUtils.dropItems(worldObj, output, getPos().up());
                     }
 
                     playerInv.setInventorySlotContents(i, null);
@@ -185,7 +184,7 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return false;
     }
 
@@ -195,17 +194,17 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
+    public int[] getSlotsForFace(EnumFacing face) {
         return SLOTS;
     }
 
     @Override
-    public boolean canInsertItem(int slot, ItemStack stack, int side) {
+    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
         return slot == 0;
     }
 
     @Override
-    public boolean canExtractItem(int slot, ItemStack stack, int side) {
+    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
         return slot >= 1;
     }
 }

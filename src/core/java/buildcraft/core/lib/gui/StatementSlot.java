@@ -32,7 +32,7 @@ public abstract class StatementSlot extends AdvancedSlot {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public TextureAtlasSprite getIcon() {
+    public TextureAtlasSprite getSprite() {
         IStatement stmt = getStatement();
 
         // if (stmt != null) {

@@ -1,7 +1,7 @@
 package buildcraft.silicon.tile;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import cofh.api.energy.IEnergyContainerItem;
 
@@ -10,14 +10,12 @@ import buildcraft.core.lib.utils.StringUtils;
 
 public class TileChargingTable extends TileLaserTableBase implements IHasWork {
     @Override
-    public boolean canUpdate() {
-        return !FMLCommonHandler.instance().getEffectiveSide().isClient();
-    }
+    public void update() {
+        super.update();
 
-    // WARNING: run only server-side, see canUpdate()!
-    @Override
-    public void updateEntity() {
-        super.updateEntity();
+        if (worldObj.isRemote) {
+            return;
+        }
 
         if (getEnergy() > 0) {
             if (getRequiredEnergy() > 0) {
@@ -63,7 +61,7 @@ public class TileChargingTable extends TileLaserTableBase implements IHasWork {
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return false;
     }
 
@@ -71,4 +69,10 @@ public class TileChargingTable extends TileLaserTableBase implements IHasWork {
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         return slot == 0 && stack != null && stack.getItem() != null && stack.getItem() instanceof IEnergyContainerItem;
     }
+
+    @Override
+    public void openInventory(EntityPlayer player) {}
+
+    @Override
+    public void closeInventory(EntityPlayer player) {}
 }

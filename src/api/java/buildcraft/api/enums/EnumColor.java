@@ -7,13 +7,12 @@ package buildcraft.api.enums;
 import java.util.Locale;
 import java.util.Random;
 
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import buildcraft.api.core.SheetIcon;
 
 public enum EnumColor implements IStringSerializable {
 
@@ -48,7 +47,7 @@ public enum EnumColor implements IStringSerializable {
     private static ResourceLocation iconSheet;
 
     @SideOnly(Side.CLIENT)
-    private static SheetIcon[] brushIcons;
+    private static TextureAtlasSprite[] brushSprites;
 
     public int getDarkHex() {
         return DARK_HEX[ordinal()];
@@ -134,23 +133,12 @@ public enum EnumColor implements IStringSerializable {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void registerIcons() {
-        brushIcons = new SheetIcon[16];
-        for (EnumColor c : values()) {
-            brushIcons[c.ordinal()] = new SheetIcon(getIconSheet(), c.ordinal() * 16, 0);
-        }
+    public static void registerSprites(TextureAtlasSprite[] sprites) {
+        brushSprites = sprites;
     }
 
     @SideOnly(Side.CLIENT)
-    public SheetIcon getIcon() {
-        return brushIcons[ordinal()];
-    }
-
-    @SideOnly(Side.CLIENT)
-    private static ResourceLocation getIconSheet() {
-        if (iconSheet == null) {
-            iconSheet = new ResourceLocation("buildcraft", "textures/gui/sheet_brushes.png");
-        }
-        return iconSheet;
+    public TextureAtlasSprite getSprite() {
+        return brushSprites[ordinal()];
     }
 }

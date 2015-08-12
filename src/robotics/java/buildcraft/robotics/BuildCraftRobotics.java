@@ -66,7 +66,7 @@ import buildcraft.silicon.BuildCraftSilicon;
 import buildcraft.silicon.item.ItemRedstoneChipset;
 
 @Mod(name = "BuildCraft Robotics", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Robotics",
-        dependencies = DefaultProps.DEPENDENCY_TRANSPORT)
+        dependencies = DefaultProps.DEPENDENCY_SILICON_TRANSPORT)
 public class BuildCraftRobotics extends BuildCraftMod {
     @Mod.Instance("BuildCraft|Robotics")
     public static BuildCraftRobotics instance;

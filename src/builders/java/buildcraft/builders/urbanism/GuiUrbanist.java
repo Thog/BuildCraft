@@ -41,7 +41,7 @@ public class GuiUrbanist extends GuiAdvancedInterface {
 
         @SideOnly(Side.CLIENT)
         @Override
-        public TextureAtlasSprite getIcon() {
+        public TextureAtlasSprite getSprite() {
             return tool.getIcon();
         }
 

@@ -43,7 +43,7 @@ public class PacketHandlerSilicon extends PacketHandler {
     }
 
     private TileAdvancedCraftingTable getAdvancedWorkbench(World world, BlockPos pos) {
-        if (!world.blockExists(pos)) {
+        if (world.isAirBlock(pos)) {
             return null;
         }
 
@@ -56,7 +56,7 @@ public class PacketHandlerSilicon extends PacketHandler {
     }
 
     private void onAdvancedWorkbenchSet(EntityPlayer player, PacketSlotChange packet1) {
-        TileAdvancedCraftingTable tile = getAdvancedWorkbench(player.worldObj, packet1.posX, packet1.posY, packet1.posZ);
+        TileAdvancedCraftingTable tile = getAdvancedWorkbench(player.worldObj, packet1.pos);
         if (tile == null) {
             return;
         }

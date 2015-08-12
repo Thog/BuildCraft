@@ -88,7 +88,7 @@ ext.moduleDependencies = [
                                 "factory": ["api", "core"],
                                 "transport": ["api", "core"],
                                 "silicon": ["api", "core"],
-                                "robotics": ["api", "core", "transport"]
+                                "robotics": ["api", "core", "silicon", "transport"]
                         ]
 
 println "modules:"

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import com.google.common.collect.Lists;
@@ -22,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -32,6 +34,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -659,6 +662,12 @@ public class BuildCraftCore extends BuildCraftMod {
     @SideOnly(Side.CLIENT)
     public void loadTextures(TextureStitchEvent.Post evt) {
         FluidRenderer.initFluidTextures(evt.map);
+        TextureAtlasSprite[] array = new TextureAtlasSprite[16];
+        for (EnumColor color : EnumColor.values()) {
+            array[color.ordinal()] = evt.map.registerSprite(new ResourceLocation("buildcraftcore:textures/items/paintbrush/" + color.getName()
+                    .toLowerCase(Locale.ENGLISH)));
+        }
+        EnumColor.registerSprites(array);
     }
 
     @SubscribeEvent

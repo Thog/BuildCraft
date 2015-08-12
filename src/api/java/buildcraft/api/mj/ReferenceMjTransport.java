@@ -18,7 +18,7 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
 
     public ReferenceMjTransport() {
         // Create our storage things
-        externalStorage = new DefaultMjExternalStorage(EnumMjType.TRANSPORT);
+        externalStorage = new DefaultMjExternalStorage(EnumMjType.TRANSPORT, 20);
         // Max power stored = 40MJ
         // Minimum power required to activate = 20MJ
         // How long to wait before losing power = 20 ticks

@@ -5,13 +5,15 @@ import net.minecraft.world.World;
 
 public class DefaultMjExternalStorage implements IMjExternalStorage {
     private IMjInternalStorage storage = null;
+    private final double maxPowerTransfered;
     private final EnumMjType type;
 
-    public DefaultMjExternalStorage(EnumMjType type) {
+    public DefaultMjExternalStorage(EnumMjType type, double maxPowerTransfered) {
         this.type = type;
         if (type == null) {
             throw new IllegalArgumentException("You must specify which type this is!");
         }
+        this.maxPowerTransfered = maxPowerTransfered;
     }
 
     @Override
@@ -28,7 +30,13 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
         if (mj < 0) {// Not a way to extract power
             return mj;
         }
-        return storage.insertPower(world, mj, simulate);
+        if (mj <= maxPowerTransfered) {
+            return storage.insertPower(world, mj, simulate);
+        } else {
+            double excess = storage.insertPower(world, maxPowerTransfered, simulate);
+            excess += maxPowerTransfered - mj;
+            return excess;
+        }
     }
 
     @Override
@@ -39,6 +47,12 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
         }
         if (minMj < 0 || maxMj < 0) {// Not a way to insert power
             return 0;
+        }
+        if (maxMj > maxPowerTransfered) {
+            maxMj = maxPowerTransfered;
+        }
+        if (minMj > maxPowerTransfered) {
+            minMj = maxPowerTransfered;
         }
         return storage.extractPower(world, minMj, maxMj, simulate);
     }

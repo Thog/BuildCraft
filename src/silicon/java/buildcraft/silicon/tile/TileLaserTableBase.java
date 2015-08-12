@@ -26,8 +26,8 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
     private Average recentEnergyAverageUtil = new Average(20);
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
         recentEnergyAverageUtil.tick();
     }
 
@@ -82,21 +82,6 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
     }
 
     @Override
-    public double getXCoord() {
-        return xCoord;
-    }
-
-    @Override
-    public double getYCoord() {
-        return yCoord;
-    }
-
-    @Override
-    public double getZCoord() {
-        return zCoord;
-    }
-
-    @Override
     public ItemStack getStackInSlot(int slot) {
         return inv.getStackInSlot(slot);
     }
@@ -123,14 +108,14 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer player) {
-        return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && !isInvalid();
+        return worldObj.getTileEntity(getPos()) == this && !isInvalid();
     }
 
     @Override
-    public void openInventory() {}
+    public void openInventory(EntityPlayer player) {}
 
     @Override
-    public void closeInventory() {}
+    public void closeInventory(EntityPlayer player) {}
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {

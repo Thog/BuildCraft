@@ -51,7 +51,7 @@ public abstract class AdvancedSlot {
         }
     }
 
-    public TextureAtlasSprite getIcon() {
+    public TextureAtlasSprite getSprite() {
         return null;
     }
 
@@ -81,7 +81,7 @@ public abstract class AdvancedSlot {
 
         if (getItemStack() != null) {
             drawStack(getItemStack());
-        } else if (getIcon() != null) {
+        } else if (getSprite() != null) {
             mc.renderEngine.bindTexture(getTexture());
             // System.out.printf("Drawing advanced sprite %s (%d,%d) at %d %d\n", getIcon().getIconName(),
             // getIcon().getOriginX(),getIcon().getOriginY(),cornerX + x, cornerY + y);
@@ -90,7 +90,7 @@ public abstract class AdvancedSlot {
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             GL11.glEnable(GL11.GL_BLEND);
 
-            gui.drawTexturedModalRect(cornerX + x, cornerY + y, getIcon(), 16, 16);
+            gui.drawTexturedModalRect(cornerX + x, cornerY + y, getSprite(), 16, 16);
 
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_ALPHA_TEST);

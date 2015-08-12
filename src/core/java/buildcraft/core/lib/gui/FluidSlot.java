@@ -31,7 +31,7 @@ public class FluidSlot extends AdvancedSlot {
     }
 
     @Override
-    public TextureAtlasSprite getIcon() {
+    public TextureAtlasSprite getSprite() {
         return FluidRenderer.getFluidTexture(fluid, false);
     }
 

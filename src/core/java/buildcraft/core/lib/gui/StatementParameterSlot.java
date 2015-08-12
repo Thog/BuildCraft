@@ -48,7 +48,7 @@ public abstract class StatementParameterSlot extends AdvancedSlot {
     }
 
     @Override
-    public TextureAtlasSprite getIcon() {
+    public TextureAtlasSprite getSprite() {
         IStatementParameter parameter = getParameter();
 
         if (parameter != null) {

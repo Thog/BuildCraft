@@ -10,7 +10,9 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 
@@ -25,6 +27,7 @@ import buildcraft.core.LaserData;
 import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.utils.BlockUtils;
+import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
@@ -58,14 +61,14 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         }
 
         laser.isVisible = false;
-        laser.head = new Vec3(xCoord, yCoord, zCoord);
-        laser.tail = new Vec3(xCoord, yCoord, zCoord);
+        laser.head = Utils.convertMiddle(getPos());
+        laser.tail = Utils.convertMiddle(getPos());
         laser.isGlowing = true;
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
 
         laser.iterateTexture();
 
@@ -141,60 +144,30 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     protected void findTable() {
         int meta = getBlockMetadata();
 
-        int minX = xCoord - 5;
-        int minY = yCoord - 5;
-        int minZ = zCoord - 5;
-        int maxX = xCoord + 5;
-        int maxY = yCoord + 5;
-        int maxZ = zCoord + 5;
+        BlockPos min = getPos().add(-5, -5, -5);
+        BlockPos max = getPos().add(5, 5, 5);
 
-        switch (EnumFacing.getFront(meta)) {
-            case WEST:
-                maxX = xCoord;
-                break;
-            case EAST:
-                minX = xCoord;
-                break;
-            case DOWN:
-                maxY = yCoord;
-                break;
-            case UP:
-                minY = yCoord;
-                break;
-            case NORTH:
-                maxZ = zCoord;
-                break;
-            default:
-            case SOUTH:
-                minZ = zCoord;
-                break;
+        EnumFacing facing = EnumFacing.getFront(meta);
+        if (facing.getAxisDirection() == AxisDirection.NEGATIVE) {
+            max = max.offset(facing, 5);
+        } else {
+            min = min.offset(facing, -5);
         }
 
         List<ILaserTarget> targets = new LinkedList<ILaserTarget>();
 
-        if (minY < 0) {
-            minY = 0;
-        }
-        if (maxY > 255) {
-            maxY = 255;
-        }
+        for (BlockPos pos : (Iterable<BlockPos>) BlockPos.getAllInBox(min, max)) {
+            if (BlockUtils.getBlock(worldObj, pos) instanceof ILaserTargetBlock) {
+                TileEntity tile = worldObj.getTileEntity(pos);
+                if (tile instanceof ILaserTarget) {
+                    ILaserTarget table = (ILaserTarget) tile;
 
-        for (int y = minY; y <= maxY; ++y) {
-            for (int x = minX; x <= maxX; ++x) {
-                for (int z = minZ; z <= maxZ; ++z) {
-                    if (BlockUtils.getBlock(worldObj, pos) instanceof ILaserTargetBlock) {
-                        TileEntity tile = BlockUtils.getTileEntity(worldObj, pos);
-
-                        if (tile instanceof ILaserTarget) {
-                            ILaserTarget table = (ILaserTarget) tile;
-
-                            if (table.requiresLaserEnergy()) {
-                                targets.add(table);
-                            }
-                        }
+                    if (table.requiresLaserEnergy()) {
+                        targets.add(table);
                     }
                 }
             }
@@ -235,9 +208,10 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
                 break;
         }
 
-        Vec3 head = new Vec3(xCoord + 0.5 + px, yCoord + 0.5 + py, zCoord + 0.5 + pz);
-        Vec3 tail = new Vec3(laserTarget.getXCoord() + 0.475 + (worldObj.rand.nextFloat() - 0.5) / 5F, laserTarget.getYCoord() + 9F / 16F, laserTarget
-                .getZCoord() + 0.475 + (worldObj.rand.nextFloat() - 0.5) / 5F);
+        Vec3 head = Utils.convertMiddle(getPos()).addVector(px, py, pz);
+
+        Vec3 tail = Utils.convert(laserTarget.getPos()).addVector(0.475 + (worldObj.rand.nextDouble() - 0.5) / 5d, 9 / 16d, 0.475 + (worldObj.rand
+                .nextDouble() - 0.5) / 5d);
 
         laser.head = head;
         laser.tail = tail;
@@ -315,13 +289,13 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         double avg = powerAverage / POWER_AVERAGING;
 
         if (avg <= 10.0) {
-            return EntityLaser.LASER_TEXTURES[0];
+            return EntityLaser.LASER_RED;
         } else if (avg <= 20.0) {
-            return EntityLaser.LASER_TEXTURES[1];
+            return EntityLaser.LASER_YELLOW;
         } else if (avg <= 30.0) {
-            return EntityLaser.LASER_TEXTURES[2];
+            return EntityLaser.LASER_GREEN;
         } else {
-            return EntityLaser.LASER_TEXTURES[3];
+            return EntityLaser.LASER_BLUE;
         }
     }
 

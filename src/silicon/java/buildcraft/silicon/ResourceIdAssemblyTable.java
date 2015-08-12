@@ -16,7 +16,7 @@ public class ResourceIdAssemblyTable extends ResourceId {
     }
 
     public ResourceIdAssemblyTable(TileAssemblyTable tile) {
-        pos = new BlockPos(tile);
+        pos = tile.getPos();
     }
 
 }

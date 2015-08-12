@@ -27,6 +27,7 @@ import buildcraft.core.BuildCraftMod;
 import buildcraft.core.CompatHooks;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
+import buildcraft.core.Version;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.network.ChannelHandler;
@@ -49,8 +50,8 @@ import buildcraft.silicon.tile.TilePackager;
 import buildcraft.silicon.tile.TileProgrammingTable;
 import buildcraft.silicon.tile.TileStampingTable;
 
-// @Mod(name = "BuildCraft Silicon", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Silicon",
-// dependencies = DefaultProps.DEPENDENCY_CORE)
+@Mod(name = "BuildCraft Silicon", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Silicon",
+        dependencies = DefaultProps.DEPENDENCY_CORE)
 public class BuildCraftSilicon extends BuildCraftMod {
     @Mod.Instance("BuildCraft|Silicon")
     public static BuildCraftSilicon instance;
@@ -93,7 +94,6 @@ public class BuildCraftSilicon extends BuildCraftMod {
         redstoneChipset = new ItemRedstoneChipset();
         redstoneChipset.setUnlocalizedName("redstoneChipset");
         CoreProxy.proxy.registerItem(redstoneChipset);
-        redstoneChipset.registerItemStacks();
 
         packageItem = new ItemPackage();
         packageItem.setUnlocalizedName("package");

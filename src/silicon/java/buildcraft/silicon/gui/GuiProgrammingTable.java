@@ -42,8 +42,9 @@ public class GuiProgrammingTable extends GuiAdvancedInterface {
             drawBackground(x, y);
 
             // Draw icon
-            Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationItemsTexture);
-            drawIcon(BuildCraftCore.iconProvider.getIcon(CoreIconProvider.ENERGY), x + 3, y + 4);
+            Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+            // drawIcon(BuildCraftCore.iconProvider.getIcon(CoreIconProvider.ENERGY), x + 3, y + 4);
+            // TODO (PASS 1): Do this icon properly!
 
             if (!isFullyOpened()) {
                 return;

@@ -5,8 +5,9 @@
 package buildcraft.robotics.gui;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -69,8 +70,8 @@ public class GuiZonePlan extends GuiAdvancedInterface {
 
     private GuiBetterButton tool, fsButton;
 
-    private List inventorySlots;
-    private List savedButtonList;
+    private List<?> inventorySlots;
+    private List<GuiBetterButton> savedButtonList;
 
     private GuiTextField textField;
 
@@ -85,8 +86,8 @@ public class GuiZonePlan extends GuiAdvancedInterface {
         }
 
         @Override
-        public TextureAtlasSprite getIcon() {
-            return color.getIcon();
+        public TextureAtlasSprite getSprite() {
+            return color.getSprite();
         }
 
         @Override
@@ -283,8 +284,8 @@ public class GuiZonePlan extends GuiAdvancedInterface {
     }
 
     @Override
-    protected void mouseMovedOrUp(int mouseX, int mouseY, int eventType) {
-        super.mouseMovedOrUp(mouseX, mouseY, eventType);
+    protected void mouseReleased(int mouseX, int mouseY, int eventType) {
+        super.mouseReleased(mouseX, mouseY, eventType);
 
         if (eventType != -1 && inSelection) {
             boolean val = tool.displayString.equals("+");
@@ -324,8 +325,8 @@ public class GuiZonePlan extends GuiAdvancedInterface {
         uploadMap();
         refreshSelectedArea();
 
-        container.inventorySlots = new LinkedList();
-        buttonList = new LinkedList();
+        container.inventorySlots = Lists.newLinkedList();
+        buttonList = Lists.newLinkedList();
     }
 
     private void toWindowed() {

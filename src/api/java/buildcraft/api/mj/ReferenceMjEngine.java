@@ -12,7 +12,7 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
 
     public ReferenceMjEngine() {
         // Create our storage things
-        externalStorage = new DefaultMjExternalStorage(EnumMjType.ENGINE);
+        externalStorage = new DefaultMjExternalStorage(EnumMjType.ENGINE, 40);
         internalStorage = new DefaultMjInternalStorage(400, 40, 600, 0.2);
         externalStorage.setInternalStorage(internalStorage);
     }
@@ -29,7 +29,7 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
         }
         // Check if we should give out power
         if (internalStorage.tick(getWorld())) {
-            // Take some power (between 2 and 4, ideally the highest available power though)
+            // Take some power (between 10 and 20, ideally the highest available power though)
             double mj = internalStorage.extractPower(getWorld(), 10, 20, false);
             // Power the above tile
             double left = powerAbove(mj);
