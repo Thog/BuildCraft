@@ -1241,6 +1241,9 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
+        if (pipe == null || pipe.transport == null) {
+            return;
+        }
         if (pipe instanceof IDebuggable) {
             ((IDebuggable) pipe).getDebugInfo(left, right, side);
         }

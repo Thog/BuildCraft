@@ -25,6 +25,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.api.enums.EnumBlueprintType;
@@ -287,6 +289,10 @@ public abstract class BlockBuildCraftBase extends Block {
     public AxisAlignedBB[] getBoxes(IBlockAccess world, BlockPos pos, IBlockState state) {
         return new AxisAlignedBB[] { getBox(world, pos, state) };
     }
+    
+    public MovingObjectPosition collisionRayTrace_super(World world, BlockPos pos, Vec3 origin, Vec3 direction) {
+        return super.collisionRayTrace(world, pos, origin, direction);
+    }
 
     @Override
     public MovingObjectPosition collisionRayTrace(World world, BlockPos pos, Vec3 origin, Vec3 direction) {
@@ -341,11 +347,12 @@ public abstract class BlockBuildCraftBase extends Block {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos pos) {
         return getBox(world, pos, world.getBlockState(pos)).offset(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    @Override
+    /*@Override
     public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) {
         AxisAlignedBB[] bbs = getBoxes(world, pos, world.getBlockState(pos));
         AxisAlignedBB bb = bbs[0];
@@ -360,5 +367,5 @@ public abstract class BlockBuildCraftBase extends Block {
         maxX = bb.maxX;
         maxY = bb.maxY;
         maxZ = bb.maxZ;
-    }
+    }*/
 }

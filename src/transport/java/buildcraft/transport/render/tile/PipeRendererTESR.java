@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.render.tile;
 
+import java.util.Arrays;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -20,8 +22,8 @@ import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.BuildCraftCore.RenderMode;
 import buildcraft.core.CoreConstants;
-import buildcraft.core.lib.render.RenderEntityBlock;
-import buildcraft.core.lib.render.RenderEntityBlock.RenderInfo;
+import buildcraft.core.lib.EntityResizableCuboid;
+import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeRenderState;
@@ -71,7 +73,6 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
         }
     }
 
-    @Deprecated
     public static void renderGate(double x, double y, double z, GatePluggable gate, EnumFacing direction) {
         GL11.glPushMatrix();
         GL11.glColor3f(1, 1, 1);
@@ -121,8 +122,9 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
     private static void renderGate(TextureAtlasSprite icon, int layer, float trim, float translateCenter, float extraDepth, EnumFacing direction,
             boolean isLit, int sideRenderingMode) {
-        RenderInfo renderBox = new RenderInfo();
-        renderBox.texture = icon;
+        // TODO (PASS RIGHT NOW): Make Gate Rendering Work
+        EntityResizableCuboid cuboid = new EntityResizableCuboid(null);
+        cuboid.makeClient();
 
         float[][] zeroState = new float[3][2];
         float min = CoreConstants.PIPE_MIN_POS + trim / 2F;
@@ -151,25 +153,30 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
         switch (sideRenderingMode) {
             case 0:
-                renderBox.setRenderSingleSide(direction.ordinal());
+                cuboid.textures[direction.ordinal()] = icon;
                 break;
             case 1:
-                renderBox.setRenderSingleSide(direction.ordinal());
-                renderBox.renderSide[direction.ordinal() ^ 1] = true;
+                cuboid.textures[direction.ordinal()] = icon;
+                cuboid.textures[direction.ordinal() ^ 1] = icon;
                 break;
             case 2:
+                Arrays.fill(cuboid.textures, icon);
                 break;
         }
 
-        renderBox.setBounds(rotated[0][0], rotated[1][0], rotated[2][0], rotated[0][1], rotated[1][1], rotated[2][1]);
-        renderLitBox(renderBox, isLit);
+        cuboid.setPosition(rotated[0][0], rotated[1][0], rotated[2][0]);
+        cuboid.xSize = rotated[0][1];
+        cuboid.ySize = rotated[1][1];
+        cuboid.zSize = rotated[2][1];
+
+        renderLitBox(cuboid, isLit);
         if (translateCenter != 0) {
             GL11.glPopMatrix();
         }
     }
 
-    private static void renderLitBox(RenderInfo info, boolean isLit) {
-        RenderEntityBlock.INSTANCE.renderBlock(info);
+    private static void renderLitBox(EntityResizableCuboid cuboid, boolean isLit) {
+        RenderResizableCuboid.INSTANCE.renderCube(cuboid);
 
         float lastX = OpenGlHelper.lastBrightnessX;
         float lastY = OpenGlHelper.lastBrightnessY;
@@ -180,7 +187,7 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
             GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
             GL11.glDepthMask(true);
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 61680, 0);
-            RenderEntityBlock.INSTANCE.renderBlock(info);
+            RenderResizableCuboid.INSTANCE.renderCube(cuboid);
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glPopMatrix();
