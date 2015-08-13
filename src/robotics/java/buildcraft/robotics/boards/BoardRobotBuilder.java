@@ -14,10 +14,11 @@ import buildcraft.api.boards.RedstoneBoardRobotNBT;
 import buildcraft.api.core.IZone;
 import buildcraft.api.robots.AIRobot;
 import buildcraft.api.robots.EntityRobotBase;
-import buildcraft.builders.tile.TileConstructionMarker;
 import buildcraft.core.builders.BuildingItem;
 import buildcraft.core.builders.BuildingSlot;
+import buildcraft.core.builders.IBuildingItemsProvider;
 import buildcraft.core.lib.inventory.filters.ArrayStackFilter;
+import buildcraft.core.lib.utils.IBlueprintProvider;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.robotics.ai.AIRobotDisposeItems;
 import buildcraft.robotics.ai.AIRobotGotoBlock;
@@ -29,7 +30,7 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
 
     private static final int MAX_RANGE_SQ = 3 * 64 * 64;
 
-    private TileConstructionMarker markerToBuild;
+    private IBlueprintProvider markerToBuild;
     private BuildingSlot currentBuildingSlot;
     private LinkedList<ItemStack> requirementsToLookFor;
     private int launchingDelay = 0;
@@ -70,7 +71,7 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
         }
 
         if (currentBuildingSlot == null) {
-            currentBuildingSlot = markerToBuild.bluePrintBuilder.reserveNextSlot(robot.worldObj);
+            currentBuildingSlot = markerToBuild.getBlueprintBuilder().reserveNextSlot(robot.worldObj);
 
             if (currentBuildingSlot == null) {
                 // No slots available yet
@@ -110,7 +111,7 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
             if (currentBuildingSlot.stackConsumed == null) {
                 // Once all the element are in, if not already, use them to
                 // prepare the slot.
-                markerToBuild.bluePrintBuilder.useRequirements(robot, currentBuildingSlot);
+                markerToBuild.getBlueprintBuilder().useRequirements(robot, currentBuildingSlot);
             }
 
             if (!hasEnoughEnergy()) {
@@ -132,7 +133,7 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
                 startDelegateAI(new AIRobotGotoSleep(robot));
             }
         } else if (ai instanceof AIRobotGotoBlock) {
-            if (markerToBuild == null || markerToBuild.bluePrintBuilder == null) {
+            if (markerToBuild == null || markerToBuild.getBlueprintBuilder() == null) {
                 // defensive code, in case of a wrong load from NBT
                 return;
             }
@@ -144,8 +145,8 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
 
             robot.getBattery().extractEnergy(currentBuildingSlot.getEnergyRequirement(), false);
             launchingDelay = currentBuildingSlot.getStacksToDisplay().size() * BuildingItem.ITEMS_SPACE;
-            markerToBuild.bluePrintBuilder.buildSlot(robot.worldObj, markerToBuild, currentBuildingSlot, robot.posX + 0.125F, robot.posY + 0.125F,
-                    robot.posZ + 0.125F);
+            markerToBuild.getBlueprintBuilder().buildSlot(robot.worldObj, (IBuildingItemsProvider) markerToBuild, currentBuildingSlot, robot.posX
+                + 0.125F, robot.posY + 0.125F, robot.posZ + 0.125F);
             currentBuildingSlot = null;
             requirementsToLookFor = null;
         }
@@ -165,13 +166,13 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
         launchingDelay = nbt.getInteger("launchingDelay");
     }
 
-    private TileConstructionMarker findClosestMarker() {
+    private IBlueprintProvider findClosestMarker() {
         double minDistance = Double.MAX_VALUE;
-        TileConstructionMarker minMarker = null;
+        IBlueprintProvider minMarker = null;
 
         IZone zone = robot.getZoneToWork();
 
-        for (TileConstructionMarker marker : TileConstructionMarker.currentMarkers) {
+        for (IBlueprintProvider marker : IBlueprintProvider.Providers.markers) {
             if (marker.getWorld() != robot.worldObj) {
                 continue;
             }

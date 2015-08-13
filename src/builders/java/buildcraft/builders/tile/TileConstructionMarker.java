@@ -33,14 +33,16 @@ import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.network.command.CommandWriter;
 import buildcraft.core.lib.network.command.ICommandReceiver;
 import buildcraft.core.lib.network.command.PacketCommand;
+import buildcraft.core.lib.utils.IBlueprintProvider;
 import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
 // TODO: Create and implement "IBlueprintProvider" for robots to get Blueprints from
-public class TileConstructionMarker extends TileBuildCraft implements IBuildingItemsProvider, IBoxProvider, ICommandReceiver {
+public class TileConstructionMarker extends TileBuildCraft implements IBuildingItemsProvider, IBoxProvider, ICommandReceiver, IBlueprintProvider {
 
+    @Deprecated
     public static HashSet<TileConstructionMarker> currentMarkers = new HashSet<TileConstructionMarker>();
 
     public EnumFacing direction = null;
@@ -178,7 +180,7 @@ public class TileConstructionMarker extends TileBuildCraft implements IBuildingI
     public void validate() {
         super.validate();
         if (!worldObj.isRemote) {
-            currentMarkers.add(this);
+            IBlueprintProvider.Providers.markers.add(this);
         }
     }
 
@@ -186,7 +188,7 @@ public class TileConstructionMarker extends TileBuildCraft implements IBuildingI
     public void invalidate() {
         super.invalidate();
         if (!worldObj.isRemote) {
-            currentMarkers.remove(this);
+            IBlueprintProvider.Providers.markers.remove(this);
         }
     }
 
@@ -257,5 +259,10 @@ public class TileConstructionMarker extends TileBuildCraft implements IBuildingI
         } else {
             itemBlueprint = null;
         }
+    }
+
+    @Override
+    public BptBuilderBase getBlueprintBuilder() {
+        return bluePrintBuilder;
     }
 }
