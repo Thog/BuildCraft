@@ -8,6 +8,7 @@ import net.minecraft.util.EnumFacing;
 
 /** Engines should implement this interface if they want to support BuildCraft's behaviour of passing energy between
  * engines without using receiveEnergy() (which has other issues). */
+@Deprecated
 public interface IEngine {
     /** Returns true if the engine wants to receive power from another engine on this side.
      * 

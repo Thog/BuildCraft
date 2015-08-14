@@ -22,7 +22,7 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     private final long lossDelay;
     private double power;
     private boolean on = false;
-    private long lastRecievedPower = -1;
+    private long lastRecievedPower = -1, lastTicked = -1;
 
     /** @param maxPower The maximum amount of power that this can store.
      * @param activationPower The minimum amount of power needed to activate.
@@ -53,8 +53,8 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
         double toTake = Math.min(max, power);
         if (!simulate) {
             power -= toTake;
-            if (power == 0) {
-                on = false;
+            if (toTake > 0) {
+                on = true;
             }
         }
         return toTake;
@@ -76,16 +76,22 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     }
 
     @Override
-    public boolean tick(World world) {
+    public void tick(World world) {
         if (power == 0 && on) {
             on = false;
-            return false;
         }
 
         long currentTick = world.getTotalWorldTime();
+        if (currentTick == lastTicked) {
+            return;// Don't affect the state if this is called multiple times
+        }
+        lastTicked = currentTick;
         if (lastRecievedPower == -1) {
             // Essentially an initialisation step
             lastRecievedPower = currentTick;
+            // Not required??
+            System.out.println("This part was required!!!!");
+            // TODO (PASS 2): Remove this debug method
         } else if (lastRecievedPower + lossDelay < currentTick) {
             // Enough time has passed, start losing power
             power -= lossRate;
@@ -93,8 +99,21 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
                 power = 0;
             }
         }
+    }
 
-        return power > activationPower || on;
+    @Override
+    public boolean hasActivated() {
+        return power >= activationPower || on;
+    }
+
+    @Override
+    public boolean isOperating() {
+        return on;
+    }
+
+    @Override
+    public void stopOperating() {
+        on = false;
     }
 
     @Override
@@ -102,6 +121,8 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setDouble("mj", power);
         nbt.setLong("lastRecievedPower", lastRecievedPower);
+        nbt.setLong("lastTicked", lastTicked);
+        nbt.setBoolean("on", on);
         return nbt;
     }
 
@@ -109,6 +130,8 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     public void readFromNBT(NBTTagCompound nbt) {
         power = nbt.getDouble("mj");
         lastRecievedPower = nbt.getLong("lastRecievedPower");
+        lastTicked = nbt.getLong("lastTicked");
+        on = nbt.getBoolean("on");
     }
 
     // ISerializable

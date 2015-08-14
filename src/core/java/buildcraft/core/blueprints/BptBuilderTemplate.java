@@ -196,7 +196,7 @@ public class BptBuilderTemplate extends BptBuilderBase {
                     world, slot.pos)) {
                 iteratorBuild.remove();
                 markLocationUsed(slot.pos);
-            } else if (builder.consumeEnergy(BuilderAPI.BUILD_ENERGY)) {
+            } else if (builder.consumePower(BuilderAPI.BUILD_ENERGY)) {
                 slot.addStackConsumed(firstSlotToConsume.decreaseStackInSlot(1));
                 result = slot;
                 iteratorBuild.remove();

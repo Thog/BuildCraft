@@ -28,6 +28,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
+import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.IInvSlot;
 import buildcraft.api.enums.EnumBlueprintType;
 import buildcraft.api.properties.BuildCraftProperties;
@@ -73,7 +74,12 @@ import io.netty.buffer.ByteBuf;
 
 public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluidHandler, IRequestProvider, IControllable, IInventoryListener {
 
-    private static int POWER_ACTIVATION = 500;
+    /** Enough power to build 2 stacks of blocks */
+    private static final double MAX_POWER = 2 * 64 * BuilderAPI.BUILD_ENERGY;
+    private static final double MAX_TRANSFERED = 16 * BuilderAPI.BUILD_ENERGY;
+    private static final double POWER_ACTIVATION = 4 * BuilderAPI.BUILD_ENERGY;
+    private static final long LOSS_DELAY = 400;
+    private static final double LOSS_RATE = BuilderAPI.BUILD_ENERGY / 4;
 
     public Box box = new Box();
     public PathIterator currentPathIterator;
@@ -207,7 +213,7 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
     }
 
     public TileBuilder() {
-        super();
+        super(MAX_POWER, MAX_TRANSFERED, POWER_ACTIVATION, LOSS_DELAY, LOSS_RATE);
 
         box.kind = Kind.STRIPES;
         inv.addInvListener(this);
@@ -583,7 +589,7 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
         if (mode != Mode.Off) {
             if (getWorld().getWorldInfo().getGameType() == GameType.CREATIVE) {
                 build();
-            } else if (getBattery().getEnergyStored() > POWER_ACTIVATION) {
+            } else if (internalStorage.hasActivated()) {
                 build();
             }
         }
@@ -592,12 +598,6 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
             updateRequirements();
         }
         isBuilding = this.isBuildingBlueprint();
-
-        if (done) {// TODO (PASS 3): This is useless right? Is/was this needed for anything?
-            return;
-        } else if (getBattery().getEnergyStored() < 25) {
-            return;
-        }
     }
 
     @Override

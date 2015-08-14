@@ -34,8 +34,10 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
 
     @Override
     public void update() {
+        // Process power loss over time
+        internalStorage.tick(getWorld());
         // Check if we should activate
-        if (internalStorage.tick(getWorld())) {
+        if (internalStorage.hasActivated()) {
             // Take some power (between 1 and 20, ideally the highest available power though)
             // This transport can push up to 20mj/t to all surrounding machines
             double mj = internalStorage.extractPower(getWorld(), 1, 20, false);
@@ -46,7 +48,7 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
     }
 
     private double transferPower(double mj) {
-        double thisSuction = externalStorage.getSuction();
+        double thisSuction = externalStorage.getSuction(getWorld(), null);
         double totalSuction = 0;
         // Setup cache maps
         EnumMap<EnumFacing, Double> suctionMap = Maps.newEnumMap(EnumFacing.class);
@@ -61,7 +63,7 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
             // Get the external storage
             IMjHandler handler = (IMjHandler) tile;
             IMjExternalStorage storage = handler.getMjStorage();
-            double otherSuction = storage.getSuction();
+            double otherSuction = storage.getSuction(getWorld(), face.getOpposite());
             // Only flow into things that require power more than we do, or if they are a machine (as they always
             // require power more than transports do)
             if (otherSuction > thisSuction || storage.getType() == EnumMjType.MACHINE) {

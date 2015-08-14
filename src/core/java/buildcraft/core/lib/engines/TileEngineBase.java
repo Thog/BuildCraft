@@ -10,20 +10,21 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-import cofh.api.energy.IEnergyConnection;
-import cofh.api.energy.IEnergyHandler;
-import cofh.api.energy.IEnergyReceiver;
-
 import buildcraft.api.enums.EnumEnergyStage;
-import buildcraft.api.power.IEngine;
+import buildcraft.api.mj.DefaultMjExternalStorage;
+import buildcraft.api.mj.DefaultMjInternalStorage;
+import buildcraft.api.mj.EnumMjType;
+import buildcraft.api.mj.IMjConnection;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.tiles.IHeatable;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.api.transport.IPipeConnection;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.BuildCraftCore;
-import buildcraft.core.CompatHooks;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.utils.MathUtils;
 import buildcraft.core.lib.utils.ResourceUtils;
@@ -31,7 +32,19 @@ import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
-public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection, IEnergyHandler, IEngine, IHeatable {
+public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection/* , IEnergyHandler *//* ,
+                                                                                                             * IEngine */, IHeatable, IMjHandler {
+    protected class SidedMjExternalStorage extends DefaultMjExternalStorage implements IMjConnection {
+        public SidedMjExternalStorage(double maxPowerTransfered) {
+            super(EnumMjType.ENGINE, maxPowerTransfered);
+        }
+
+        @Override
+        public boolean canConnectPower(EnumFacing face, IMjExternalStorage from) {
+            return orientation == face;
+        }
+    }
+
     // TEMP
     public static final ResourceLocation TRUNK_BLUE_TEXTURE = new ResourceLocation("buildcraftcore:textures/blocks/engine/trunk_blue.png");
     public static final ResourceLocation TRUNK_GREEN_TEXTURE = new ResourceLocation("buildcraftcore:textures/blocks/engine/trunk_green.png");
@@ -42,10 +55,10 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     public static final float MIN_HEAT = 20;
     public static final float IDEAL_HEAT = 100;
     public static final float MAX_HEAT = 250;
-    public int currentOutput = 0;
+    public double currentOutput = 0;
     public boolean isRedstonePowered = false;
     public float progress;
-    public int energy;
+    public int clientEnergy;
     public float heat = MIN_HEAT;
     public EnumEnergyStage energyStage = EnumEnergyStage.BLUE;
     public EnumFacing orientation = EnumFacing.UP;
@@ -57,7 +70,14 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
     private boolean isPumping = false; // Used for SMP synch
 
-    public TileEngineBase() {}
+    protected final SidedMjExternalStorage externalStorage;
+    protected final DefaultMjInternalStorage internalStorage;
+
+    protected TileEngineBase(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
+        externalStorage = new SidedMjExternalStorage(maxPowerTransfered);
+        internalStorage = new DefaultMjInternalStorage(maxPower, activationPower, lossDelay, lossRate);
+        externalStorage.setInternalStorage(internalStorage);
+    }
 
     @Override
     public void initialize() {
@@ -113,8 +133,8 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         return false;
     }
 
-    public double getEnergyLevel() {
-        return ((double) energy) / getMaxEnergy();
+    public double getEnergyPercentage() {
+        return internalStorage.currentPower() / internalStorage.maxPower();
     }
 
     protected EnumEnergyStage computeEnergyStage() {
@@ -161,7 +181,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     }
 
     public void updateHeat() {
-        heat = (float) ((MAX_HEAT - MIN_HEAT) * getEnergyLevel()) + MIN_HEAT;
+        heat = (float) ((MAX_HEAT - MIN_HEAT) * getEnergyPercentage()) + MIN_HEAT;
     }
 
     public float getHeatLevel() {
@@ -222,117 +242,87 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         getEnergyStage();
 
         if (getEnergyStage() == EnumEnergyStage.OVERHEAT) {
-            this.energy = Math.max(this.energy - 50, 0);
+            // this.energy = Math.max(this.energy - 50, 0);
+            // TODO (PASS 1): Explode the engine.
             return;
         }
 
-        engineUpdate();
+        // engineUpdate();
+        if (!isRedstonePowered || !isActive()) {
+            return;
+        }
 
-        Object tile = getEnergyProvider(orientation);
+        internalStorage.tick(getWorld());
 
-        if (progressPart != 0) {
-            progress += getPistonSpeed();
-
-            if (progress > 0.5 && progressPart == 1) {
-                progressPart = 2;
-            } else if (progress >= 1) {
-                progress = 0;
-                progressPart = 0;
-            }
-        } else if (isRedstonePowered && isActive()) {
-            if (isPoweredTile(tile, orientation)) {
-                progressPart = 1;
-                setPumping(true);
-                if (getPowerToExtract() > 0) {
-                    progressPart = 1;
-                    setPumping(true);
-                } else {
+        if (internalStorage.hasActivated()) {
+            double maxMj = internalStorage.currentPower() / 5d;
+            double minMj = maxMj / 3d;
+            double power = internalStorage.extractPower(getWorld(), minMj, maxMj, false);
+            if (power > 0) {
+                TileEntity tile = getWorld().getTileEntity(getPos().offset(orientation));
+                if (tile != null && tile instanceof IMjHandler) {
+                    IMjHandler handler = (IMjHandler) tile;
+                    IMjExternalStorage storage = handler.getMjStorage();
+                    if (canSendPowerTo(tile, storage)) {
+                        double excess = storage.insertPower(getWorld(), orientation, getMjStorage(), power, false);
+                        internalStorage.insertPower(getWorld(), excess, false);
+                        setPumping(true);
+                    } else {// We didn't want to send power to it
+                        setPumping(false);
+                    }
+                } else {// The tile did not handle MJ
                     setPumping(false);
                 }
-            } else {
+            } else {// Power == 0
                 setPumping(false);
             }
-        } else {
-            setPumping(false);
         }
-
+        /* Object tile = getEnergyProvider(orientation); if (progressPart != 0) { progress += getPistonSpeed(); if
+         * (progress > 0.5 && progressPart == 1) { progressPart = 2; } else if (progress >= 1) { progress = 0;
+         * progressPart = 0; } } else if (isRedstonePowered && isActive()) { if (isPoweredTile(tile, orientation)) {
+         * progressPart = 1; setPumping(true); if (getPowerToExtract() > 0) { progressPart = 1; setPumping(true); } else
+         * { setPumping(false); } } else { setPumping(false); } } else { setPumping(false); } */
         burn();
 
-        if (!isRedstonePowered) {
-            currentOutput = 0;
-        } else if (isRedstonePowered && isActive()) {
-            sendPower();
-        }
+        /* if (!isRedstonePowered) { currentOutput = 0; } else if (isRedstonePowered && isActive()) { sendPower(); } */
     }
 
-    public Object getEnergyProvider(EnumFacing orientation) {
-        return CompatHooks.INSTANCE.getEnergyProvider(getTile(orientation));
+    protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
+        return true;
     }
 
-    private int getPowerToExtract() {
-        Object tile = getEnergyProvider(orientation);
+    // public Object getEnergyProvider(EnumFacing orientation) {
+    // return CompatHooks.INSTANCE.getEnergyProvider(getTile(orientation));
+    // }
 
-        if (tile instanceof IEngine) {
-            IEngine engine = (IEngine) tile;
-
-            int maxEnergy = engine.receiveEnergyFromEngine(orientation.getOpposite(), this.energy, true);
-            return extractEnergy(maxEnergy, false);
-        } else if (tile instanceof IEnergyHandler) {
-            IEnergyHandler handler = (IEnergyHandler) tile;
-
-            int maxEnergy = handler.receiveEnergy(orientation.getOpposite(), this.energy, true);
-            return extractEnergy(maxEnergy, false);
-        } else if (tile instanceof IEnergyReceiver) {
-            IEnergyReceiver handler = (IEnergyReceiver) tile;
-
-            int maxEnergy = handler.receiveEnergy(orientation.getOpposite(), this.energy, true);
-            return extractEnergy(maxEnergy, false);
-        } else {
-            return 0;
-        }
-    }
-
-    protected void sendPower() {
-        Object tile = getEnergyProvider(orientation);
-        if (isPoweredTile(tile, orientation)) {
-            int extracted = getPowerToExtract();
-            if (extracted <= 0) {
-                setPumping(false);
-                return;
-            }
-
-            setPumping(true);
-
-            if (tile instanceof IEngine) {
-                IEngine engine = (IEngine) tile;
-                int neededRF = engine.receiveEnergyFromEngine(orientation.getOpposite(), extracted, false);
-
-                extractEnergy(neededRF, true);
-            } else if (tile instanceof IEnergyHandler) {
-                IEnergyHandler handler = (IEnergyHandler) tile;
-                int neededRF = handler.receiveEnergy(orientation.getOpposite(), extracted, false);
-
-                extractEnergy(neededRF, true);
-            } else if (tile instanceof IEnergyReceiver) {
-                IEnergyReceiver handler = (IEnergyReceiver) tile;
-                int neededRF = handler.receiveEnergy(orientation.getOpposite(), extracted, false);
-
-                extractEnergy(neededRF, true);
-            }
-        }
-    }
+    /* private int getPowerToExtract() { Object tile = getEnergyProvider(orientation); if (tile instanceof IEngine) {
+     * IEngine engine = (IEngine) tile; int maxEnergy = engine.receiveEnergyFromEngine(orientation.getOpposite(),
+     * this.energy, true); return extractEnergy(maxEnergy, false); } else if (tile instanceof IEnergyHandler) {
+     * IEnergyHandler handler = (IEnergyHandler) tile; int maxEnergy = handler.receiveEnergy(orientation.getOpposite(),
+     * this.energy, true); return extractEnergy(maxEnergy, false); } else if (tile instanceof IEnergyReceiver) {
+     * IEnergyReceiver handler = (IEnergyReceiver) tile; int maxEnergy =
+     * handler.receiveEnergy(orientation.getOpposite(), this.energy, true); return extractEnergy(maxEnergy, false); }
+     * else { return 0; } } private void sendPower() { Object tile = getEnergyProvider(orientation); if
+     * (isPoweredTile(tile, orientation)) { int extracted = getPowerToExtract(); if (extracted <= 0) {
+     * setPumping(false); return; } setPumping(true); if (tile instanceof IEngine) { IEngine engine = (IEngine) tile;
+     * int neededRF = engine.receiveEnergyFromEngine(orientation.getOpposite(), extracted, false);
+     * extractEnergy(neededRF, true); } else if (tile instanceof IEnergyHandler) { IEnergyHandler handler =
+     * (IEnergyHandler) tile; int neededRF = handler.receiveEnergy(orientation.getOpposite(), extracted, false);
+     * extractEnergy(neededRF, true); } else if (tile instanceof IEnergyReceiver) { IEnergyReceiver handler =
+     * (IEnergyReceiver) tile; int neededRF = handler.receiveEnergy(orientation.getOpposite(), extracted, false);
+     * extractEnergy(neededRF, true); } } } */
 
     protected void burn() {}
 
-    protected void engineUpdate() {
-        if (!isRedstonePowered) {
-            if (energy >= 10) {
-                energy -= 10;
-            } else if (energy < 10) {
-                energy = 0;
-            }
-        }
-    }
+    // protected void engineUpdate() {
+    // if (!isRedstonePowered) {
+    // if (energy >= 10) {
+    // energy -= 10;
+    // } else if (energy < 10) {
+    // energy = 0;
+    // }
+    // }
+    // }
 
     public boolean isActive() {
         return true;
@@ -348,9 +338,19 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     }
 
     public boolean isOrientationValid() {
-        Object tile = getEnergyProvider(orientation);
-
-        return isPoweredTile(tile, orientation);
+        TileEntity tile = getWorld().getTileEntity(getPos().offset(orientation));
+        if (tile == null || !(tile instanceof IMjHandler)) {
+            return false;
+        }
+        IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
+        if (storage instanceof IMjConnection) {
+            IMjConnection connection = (IMjConnection) storage;
+            if (!connection.canConnectPower(orientation.getOpposite(), getMjStorage())) {
+                return false;
+            }
+        }
+        return storage.getType().acceptsPowerFrom(EnumMjType.ENGINE);
+        // return isPoweredTile(tile, orientation);
     }
 
     public boolean switchOrientation(boolean preferPipe) {
@@ -362,17 +362,22 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     }
 
     private boolean switchOrientationDo(boolean pipesOnly) {
+        EnumFacing oldOrientation = orientation;
         for (int i = orientation.getIndex() + 1; i <= orientation.getIndex() + 6; ++i) {
             EnumFacing o = EnumFacing.VALUES[i % 6];
 
             TileEntity tile = getTile(o);
 
-            if ((!pipesOnly || tile instanceof IPipeTile) && isPoweredTile(tile, o)) {
+            if (!pipesOnly || tile instanceof IPipeTile) {
                 orientation = o;
-                worldObj.markBlockForUpdate(pos);
-                worldObj.notifyNeighborsOfStateChange(pos, worldObj.getBlockState(pos).getBlock());
-
-                return true;
+                boolean can = isOrientationValid();
+                if (can) {
+                    worldObj.markBlockForUpdate(pos);
+                    worldObj.notifyNeighborsOfStateChange(pos, worldObj.getBlockState(pos).getBlock());
+                    return true;
+                } else {
+                    orientation = oldOrientation;
+                }
             }
         }
 
@@ -397,7 +402,13 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
         orientation = EnumFacing.values()[data.getByte("orientation")];
         progress = data.getFloat("progress");
-        energy = data.getInteger("energy");
+        // Back compat with 1.7.10
+        if (data.hasKey("energy")) {
+            int rfEnergy = data.getInteger("energy");
+            internalStorage.insertPower(getWorld(), rfEnergy / 10d, false);
+        } else {
+            internalStorage.readFromNBT(data.getCompoundTag("internalStorage"));
+        }
         heat = data.getFloat("heat");
     }
 
@@ -407,7 +418,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
         data.setByte("orientation", (byte) orientation.ordinal());
         data.setFloat("progress", progress);
-        data.setInteger("energy", energy);
+        data.setTag("internalStorage", internalStorage.writeToNBT());
         data.setFloat("heat", heat);
     }
 
@@ -417,25 +428,27 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         energyStage = EnumEnergyStage.values()[flags & 0x07];
         isPumping = (flags & 0x08) != 0;
         orientation = EnumFacing.values()[stream.readByte()];
+        internalStorage.readData(stream);
     }
 
     @Override
     public void writeData(ByteBuf stream) {
         stream.writeByte(energyStage.ordinal() | (isPumping ? 8 : 0));
         stream.writeByte(orientation.ordinal());
+        internalStorage.writeData(stream);
     }
 
     public void getGUINetworkData(int id, int value) {
         switch (id) {
             case 0:
-                int iEnergy = Math.round(energy);
+                int iEnergy = Math.round(clientEnergy);
                 iEnergy = (iEnergy & 0xffff0000) | (value & 0xffff);
-                energy = iEnergy;
+                clientEnergy = iEnergy;
                 break;
             case 1:
-                iEnergy = Math.round(energy);
+                iEnergy = Math.round(clientEnergy);
                 iEnergy = (iEnergy & 0xffff) | ((value & 0xffff) << 16);
-                energy = iEnergy;
+                clientEnergy = iEnergy;
                 break;
             case 2:
                 currentOutput = value;
@@ -447,77 +460,26 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     }
 
     public void sendGUINetworkData(Container container, ICrafting iCrafting) {
-        iCrafting.sendProgressBarUpdate(container, 0, Math.round(energy) & 0xffff);
-        iCrafting.sendProgressBarUpdate(container, 1, (Math.round(energy) & 0xffff0000) >> 16);
-        iCrafting.sendProgressBarUpdate(container, 2, Math.round(currentOutput));
+        iCrafting.sendProgressBarUpdate(container, 0, MathHelper.floor_double(internalStorage.currentPower()) & 0xffff);
+        iCrafting.sendProgressBarUpdate(container, 1, (MathHelper.floor_double(internalStorage.currentPower()) & 0xffff0000) >> 16);
+        iCrafting.sendProgressBarUpdate(container, 2, MathHelper.floor_double(currentOutput));
         iCrafting.sendProgressBarUpdate(container, 3, Math.round(heat * 100));
     }
 
     /* STATE INFORMATION */
     public abstract boolean isBurning();
 
-    public void addEnergy(int addition) {
-        if (getEnergyStage() == EnumEnergyStage.OVERHEAT) {
-            return;
-        }
-
-        energy += addition;
-
-        if (energy > getMaxEnergy()) {
-            energy = getMaxEnergy();
-        }
-    }
-
-    public int extractEnergy(int energyMax, boolean doExtract) {
-        int max = Math.min(energyMax, maxEnergyExtracted());
-
-        int extracted;
-
-        if (energy >= max) {
-            extracted = max;
-
-            if (doExtract) {
-                energy -= max;
-            }
-        } else {
-            extracted = energy;
-
-            if (doExtract) {
-                energy = 0;
-            }
-        }
-
-        return extracted;
-    }
-
-    public boolean isPoweredTile(Object tile, EnumFacing side) {
-        if (tile == null) {
-            return false;
-        } else if (tile instanceof IEngine) {
-            return ((IEngine) tile).canReceiveFromEngine(side.getOpposite());
-        } else if (tile instanceof IEnergyHandler || tile instanceof IEnergyReceiver) {
-            return ((IEnergyConnection) tile).canConnectEnergy(side.getOpposite());
-        } else {
-            return false;
-        }
-    }
-
-    public abstract int getMaxEnergy();
-
-    public int minEnergyReceived() {
-        return 20;
-    }
-
-    public abstract int maxEnergyReceived();
-
-    public abstract int maxEnergyExtracted();
-
-    public int getEnergyStored() {
-        return energy;
-    }
-
-    public abstract int calculateCurrentOutput();
-
+    /* public void addEnergy(int addition) { if (getEnergyStage() == EnumEnergyStage.OVERHEAT) { return; } energy +=
+     * addition; if (energy > getMaxEnergy()) { energy = getMaxEnergy(); } } public int extractEnergy(int energyMax,
+     * boolean doExtract) { int max = Math.min(energyMax, maxEnergyExtracted()); int extracted; if (energy >= max) {
+     * extracted = max; if (doExtract) { energy -= max; } } else { extracted = energy; if (doExtract) { energy = 0; } }
+     * return extracted; } public boolean isPoweredTile(Object tile, EnumFacing side) { if (tile == null) { return
+     * false; } else if (tile instanceof IEngine) { return ((IEngine) tile).canReceiveFromEngine(side.getOpposite()); }
+     * else if (tile instanceof IEnergyHandler || tile instanceof IEnergyReceiver) { return ((IEnergyConnection)
+     * tile).canConnectEnergy(side.getOpposite()); } else { return false; } } public abstract int getMaxEnergy(); public
+     * int minEnergyReceived() { return 20; } public abstract int maxEnergyReceived(); public abstract int
+     * maxEnergyExtracted(); public int getEnergyStored() { return energy; } public abstract int
+     * calculateCurrentOutput(); */
     @Override
     public ConnectOverride overridePipeConnection(IPipeTile.PipeType type, EnumFacing with) {
         if (type == IPipeTile.PipeType.POWER) {
@@ -539,52 +501,24 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         checkOrientation = true;
     }
 
+    // MJ Support
+
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
+    }
+
     // RF support
 
-    @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        return 0;
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        if (!(from == orientation)) {
-            return 0;
-        }
-
-        return energy;
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return this.getMaxEnergy();
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return from == orientation;
-    }
-
+    /* @Override public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) { return 0; }
+     * @Override public int getEnergyStored(EnumFacing from) { if (!(from == orientation)) { return 0; } return energy;
+     * }
+     * @Override public int getMaxEnergyStored(EnumFacing from) { return this.getMaxEnergy(); }
+     * @Override public boolean canConnectEnergy(EnumFacing from) { return from == orientation; } */
     // IEngine
-
-    @Override
-    public boolean canReceiveFromEngine(EnumFacing side) {
-        return side == orientation.getOpposite();
-    }
-
-    @Override
-    public int receiveEnergyFromEngine(EnumFacing side, int amount, boolean simulate) {
-        if (canReceiveFromEngine(side)) {
-            int targetEnergy = Math.min(this.getMaxEnergy() - this.energy, amount);
-            if (!simulate) {
-                energy += targetEnergy;
-            }
-            return targetEnergy;
-        } else {
-            return 0;
-        }
-    }
-
+    /* @Override public boolean canReceiveFromEngine(EnumFacing side) { return side == orientation.getOpposite(); }
+     * @Override public int receiveEnergyFromEngine(EnumFacing side, int amount, boolean simulate) { if
+     * (canReceiveFromEngine(side)) { int targetEnergy = Math.min(this.getMaxEnergy() - this.energy, amount); if
+     * (!simulate) { energy += targetEnergy; } return targetEnergy; } else { return 0; } } */
     // IHeatable
 
     @Override

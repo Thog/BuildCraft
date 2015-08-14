@@ -21,8 +21,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.core.BuildCraftCore;
@@ -38,18 +36,19 @@ import io.netty.buffer.ByteBuf;
 /** For future maintainers: This class intentionally does not implement just every interface out there. For some of them
  * (such as IControllable), we expect the tiles supporting it to implement it - but TileBuildCraft provides all the
  * underlying functionality to stop code repetition. */
-public abstract class TileBuildCraft extends TileEntity implements IEnergyHandler, ISerializable, IUpdatePlayerListBox, IAdditionalDataTile {
+public abstract class TileBuildCraft extends TileEntity implements /*IEnergyHandler,*/ ISerializable, IUpdatePlayerListBox, IAdditionalDataTile {
     protected TileBuffer[] cache;
     protected HashSet<EntityPlayer> guiWatchers = new HashSet<EntityPlayer>();
     protected IControllable.Mode mode;
 
     private int init = 0;
     private String owner = "[BuildCraft]";
-    private RFBattery battery;
+//    private RFBattery battery;
 
-    private int receivedTick, extractedTick;
-    private long worldTimeEnergyReceive;
+//    private int receivedTick, extractedTick;
+//    private long worldTimeEnergyReceive;
     /** Used at the client for the power LED brightness */
+    // TODO: Make LED POWER work... somehow
     public int ledPower = 0;
     public boolean ledActive = false;
 
@@ -80,9 +79,9 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
             init = 2;
         }
 
-        if (battery != null) {
-            receivedTick = 0;
-            extractedTick = 0;
+        /*if (battery != null) {
+//            receivedTick = 0;
+//            extractedTick = 0;
 
             if (!worldObj.isRemote) {
                 int prePower = ledPower;
@@ -96,7 +95,7 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
                     sendNetworkUpdate();
                 }
             }
-        }
+        }*/
     }
 
     public void initialize() {
@@ -159,11 +158,11 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setString("owner", owner);
-        if (battery != null) {
+        /*if (battery != null) {
             NBTTagCompound batteryNBT = new NBTTagCompound();
             battery.writeToNBT(batteryNBT);
             nbt.setTag("battery", batteryNBT);
-        }
+        }*/
         if (mode != null) {
             nbt.setByte("lastMode", (byte) mode.ordinal());
         }
@@ -175,17 +174,17 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
         if (nbt.hasKey("owner")) {
             owner = nbt.getString("owner");
         }
-        if (battery != null) {
+        /*if (battery != null) {
             battery.readFromNBT(nbt.getCompoundTag("battery"));
-        }
+        }*/
         if (nbt.hasKey("lastMode")) {
             mode = IControllable.Mode.values()[nbt.getByte("lastMode")];
         }
     }
-
-    protected int getTicksSinceEnergyReceived() {
-        return (int) (worldObj.getTotalWorldTime() - worldTimeEnergyReceive);
-    }
+//
+//    protected int getTicksSinceEnergyReceived() {
+//        return (int) (worldObj.getTotalWorldTime() - worldTimeEnergyReceive);
+//    }
 
     @Override
     public int hashCode() {
@@ -197,7 +196,7 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
         return this == cmp;
     }
 
-    @Override
+    /*@Override
     public boolean canConnectEnergy(EnumFacing from) {
         return battery != null;
     }
@@ -216,7 +215,7 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
         }
     }
 
-    /** If you want to use this, implement IEnergyProvider. */
+    /** If you want to use this, implement IEnergyProvider. * /
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
         if (battery != null && this.canConnectEnergy(from)) {
             int extracted = battery.extractEnergy(maxExtract - extractedTick, simulate);
@@ -254,7 +253,7 @@ public abstract class TileBuildCraft extends TileEntity implements IEnergyHandle
     protected void setBattery(RFBattery battery) {
         this.battery = battery;
     }
-
+*/
     public IBlockState getBlockState(EnumFacing side) {
         if (cache == null) {
             cache = TileBuffer.makeBuffer(worldObj, pos, false);

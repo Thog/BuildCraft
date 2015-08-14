@@ -22,7 +22,7 @@ public class BlockMiner {
     protected final BlockPos pos;
 
     private boolean hasMined, hasFailed;
-    private int energyRequired, energyAccepted;
+    private double powerRequired, powerAccepted;
 
     public BlockMiner(World world, TileEntity owner, BlockPos pos) {
         this.world = world;
@@ -71,13 +71,13 @@ public class BlockMiner {
         world.sendBlockBreakProgress(pos.hashCode(), pos, -1);
     }
 
-    public int acceptEnergy(int offeredAmount) {
-        energyRequired = BlockUtils.computeBlockBreakEnergy(world, pos);
+    public double acceptPower(double offeredPower) {
+        powerRequired = BlockUtils.computeBlockBreakEnergy(world, pos);
 
-        int usedAmount = MathUtils.clamp(offeredAmount, 0, Math.max(0, energyRequired - energyAccepted));
-        energyAccepted += usedAmount;
+        double usedAmount = MathUtils.clamp(offeredPower, 0, Math.max(0, powerRequired - powerAccepted));
+        powerAccepted += usedAmount;
 
-        if (energyAccepted >= energyRequired) {
+        if (powerAccepted >= powerRequired) {
             world.sendBlockBreakProgress(pos.hashCode(), pos, -1);
 
             hasMined = true;
@@ -107,7 +107,7 @@ public class BlockMiner {
                 hasFailed = true;
             }
         } else {
-            world.sendBlockBreakProgress(pos.hashCode(), pos, MathUtils.clamp((int) Math.floor(energyAccepted * 10 / energyRequired), 0, 9));
+            world.sendBlockBreakProgress(pos.hashCode(), pos, (int) MathUtils.clamp(Math.floor(powerAccepted * 10 / powerRequired), 0, 9));
         }
         return usedAmount;
     }

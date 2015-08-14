@@ -9,6 +9,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 import buildcraft.api.enums.EnumEnergyStage;
+import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.power.IRedstoneEngine;
 import buildcraft.api.power.IRedstoneEngineReceiver;
 import buildcraft.api.transport.IPipeTile;
@@ -16,7 +17,17 @@ import buildcraft.core.lib.engines.TileEngineBase;
 
 public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
 
-    private boolean hasSent = false;
+    private static final double MAX_POWER = 40;
+    private static final double MAX_TRANSFERED = 4;
+    private static final double ACTIVATION_POWER = 2;
+    private static final long LOSS_DELAY = 200;
+    private static final double LOSS_RATE = 2;
+
+    public TileEngineWood() {
+        super(MAX_POWER, MAX_TRANSFERED, ACTIVATION_POWER, LOSS_DELAY, LOSS_RATE);
+    }
+
+    // private boolean hasSent = false;
 
     @Override
     public String getResourcePrefix() {
@@ -29,18 +40,8 @@ public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
     }
 
     @Override
-    public int minEnergyReceived() {
-        return 0;
-    }
-
-    @Override
-    public int maxEnergyReceived() {
-        return 500;
-    }
-
-    @Override
     protected EnumEnergyStage computeEnergyStage() {
-        double energyLevel = getEnergyLevel();
+        double energyLevel = getEnergyPercentage();
         if (energyLevel < 0.33f) {
             return EnumEnergyStage.BLUE;
         } else if (energyLevel < 0.66f) {
@@ -71,12 +72,12 @@ public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
     }
 
     @Override
-    public void engineUpdate() {
-        super.engineUpdate();
+    public void update() {
+        super.update();
 
         if (isRedstonePowered) {
             if (worldObj.getTotalWorldTime() % 16 == 0) {
-                addEnergy(10);
+                internalStorage.insertPower(getWorld(), 1, false);
             }
         }
     }
@@ -91,41 +92,51 @@ public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
         return isRedstonePowered;
     }
 
-    @Override
-    public int getMaxEnergy() {
-        return 1000;
-    }
+    // @Override
+    // public int getMaxEnergy() {
+    // return 1000;
+    // }
+    //
+    // @Override
+    // public int calculateCurrentOutput() {
+    // return 10;
+    // }
+    //
+    // @Override
+    // public int maxEnergyExtracted() {
+    // return 10;
+    // }
+
+    // // TODO: HACK
+    // @Override
+    // public boolean canConnectEnergy(EnumFacing from) {
+    // return false;
+    // }
 
     @Override
-    public int calculateCurrentOutput() {
-        return 10;
-    }
-
-    @Override
-    public int maxEnergyExtracted() {
-        return 10;
-    }
-
-    // TODO: HACK
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return false;
-    }
-
-    @Override
-    protected void sendPower() {
-        if (progressPart == 2 && !hasSent) {
-            hasSent = true;
-
-            TileEntity tile = getTile(orientation);
-
-            if (tile instanceof IRedstoneEngineReceiver && ((IRedstoneEngineReceiver) tile).canConnectRedstoneEngine(orientation.getOpposite())) {
-                super.sendPower();
-            } else {
-                this.energy = 0;
-            }
-        } else if (progressPart != 2) {
-            hasSent = false;
+    protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
+        if (!(storage instanceof IRedstoneEngineReceiver)) {
+            return false;
         }
+        IRedstoneEngineReceiver reciever = (IRedstoneEngineReceiver) storage;
+        return reciever.canConnectRedstoneEngine(orientation);
     }
+
+    // @Override
+    // protected void sendPower() {
+    // if (progressPart == 2 && !hasSent) {
+    // hasSent = true;
+    //
+    // TileEntity tile = getTile(orientation);
+    //
+    // if (tile instanceof IRedstoneEngineReceiver && ((IRedstoneEngineReceiver)
+    // tile).canConnectRedstoneEngine(orientation.getOpposite())) {
+    // super.sendPower();
+    // } else {
+    // this.energy = 0;
+    // }
+    // } else if (progressPart != 2) {
+    // hasSent = false;
+    // }
+    // }
 }

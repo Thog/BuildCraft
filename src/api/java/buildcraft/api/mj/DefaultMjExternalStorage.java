@@ -58,7 +58,7 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     }
 
     @Override
-    public double getSuction() {
+    public double getSuction(World world, EnumFacing florDirection) {
         double filled = storage.currentPower() / storage.maxPower();
         filled = 1 - filled;
         return filled / getType().getFlowDivisor();

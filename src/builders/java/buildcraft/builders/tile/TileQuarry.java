@@ -50,7 +50,6 @@ import buildcraft.core.blueprints.BptBuilderBase;
 import buildcraft.core.blueprints.BptBuilderBlueprint;
 import buildcraft.core.builders.TileAbstractBuilder;
 import buildcraft.core.internal.IDropControlInventory;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.utils.BlockMiner;
 import buildcraft.core.lib.utils.BlockUtils;
 import buildcraft.core.lib.utils.Utils;
@@ -68,6 +67,12 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
         IDLE,
         DONE
     }
+
+    private static final double MAX_POWER = 2 * 64 * BuilderAPI.BREAK_ENERGY * BuildCraftCore.miningMultiplier;
+    private static final double MAX_TRANSFERED = 16 * BuilderAPI.BREAK_ENERGY * BuildCraftCore.miningMultiplier;
+    private static final double POWER_ACTIVATION = 4 * BuilderAPI.BREAK_ENERGY;
+    private static final long LOSS_DELAY = 400;
+    private static final double LOSS_RATE = BuilderAPI.BREAK_ENERGY * BuildCraftCore.miningMultiplier / 4;
 
     public EntityMechanicalArm arm;
     public EntityPlayer placedBy;
@@ -99,9 +104,8 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
     private int ledState;
 
     public TileQuarry() {
+        super(MAX_POWER, MAX_TRANSFERED, POWER_ACTIVATION, LOSS_DELAY, LOSS_RATE);
         box.kind = Kind.STRIPES;
-        this.setBattery(new RFBattery((int) (2 * 64 * BuilderAPI.BREAK_ENERGY * BuildCraftCore.miningMultiplier), (int) (1000
-            * BuildCraftCore.miningMultiplier), 0));
     }
 
     public void createUtilsIfNeeded() {
@@ -197,11 +201,12 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
             // In this case, since idling() does it anyway, we should return.
             return;
         } else if (getStage() == Stage.MOVING) {
-            int energyUsed = this.getBattery().useEnergy(20, (int) Math.ceil(20 + getBattery().getEnergyStored() / 10), false);
+            double minMovePower = 2 * BuildCraftCore.miningMultiplier;
+            double power = internalStorage.extractPower(getWorld(), minMovePower, minMovePower + internalStorage.currentPower() / 10d, false);
 
-            if (energyUsed >= 20) {
+            if (power >= minMovePower) {
 
-                speed = 0.1 + energyUsed / 2000F;
+                speed = 0.1 + power / 200d / BuildCraftCore.miningMultiplier;
 
                 // If it's raining or snowing above the head, slow down.
                 if (worldObj.isRaining()) {
@@ -233,8 +238,8 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
             return;
         }
 
-        int rfTaken = miner.acceptEnergy(getBattery().getEnergyStored());
-        getBattery().useEnergy(rfTaken, rfTaken, false);
+        double mjTaken = miner.acceptPower(internalStorage.currentPower());
+        internalStorage.extractPower(getWorld(), mjTaken, mjTaken, false);
 
         if (miner.hasMined()) {
             // Collect any lost items laying around
@@ -649,7 +654,7 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
         flags |= movingHorizontally ? 0x10 : 0;
         flags |= movingVertically ? 0x20 : 0;
         stream.writeByte(flags);
-        ledState = (getBattery().getEnergyStored() * 3 / getBattery().getMaxEnergyStored());
+        ledState = (int) (internalStorage.currentPower() * 3 / internalStorage.maxPower());
         stream.writeByte(ledState);
     }
 

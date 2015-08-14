@@ -6,13 +6,13 @@ package buildcraft.api.power;
 
 import net.minecraft.util.EnumFacing;
 
-import cofh.api.energy.IEnergyReceiver;
+import buildcraft.api.mj.IMjExternalStorage;
 
-/** Implement this on tiles that you wish to be able to receive Redstone Engine (low-power) energy.
+/** Implement this on IMjExternalStorage types that you wish to be able to receive Redstone Engine (low-power) energy.
  *
  * Please do not implement it on batteries, pipes or machines which can have their energy extracted from. That could
  * lead to exploits and abuse. */
-public interface IRedstoneEngineReceiver extends IEnergyReceiver {
+public interface IRedstoneEngineReceiver extends IMjExternalStorage {
     /** This function is queried on every attempt to receive energy from a redstone engine as well.
      * 
      * @param side

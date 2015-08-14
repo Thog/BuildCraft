@@ -24,16 +24,13 @@ import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.RFBattery;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.IPipeTransportPowerHook;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportPower;
 
-public class PipePowerWood extends Pipe<PipeTransportPower>implements IPipeTransportPowerHook, IEnergyHandler, IRedstoneEngineReceiver, IDebuggable {
+public class PipePowerWood extends PipePowerBase implements IPipeTransportPowerHook, IRedstoneEngineReceiver, IDebuggable {
     public final boolean[] powerSources = new boolean[6];
 
     protected int standardIconIndex = PipeIconProvider.TYPE.PipePowerWood_Standard.ordinal();
     protected int solidIconIndex = PipeIconProvider.TYPE.PipeAllWood_Solid.ordinal();
-    protected RFBattery battery;
 
     private boolean full;
     private int requestedEnergy, sources, lastRequestedEnergy;
@@ -41,7 +38,7 @@ public class PipePowerWood extends Pipe<PipeTransportPower>implements IPipeTrans
     private boolean allowExtraction = false;
 
     public PipePowerWood(Item item) {
-        super(new PipeTransportPower(), item);
+        super(item);
 
         battery = new RFBattery(320 * 50, 320, 0);
         transport.initFromPipe(getClass());

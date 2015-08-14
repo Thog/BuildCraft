@@ -24,8 +24,10 @@ public final class ReferenceMjMachine extends TileEntity implements IMjHandler, 
 
     @Override
     public void update() {
+        // Process power loss over time
+        internalStorage.tick(getWorld());
         // Check if we should activate
-        if (internalStorage.tick(getWorld())) {
+        if (internalStorage.hasActivated()) {
             // Take some power (between 2 and 4, ideally the highest available power though)
             double mj = internalStorage.extractPower(getWorld(), 2, 4, false);
             doAThing(mj);

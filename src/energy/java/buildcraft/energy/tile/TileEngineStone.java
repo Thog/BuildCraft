@@ -21,9 +21,15 @@ import buildcraft.energy.BuildCraftEnergy;
 
 public class TileEngineStone extends TileEngineWithInventory {
 
-    static final float MAX_OUTPUT = 10;
-    static final float MIN_OUTPUT = MAX_OUTPUT / 3;
-    static final float TARGET_OUTPUT = .375f;
+    static final double MAX_OUTPUT = 1;
+    static final double MIN_OUTPUT = MAX_OUTPUT / 3;
+    static final double TARGET_OUTPUT = 0.0375;
+    static final double MAX_POWER = 1000;
+    static final double MAX_TRANSFERED = 40;
+    static final double ACTIVATION_POWER = 40;
+    static final long LOSS_DELAY = 200;
+    static final double LOSS_RATE = 2;
+
     final float kp = 1f;
     final float ki = 0.05f;
     final double eLimit = (MAX_OUTPUT - MIN_OUTPUT) / ki;
@@ -33,7 +39,7 @@ public class TileEngineStone extends TileEngineWithInventory {
     double esum = 0;
 
     public TileEngineStone() {
-        super(1);
+        super(MAX_POWER, MAX_TRANSFERED, ACTIVATION_POWER, LOSS_DELAY, LOSS_RATE, 1);
     }
 
     @Override
@@ -69,7 +75,8 @@ public class TileEngineStone extends TileEngineWithInventory {
             burnTime--;
             if (isRedstonePowered) {
                 currentOutput = calculateCurrentOutput();
-                addEnergy(currentOutput);
+                internalStorage.insertPower(getWorld(), currentOutput, false);
+                // addEnergy(currentOutput);
             }
         } else {
             currentOutput = 0;
@@ -134,28 +141,15 @@ public class TileEngineStone extends TileEngineWithInventory {
         iCrafting.sendProgressBarUpdate(containerEngine, 16, totalBurnTime);
     }
 
-    @Override
-    public int maxEnergyReceived() {
-        return 2000;
-    }
-
-    @Override
-    public int maxEnergyExtracted() {
-        return 1000;
-    }
-
-    @Override
-    public int getMaxEnergy() {
-        return 10000;
-    }
-
-    @Override
-    public int calculateCurrentOutput() {
+    /* @Override public int maxEnergyReceived() { return 2000; }
+     * @Override public int maxEnergyExtracted() { return 1000; }
+     * @Override public int getMaxEnergy() { return 10000; } */
+    public double calculateCurrentOutput() {
         if (burnItem != null && burnItem.getItem() == Items.paper) {
             return 1;
         }
 
-        double e = TARGET_OUTPUT * getMaxEnergy() - energy;
+        double e = TARGET_OUTPUT * MAX_POWER - internalStorage.currentPower();
         esum = MathUtils.clamp(esum + e, -eLimit, eLimit);
         return (int) Math.round(MathUtils.clamp(e * kp + esum * ki, MIN_OUTPUT, MAX_OUTPUT));
     }

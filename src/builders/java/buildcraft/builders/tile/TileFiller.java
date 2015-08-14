@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.fml.relauncher.Side;
 
+import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.api.filler.FillerManager;
 import buildcraft.api.properties.BuildCraftProperties;
@@ -23,7 +24,6 @@ import buildcraft.core.Box;
 import buildcraft.core.Box.Kind;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.blueprints.BptBuilderTemplate;
-import buildcraft.core.blueprints.BptContext;
 import buildcraft.core.builders.TileAbstractBuilder;
 import buildcraft.core.builders.patterns.FillerPattern;
 import buildcraft.core.builders.patterns.PatternNone;
@@ -38,13 +38,18 @@ import io.netty.buffer.ByteBuf;
 
 public class TileFiller extends TileAbstractBuilder implements IHasWork, IControllable, ICommandReceiver, IStatementContainer {
 
-    private static int POWER_ACTIVATION = 500;
+    /** Enough power to build 2 stacks of blocks */
+    private static final double MAX_POWER = 2 * 64 * BuilderAPI.BUILD_ENERGY;
+    private static final double MAX_TRANSFERED = 16 * BuilderAPI.BUILD_ENERGY;
+    private static final double POWER_ACTIVATION = 4 * BuilderAPI.BUILD_ENERGY;
+    private static final long LOSS_DELAY = 400;
+    private static final double LOSS_RATE = BuilderAPI.BUILD_ENERGY / 4;
 
     public FillerPattern currentPattern = PatternNone.INSTANCE;
     public IStatementParameter[] patternParameters;
 
     private BptBuilderTemplate currentTemplate;
-    private BptContext context;
+    // private BptContext context;
 
     private final Box box = new Box();
     private boolean done = false;
@@ -53,6 +58,7 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
     private NBTTagCompound initNBT = null;
 
     public TileFiller() {
+        super(MAX_POWER, MAX_TRANSFERED, POWER_ACTIVATION, LOSS_DELAY, LOSS_RATE);
         inv.addListener(this);
         box.kind = Kind.STRIPES;
         initPatternParameters();
@@ -80,7 +86,7 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
 
         if (currentPattern != null && currentTemplate == null && box.isInitialized()) {
             currentTemplate = currentPattern.getTemplateBuilder(box, getWorld(), patternParameters);
-            context = currentTemplate.getContext();
+            // context = currentTemplate.getContext();
         }
 
         if (initNBT != null && currentTemplate != null) {
@@ -106,7 +112,7 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
             return;
         }
 
-        if (getBattery().getEnergyStored() < POWER_ACTIVATION) {
+        if (!internalStorage.hasActivated()) {
             return;
         }
 
@@ -122,7 +128,7 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
 
         if (currentPattern != null && currentTemplate == null) {
             currentTemplate = currentPattern.getTemplateBuilder(box, getWorld(), patternParameters);
-            context = currentTemplate.getContext();
+            // context = currentTemplate.getContext();
         }
 
         if (currentTemplate != null) {

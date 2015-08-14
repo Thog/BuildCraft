@@ -61,7 +61,7 @@ public abstract class BuildingSlot {
 
     public abstract void readFromNBT(NBTTagCompound nbt, MappingRegistry registry) throws MappingNotFoundException;
 
-    public abstract int getEnergyRequirement();
+    public abstract double getPowerRequirement();
 
     public abstract int buildTime();
 

@@ -236,9 +236,9 @@ public final class BlockUtils {
         }
     }
 
-    public static int computeBlockBreakEnergy(World world, BlockPos pos) {
+    public static double computeBlockBreakEnergy(World world, BlockPos pos) {
         float hardness = world.getBlockState(pos).getBlock().getBlockHardness(world, pos);
-        return (int) Math.floor(BuilderAPI.BREAK_ENERGY * BuildCraftCore.miningMultiplier * ((hardness + 1) * 2));
+        return BuilderAPI.BREAK_ENERGY * BuildCraftCore.miningMultiplier * ((hardness + 1) * 2);
     }
 
     /** The following functions let you avoid unnecessary chunk loads, which is nice. */

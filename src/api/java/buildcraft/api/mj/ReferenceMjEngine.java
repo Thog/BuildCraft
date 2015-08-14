@@ -27,8 +27,10 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
         if (hasItemsToBurn()) {
             internalStorage.insertPower(getWorld(), 1, false);
         }
+        // Process power loss over time
+        internalStorage.tick(getWorld());
         // Check if we should give out power
-        if (internalStorage.tick(getWorld())) {
+        if (internalStorage.hasActivated()) {
             // Take some power (between 10 and 20, ideally the highest available power though)
             double mj = internalStorage.extractPower(getWorld(), 10, 20, false);
             // Power the above tile

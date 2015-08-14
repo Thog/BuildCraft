@@ -13,7 +13,10 @@ public interface IMjInternalStorage {
     /** @return The maximum power this storage can hold. */
     double maxPower();
 
-    /** @param min The minimum amount of power to take. If this much power cannot be taken, then it will return 0 power.
+    /** If this has enough power then this will activate the machine, so that the machine can continue running until it
+     * has no power left
+     * 
+     * @param min The minimum amount of power to take. If this much power cannot be taken, then it will return 0 power.
      * @param max The maximum amount of power to take.
      * @param simulate If true, then only pretend you took power from this device (essentially this will run without
      *            side effects)
@@ -26,11 +29,20 @@ public interface IMjInternalStorage {
      * @return The amount of overflow power that this device could not accept */
     double insertPower(World world, double mj, boolean simulate);
 
-    /** This should be called every tick from the tile entity.
-     * 
-     * @return True if this has enough power to start operation (generally if this device has enough power to begin
-     *         operation if this is a machine */
-    boolean tick(World worldObj);
+    /** This should be called every tick from the tile entity. Generally this should be called before calling any of the
+     * modifying operations in the tick method. It is safe to call this method many times during the same tick. */
+    void tick(World worldObj);
+
+    /** @return True if this has enough power to start operation or continue operation if the device was operating
+     *         previously operating. */
+    boolean hasActivated();
+
+    /** @return True if the machine has been activated by extracting power from it. */
+    boolean isOperating();
+
+    /** Stop the machine from operating if it does not have enough power for activation (This will only make
+     * {@link #hasActivated(World)} return false if it does not have enough energy to continue) */
+    void stopOperating();
 
     NBTTagCompound writeToNBT();
 

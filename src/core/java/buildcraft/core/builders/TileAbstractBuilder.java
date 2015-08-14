@@ -17,12 +17,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 
-import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.blueprints.ITileBuilder;
+import buildcraft.api.mj.DefaultMjExternalStorage;
+import buildcraft.api.mj.DefaultMjInternalStorage;
+import buildcraft.api.mj.EnumMjType;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.LaserData;
 import buildcraft.core.internal.IBoxProvider;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.network.command.CommandWriter;
@@ -38,14 +39,13 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
 
     public Set<BuildingItem> buildersInAction = Sets.newConcurrentHashSet();
 
-    private int rfPrev = 0;
-    private int rfUnchangedCycles = 0;
+    protected final DefaultMjExternalStorage externalStorage;
+    protected final DefaultMjInternalStorage internalStorage;
 
-    public TileAbstractBuilder() {
-        super();
-        /** The builder should not act as a gigantic energy buffer, thus we keep enough build energy to build about 2
-         * stacks' worth of blocks. */
-        this.setBattery(new RFBattery(2 * 64 * BuilderAPI.BUILD_ENERGY, 1000, 0));
+    protected TileAbstractBuilder(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
+        externalStorage = new DefaultMjExternalStorage(EnumMjType.MACHINE, maxPowerTransfered);
+        internalStorage = new DefaultMjInternalStorage(maxPower, activationPower, lossDelay, lossRate);
+        externalStorage.setInternalStorage(internalStorage);
     }
 
     @Override
@@ -81,13 +81,7 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
     @Override
     public void update() {
         super.update();
-
-        RFBattery battery = this.getBattery();
-
-        if (rfPrev != battery.getEnergyStored()) {
-            rfPrev = battery.getEnergyStored();
-            rfUnchangedCycles = 0;
-        }
+        internalStorage.tick(getWorld());
 
         Iterator<BuildingItem> itemIterator = buildersInAction.iterator();
         BuildingItem i;
@@ -99,21 +93,6 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
             if (i.isDone()) {
                 itemIterator.remove();
             }
-        }
-
-        if (rfPrev != battery.getEnergyStored()) {
-            rfPrev = battery.getEnergyStored();
-            rfUnchangedCycles = 0;
-        }
-
-        rfUnchangedCycles++;
-
-        /** After 100 cycles with no consumption or additional power, start to slowly to decrease the amount of power
-         * available in the builder. */
-        if (rfUnchangedCycles > 100) {
-            battery.useEnergy(0, 1000, false);
-
-            rfPrev = battery.getEnergyStored();
         }
     }
 
@@ -132,25 +111,24 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
         BuildCraftCore.instance.sendToPlayersNear(createLaunchItemPacket(item), this);
     }
 
-    public final int energyAvailable() {
-        return getBattery().getEnergyStored();
+    public final double powerAvailable() {
+        return internalStorage.currentPower();
     }
 
-    public final boolean consumeEnergy(int quantity) {
-        return getBattery().useEnergy(quantity, quantity, false) > 0;
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound nbttagcompound) {
-        super.writeToNBT(nbttagcompound);
+    public final boolean consumePower(double quantity) {
+        return internalStorage.extractPower(getWorld(), quantity, quantity, false) == quantity;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbttagcompound) {
-        super.readFromNBT(nbttagcompound);
+    public void writeToNBT(NBTTagCompound nbt) {
+        super.writeToNBT(nbt);
+        nbt.setTag("internalStorage", internalStorage.writeToNBT());
+    }
 
-        rfPrev = getBattery().getEnergyStored();
-        rfUnchangedCycles = 0;
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
+        super.readFromNBT(nbt);
+        internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
     }
 
     @Override
@@ -163,6 +141,7 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
             ld.readData(stream);
             pathLasers.add(ld);
         }
+        internalStorage.readData(stream);
     }
 
     @Override
@@ -172,6 +151,7 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
         for (LaserData ld : pathLasers) {
             ld.writeData(stream);
         }
+        internalStorage.writeData(stream);
     }
 
     @Override

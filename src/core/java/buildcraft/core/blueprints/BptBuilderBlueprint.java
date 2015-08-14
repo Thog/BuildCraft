@@ -313,7 +313,7 @@ public class BptBuilderBlueprint extends BptBuilderBase {
     /** Gets the next available block. If builder is not null, then building will be verified and performed. Otherwise,
      * the next possible building slot is returned, possibly for reservation, with no building. */
     private BuildingSlot internalGetNextBlock(World world, TileAbstractBuilder builder) {
-        if (builder != null && builder.energyAvailable() < BuilderAPI.BREAK_ENERGY) {
+        if (builder != null && builder.powerAvailable() < BuilderAPI.BREAK_ENERGY) {
             return null;
         }
 
@@ -405,7 +405,7 @@ public class BptBuilderBlueprint extends BptBuilderBase {
                             // When the item reaches the actual block, we'll
                             // verify that the location is indeed clear, and
                             // avoid building otherwise.
-                            builder.consumeEnergy(slot.getEnergyRequirement());
+                            builder.consumePower(slot.getPowerRequirement());
                             useRequirements(builder, slot);
 
                             iterator.remove();
@@ -441,7 +441,7 @@ public class BptBuilderBlueprint extends BptBuilderBase {
                 it.remove();
             } else {
                 if (checkRequirements(builder, slot.schematic)) {
-                    builder.consumeEnergy(slot.getEnergyRequirement());
+                    builder.consumePower(slot.getPowerRequirement());
                     useRequirements(builder, slot);
 
                     it.remove();
@@ -481,7 +481,7 @@ public class BptBuilderBlueprint extends BptBuilderBase {
                 stacksUsed.add(s);
             }
 
-            return !(builder.energyAvailable() < slot.getEnergyRequirement(stacksUsed));
+            return !(builder.powerAvailable() < slot.getPowerRequirement(stacksUsed));
         }
 
         for (ItemStack reqStk : tmpReq) {
@@ -526,7 +526,7 @@ public class BptBuilderBlueprint extends BptBuilderBase {
             }
         }
 
-        return builder.energyAvailable() >= slot.getEnergyRequirement(stacksUsed);
+        return builder.powerAvailable() >= slot.getPowerRequirement(stacksUsed);
     }
 
     @Override

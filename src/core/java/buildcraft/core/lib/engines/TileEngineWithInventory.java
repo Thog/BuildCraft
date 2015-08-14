@@ -21,7 +21,8 @@ public abstract class TileEngineWithInventory extends TileEngineBase implements 
     private final SimpleInventory inv;
     private final int[] defaultSlotArray;
 
-    public TileEngineWithInventory(int invSize) {
+    public TileEngineWithInventory(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate, int invSize) {
+        super(maxPower, maxPowerTransfered, activationPower, lossDelay, lossRate);
         inv = new SimpleInventory(invSize, "Engine", 64);
         defaultSlotArray = Utils.createSlotArray(0, invSize);
     }

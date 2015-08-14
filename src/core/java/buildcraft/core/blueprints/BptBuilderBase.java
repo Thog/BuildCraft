@@ -198,20 +198,20 @@ public abstract class BptBuilderBase implements IAreaProvider {
         return done && builder.getBuilders().size() == 0;
     }
 
-    private int getBlockBreakEnergy(BuildingSlotBlock slot) {
+    private double getBlockBreakPower(BuildingSlotBlock slot) {
         return BlockUtils.computeBlockBreakEnergy(context.world(), slot.pos);
     }
 
     protected final boolean canDestroy(TileAbstractBuilder builder, IBuilderContext context, BuildingSlotBlock slot) {
-        return builder.energyAvailable() >= getBlockBreakEnergy(slot);
+        return builder.powerAvailable() >= getBlockBreakPower(slot);
     }
 
     public void consumeEnergyToDestroy(TileAbstractBuilder builder, BuildingSlotBlock slot) {
-        builder.consumeEnergy(getBlockBreakEnergy(slot));
+        builder.consumePower(getBlockBreakPower(slot));
     }
 
     public void createDestroyItems(BuildingSlotBlock slot) {
-        int hardness = (int) Math.ceil(getBlockBreakEnergy(slot) / BuilderAPI.BREAK_ENERGY);
+        int hardness = (int) Math.ceil(getBlockBreakPower(slot) / BuilderAPI.BREAK_ENERGY);
 
         for (int i = 0; i < hardness; ++i) {
             slot.addStackConsumed(new ItemStack(BuildCraftCore.buildToolBlock));

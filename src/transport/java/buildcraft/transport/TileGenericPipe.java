@@ -31,14 +31,16 @@ import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.enums.EnumColor;
 import buildcraft.api.gates.IGateExpansion;
-import buildcraft.api.power.IRedstoneEngineReceiver;
+import buildcraft.api.mj.EnumMjType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.IMjInternalStorage;
+import buildcraft.api.mj.NonExistantStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeConnection;
@@ -67,8 +69,8 @@ import buildcraft.transport.pluggable.PlugPluggable;
 
 import io.netty.buffer.ByteBuf;
 
-public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox, IFluidHandler, IPipeTile, ITileBufferHolder, IEnergyHandler,
-        IDropControlInventory, ISyncedTile, ISolidSideTile, IGuiReturnHandler, IRedstoneEngineReceiver, IDebuggable, IAdditionalDataTile {
+public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox, IFluidHandler, IPipeTile, ITileBufferHolder, IDropControlInventory,
+        ISyncedTile, ISolidSideTile, IGuiReturnHandler, IDebuggable, IAdditionalDataTile, IMjHandler {
 
     public boolean initialized = false;
     public final PipeRenderState renderState = new PipeRenderState();
@@ -88,6 +90,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     protected boolean resyncGateExpansions = false;
     protected boolean attachPluggables = false;
     protected SideProperties sideProperties = new SideProperties();
+
+    private final SidedExternalStorage storage = new SidedExternalStorage();
 
     private TileBuffer[] tileBuffer;
     private int glassColor = -1;
@@ -251,6 +255,46 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 }
             }
         }
+    }
+
+    public class SidedExternalStorage implements IMjExternalStorage {
+        @Override
+        public EnumMjType getType() {
+            return EnumMjType.TRANSPORT;
+        }
+
+        private IMjExternalStorage getSidedStorage(EnumFacing side) {
+            if (hasPipePluggable(side)) {
+                PipePluggable pluggable = getPipePluggable(side);
+                if (pluggable instanceof IMjExternalStorage) {
+                    return (IMjExternalStorage) pluggable;
+                } else if (pluggable.isBlocking(TileGenericPipe.this, side)) {
+                    return null;
+                }
+            }
+            if (pipe instanceof IMjExternalStorage) {
+                return (IMjExternalStorage) pipe;
+            }
+            return NonExistantStorage.INSTANCE;
+        }
+
+        @Override
+        public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
+            return getSidedStorage(flowDirection).extractPower(world, flowDirection, to, minMj, maxMj, simulate);
+        }
+
+        @Override
+        public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+            return getSidedStorage(flowDirection.getOpposite()).insertPower(world, flowDirection, from, mj, simulate);
+        }
+
+        @Override
+        public double getSuction(World world, EnumFacing flowDirection) {
+            return getSidedStorage(flowDirection.getOpposite()).getSuction(world, flowDirection);
+        }
+
+        @Override
+        public void setInternalStorage(IMjInternalStorage storage) {}
     }
 
     public TileGenericPipe() {}
@@ -1140,71 +1184,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
     }
 
-    private IEnergyHandler internalGetEnergyHandler(EnumFacing side) {
-        if (hasPipePluggable(side)) {
-            PipePluggable pluggable = getPipePluggable(side);
-            if (pluggable instanceof IEnergyHandler) {
-                return (IEnergyHandler) pluggable;
-            } else if (pluggable.isBlocking(this, side)) {
-                return null;
-            }
-        }
-        if (pipe instanceof IEnergyHandler) {
-            return (IEnergyHandler) pipe;
-        }
-        return null;
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        IEnergyHandler handler = internalGetEnergyHandler(from);
-        if (handler != null) {
-            return handler.canConnectEnergy(from);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        IEnergyHandler handler = internalGetEnergyHandler(from);
-        if (handler != null) {
-            return handler.receiveEnergy(from, maxReceive, simulate);
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        IEnergyHandler handler = internalGetEnergyHandler(from);
-        if (handler != null) {
-            return handler.extractEnergy(from, maxExtract, simulate);
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        IEnergyHandler handler = internalGetEnergyHandler(from);
-        if (handler != null) {
-            return handler.getEnergyStored(from);
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        IEnergyHandler handler = internalGetEnergyHandler(from);
-        if (handler != null) {
-            return handler.getMaxEnergyStored(from);
-        } else {
-            return 0;
-        }
-    }
-
     @Override
     public Block getNeighborBlock(EnumFacing dir) {
         return getBlock(dir);
@@ -1231,15 +1210,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     @Override
-    public boolean canConnectRedstoneEngine(EnumFacing side) {
-        if (pipe instanceof IRedstoneEngineReceiver) {
-            return ((IRedstoneEngineReceiver) pipe).canConnectRedstoneEngine(side);
-        } else {
-            return (getPipeType() != PipeType.POWER) && (getPipeType() != PipeType.STRUCTURE);
-        }
-    }
-
-    @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
         if (pipe == null || pipe.transport == null) {
             return;
@@ -1253,5 +1223,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         if (getPipePluggable(side) != null && getPipePluggable(side) instanceof IDebuggable) {
             ((IDebuggable) getPipePluggable(side)).getDebugInfo(left, right, side);
         }
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return storage;
     }
 }

@@ -72,7 +72,7 @@ public class SchematicFluid extends SchematicBlock {
     }
 
     @Override
-    public int getEnergyRequirement(LinkedList<ItemStack> stacksUsed) {
+    public double getPowerRequirement(LinkedList<ItemStack> stacksUsed) {
         return 1 * BuilderAPI.BUILD_ENERGY;
     }
 
