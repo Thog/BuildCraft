@@ -46,8 +46,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
     public final Item item;
     public boolean[] wireSet = new boolean[] { false, false, false, false };
     public final Gate[] gates = new Gate[EnumFacing.VALUES.length];
-    // TODO: Remove PipeEventBus and replace it (completly) with google's event bus.
-    public final EventBus bus = new EventBus("buildcraft.transport.Pipe.eventBus");
+    
     public PipeEventBus eventBus = new PipeEventBus();
 
     private boolean internalUpdateScheduled = false;
@@ -128,7 +127,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
      * @return An index valid in the array returned by getTextureIcons() */
     public abstract int getIconIndex(EnumFacing direction);
 
-    public void updateEntity() {
+    public void update() {
         transport.updateEntity();
 
         if (internalUpdateScheduled) {

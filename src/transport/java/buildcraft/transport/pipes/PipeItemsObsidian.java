@@ -136,8 +136,8 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
 
         if (battery.getEnergyStored() > 0) {
             for (int j = 1; j < 5; ++j) {

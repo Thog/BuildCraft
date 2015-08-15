@@ -12,6 +12,7 @@ import buildcraft.api.mj.IMjExternalStorage;
  *
  * Please do not implement it on batteries, pipes or machines which can have their energy extracted from. That could
  * lead to exploits and abuse. */
+@Deprecated
 public interface IRedstoneEngineReceiver extends IMjExternalStorage {
     /** This function is queried on every attempt to receive energy from a redstone engine as well.
      * 

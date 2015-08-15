@@ -15,6 +15,7 @@ import buildcraft.transport.pipes.events.PipeEvent;
 import buildcraft.transport.pipes.events.PipeEventPriority;
 
 @Deprecated
+// TODO: Make this use something other than reflection
 public class PipeEventBus {
     private class EventHandler {
         public Method method;

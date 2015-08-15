@@ -94,8 +94,8 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
 
         if (container.getWorld().isRemote) {
             return;

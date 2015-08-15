@@ -9,8 +9,13 @@ public final class NonExistantStorage implements IMjExternalStorage {
     public static final NonExistantStorage INSTANCE = new NonExistantStorage();
 
     @Override
-    public EnumMjType getType() {// Doesn't really matter, as it cannot accept power anyway
-        return EnumMjType.ENGINE;
+    public EnumMjDeviceType getDeviceType() {// Doesn't really matter, as it cannot accept power anyway
+        return EnumMjDeviceType.ENGINE;
+    }
+
+    @Override
+    public EnumMjPowerType getPowerType() {// Again doesn't really matter, as it cannot be converted
+        return EnumMjPowerType.NORMAL;
     }
 
     @Override

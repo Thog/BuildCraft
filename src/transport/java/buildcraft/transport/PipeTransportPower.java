@@ -13,19 +13,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyReceiver;
 
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.power.IEngine;
-import buildcraft.api.power.IRedstoneEngine;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjConnection;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.CompatHooks;
 import buildcraft.core.DefaultProps;
-import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketPowerUpdate;
 import buildcraft.transport.pipes.PipePowerCobblestone;
@@ -39,7 +40,9 @@ import buildcraft.transport.pipes.PipePowerStone;
 import buildcraft.transport.pipes.PipePowerWood;
 
 public class PipeTransportPower extends PipeTransport implements IDebuggable {
+    @Deprecated
     public static final Map<Class<? extends Pipe<?>>, Integer> powerCapacities = new HashMap<Class<? extends Pipe<?>>, Integer>();
+    @Deprecated
     public static final Map<Class<? extends Pipe<?>>, Float> powerResistances = new HashMap<Class<? extends Pipe<?>>, Float>();
 
     private static final int DISPLAY_SMOOTHING = 10;
@@ -100,40 +103,47 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
             return true;
         }
 
-        if (container.pipe instanceof PipePowerWood) {
-            return isPowerSource(tile, side);
-        } else {
-            if (tile instanceof IEngine) {
-                // Disregard engines for this.
-                return false;
+        if (tile instanceof IMjHandler) {
+            if (container.pipe instanceof PipePowerWood) {
+
             }
-            if (tile instanceof IEnergyHandler || tile instanceof IEnergyReceiver) {
-                IEnergyConnection handler = (IEnergyConnection) tile;
-                if (handler.canConnectEnergy(side.getOpposite())) {
-                    return true;
-                }
-            }
+            IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
+            return storage.getDeviceType().acceptsPowerFrom(EnumMjDeviceType.TRANSPORT);
         }
+        /* if (tile instanceof IEngine) { // Disregard engines for this. return false; } if (tile instanceof
+         * IEnergyHandler || tile instanceof IEnergyReceiver) { IEnergyConnection handler = (IEnergyConnection) tile; if
+         * (handler.canConnectEnergy(side.getOpposite())) { return true; } } */
 
         return false;
     }
 
     public boolean isPowerSource(TileEntity tile, EnumFacing side) {
-        if (tile instanceof TileBuildCraft && !(tile instanceof IEngine)) {
-            // Disregard non-engine BC tiles.
-            // While this, of course, does nothing to work with other mods,
-            // it at least makes it work nicely with BC's built-in blocks while
-            // the new RF api isn't out.
+        if (!(tile instanceof IMjHandler)) {
             return false;
         }
-
-        if (tile instanceof IRedstoneEngine) {
-            // Do not render wooden pipe connections to match the look of transport/fluid pipes
-            // for kinesis.
-            return false;
+        IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
+        if (storage instanceof IMjConnection) {
+            IMjConnection connect = (IMjConnection) storage;
+            if (!connect.canConnectPower(side.getOpposite(), container.getMjStorage())) {
+                return false;
+            }
         }
-
-        return tile instanceof IEnergyConnection && ((IEnergyConnection) tile).canConnectEnergy(side.getOpposite());
+        return storage.getDeviceType() == EnumMjDeviceType.ENGINE && storage.getPowerType() == EnumMjPowerType.NORMAL;
+        // if (tile instanceof TileBuildCraft && !(tile instanceof IEngine)) {
+        // // Disregard non-engine BC tiles.
+        // // While this, of course, does nothing to work with other mods,
+        // // it at least makes it work nicely with BC's built-in blocks while
+        // // the new RF api isn't out.
+        // return false;
+        // }
+        //
+        // if (tile instanceof IRedstoneEngine) {
+        // // Do not render wooden pipe connections to match the look of transport/fluid pipes
+        // // for kinesis.
+        // return false;
+        // }
+        //
+        // return tile instanceof IEnergyConnection && ((IEnergyConnection) tile).canConnectEnergy(side.getOpposite());
     }
 
     @Override

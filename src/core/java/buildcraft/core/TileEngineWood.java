@@ -4,18 +4,29 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core;
 
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 import buildcraft.api.enums.EnumEnergyStage;
+import buildcraft.api.mj.DefaultMjExternalStorage;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
-import buildcraft.api.power.IRedstoneEngine;
-import buildcraft.api.power.IRedstoneEngineReceiver;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.engines.TileEngineBase;
 
-public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
+public class TileEngineWood extends TileEngineBase {
+    protected class SidedMjExternalStorage extends DefaultMjExternalStorage implements IMjConnection {
+        public SidedMjExternalStorage(double maxPowerTransfered) {
+            super(EnumMjDeviceType.ENGINE, EnumMjPowerType.REDSTONE, maxPowerTransfered);
+        }
+
+        @Override
+        public boolean canConnectPower(EnumFacing face, IMjExternalStorage from) {
+            return orientation == face;
+        }
+    }
 
     private static final double MAX_POWER = 40;
     private static final double MAX_TRANSFERED = 4;
@@ -25,6 +36,7 @@ public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
 
     public TileEngineWood() {
         super(MAX_POWER, MAX_TRANSFERED, ACTIVATION_POWER, LOSS_DELAY, LOSS_RATE);
+        externalStorage = new SidedMjExternalStorage(MAX_TRANSFERED);
     }
 
     // private boolean hasSent = false;
@@ -112,16 +124,16 @@ public class TileEngineWood extends TileEngineBase implements IRedstoneEngine {
     // public boolean canConnectEnergy(EnumFacing from) {
     // return false;
     // }
-
-    @Override
-    protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
-        if (!(storage instanceof IRedstoneEngineReceiver)) {
-            return false;
-        }
-        IRedstoneEngineReceiver reciever = (IRedstoneEngineReceiver) storage;
-        return reciever.canConnectRedstoneEngine(orientation);
-    }
-
+    //
+    // @Override
+    // protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
+    // if (!(storage instanceof IRedstoneEngineReceiver)) {
+    // return false;
+    // }
+    // IRedstoneEngineReceiver reciever = (IRedstoneEngineReceiver) storage;
+    // return reciever.canConnectRedstoneEngine(orientation);
+    // }
+    //
     // @Override
     // protected void sendPower() {
     // if (progressPart == 2 && !hasSent) {

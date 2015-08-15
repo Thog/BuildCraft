@@ -20,7 +20,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import buildcraft.api.blueprints.ITileBuilder;
 import buildcraft.api.mj.DefaultMjExternalStorage;
 import buildcraft.api.mj.DefaultMjInternalStorage;
-import buildcraft.api.mj.EnumMjType;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.LaserData;
 import buildcraft.core.internal.IBoxProvider;
@@ -43,7 +44,7 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
     protected final DefaultMjInternalStorage internalStorage;
 
     protected TileAbstractBuilder(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
-        externalStorage = new DefaultMjExternalStorage(EnumMjType.MACHINE, maxPowerTransfered);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.NORMAL, maxPowerTransfered);
         internalStorage = new DefaultMjInternalStorage(maxPower, activationPower, lossDelay, lossRate);
         externalStorage.setInternalStorage(internalStorage);
     }

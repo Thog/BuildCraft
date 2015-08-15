@@ -49,8 +49,8 @@ public class PipeItemsStripes extends Pipe<PipeTransportItems>implements IEnergy
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
 
         if (container.getWorld().isRemote) {
             return;

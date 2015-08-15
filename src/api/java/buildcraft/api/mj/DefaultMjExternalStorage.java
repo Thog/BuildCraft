@@ -6,25 +6,40 @@ import net.minecraft.world.World;
 public class DefaultMjExternalStorage implements IMjExternalStorage {
     private IMjInternalStorage storage = null;
     private final double maxPowerTransfered;
-    private final EnumMjType type;
+    private final EnumMjDeviceType deviceType;
+    private final EnumMjPowerType powerType;
 
-    public DefaultMjExternalStorage(EnumMjType type, double maxPowerTransfered) {
-        this.type = type;
-        if (type == null) {
+    public DefaultMjExternalStorage(EnumMjDeviceType type, double maxPowerTransfered) {
+        this(type, EnumMjPowerType.NORMAL, maxPowerTransfered);
+    }
+
+    public DefaultMjExternalStorage(EnumMjDeviceType deviceType, EnumMjPowerType powerType, double maxPowerTransfered) {
+        this.deviceType = deviceType;
+        this.powerType = powerType;
+        if (deviceType == null) {
             throw new IllegalArgumentException("You must specify which type this is!");
         }
         this.maxPowerTransfered = maxPowerTransfered;
     }
 
     @Override
-    public EnumMjType getType() {
-        return type;
+    public EnumMjDeviceType getDeviceType() {
+        return deviceType;
+    }
+
+    @Override
+    public EnumMjPowerType getPowerType() {
+        return powerType;
     }
 
     @Override
     public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
-        EnumMjType otherType = from.getType();
-        if (!otherType.givesPowerTo(type) || !type.acceptsPowerFrom(otherType)) {
+        EnumMjDeviceType otherDeviceType = from.getDeviceType();
+        if (!otherDeviceType.givesPowerTo(deviceType) || !deviceType.acceptsPowerFrom(otherDeviceType)) {
+            return mj;
+        }
+        EnumMjPowerType otherPowerType = from.getPowerType();
+        if (!otherPowerType.canConvertTo(powerType) || !powerType.canConvertFrom(otherPowerType)) {
             return mj;
         }
         if (mj < 0) {// Not a way to extract power
@@ -41,8 +56,12 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
 
     @Override
     public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
-        EnumMjType otherType = to.getType();
-        if (!otherType.acceptsPowerFrom(type) || !type.givesPowerTo(otherType)) {
+        EnumMjDeviceType otherType = to.getDeviceType();
+        if (!otherType.acceptsPowerFrom(deviceType) || !deviceType.givesPowerTo(otherType)) {
+            return 0;
+        }
+        EnumMjPowerType otherPowerType = to.getPowerType();
+        if (!otherPowerType.canConvertFrom(powerType) || !powerType.canConvertTo(otherPowerType)) {
             return 0;
         }
         if (minMj < 0 || maxMj < 0) {// Not a way to insert power
@@ -61,7 +80,7 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     public double getSuction(World world, EnumFacing florDirection) {
         double filled = storage.currentPower() / storage.maxPower();
         filled = 1 - filled;
-        return filled / getType().getFlowDivisor();
+        return filled / getDeviceType().getFlowDivisor();
     }
 
     @Override

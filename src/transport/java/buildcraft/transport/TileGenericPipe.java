@@ -36,7 +36,8 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.enums.EnumColor;
 import buildcraft.api.gates.IGateExpansion;
-import buildcraft.api.mj.EnumMjType;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
@@ -259,8 +260,17 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     public class SidedExternalStorage implements IMjExternalStorage {
         @Override
-        public EnumMjType getType() {
-            return EnumMjType.TRANSPORT;
+        public EnumMjDeviceType getDeviceType() {
+            return EnumMjDeviceType.TRANSPORT;
+        }
+
+        @Override
+        public EnumMjPowerType getPowerType() {
+            if (pipe instanceof IMjExternalStorage) {
+                return EnumMjPowerType.NORMAL;
+            } else {
+                return EnumMjPowerType.REDSTONE;
+            }
         }
 
         private IMjExternalStorage getSidedStorage(EnumFacing side) {
@@ -426,7 +436,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             return;
         }
 
-        pipe.updateEntity();
+        pipe.update();
 
         for (EnumFacing direction : EnumFacing.VALUES) {
             PipePluggable p = getPipePluggable(direction);

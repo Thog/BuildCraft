@@ -15,15 +15,17 @@ import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
 
 import buildcraft.api.core.IInvSlot;
-import buildcraft.api.power.IRedstoneEngine;
-import buildcraft.api.power.IRedstoneEngineReceiver;
+import buildcraft.api.mj.DefaultMjExternalStorage;
+import buildcraft.api.mj.DefaultMjInternalStorage;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.tiles.IHasWork;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.gui.ContainerDummy;
 import buildcraft.core.lib.inventory.InvUtils;
@@ -35,7 +37,7 @@ import buildcraft.core.lib.utils.CraftingUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
 
-public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory, IHasWork, IRedstoneEngineReceiver {
+public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory, IHasWork, IMjHandler {
 
     public static final int SLOT_RESULT = 9;
     public static final int CRAFT_TIME = 256;
@@ -61,25 +63,18 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
     private boolean hasWork = false;
     private boolean scheduledCacheRebuild = false;
 
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
+
     public TileAutoWorkbench() {
-        super();
-        this.setBattery(new RFBattery(16, 16, 0));
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.REDSTONE, 1.6);
+        internalStorage = new DefaultMjInternalStorage(3.2, 1.6, 400, 0.2);
+        externalStorage.setInternalStorage(internalStorage);
     }
 
     @Override
     public boolean hasWork() {
         return hasWork;
-    }
-
-    @Override
-    public boolean canConnectRedstoneEngine(EnumFacing side) {
-        return true;
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing side) {
-        TileEntity tile = worldObj.getTileEntity(pos.offset(side));
-        return tile instanceof IRedstoneEngine;
     }
 
     public class LocalInventoryCrafting extends InventoryCrafting {
@@ -422,5 +417,10 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
     @Override
     public boolean hasCustomName() {
         return false;
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return storage;
     }
 }

@@ -11,15 +11,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportPower;
 
-public class PipePowerStone extends Pipe<PipeTransportPower> {
-
+public class PipePowerStone extends PipePowerBase {
     public PipePowerStone(Item item) {
-        super(new PipeTransportPower(), item);
-        transport.initFromPipe(getClass());
+        super(item);
     }
 
     @Override

@@ -11,7 +11,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.core.lib.utils.Utils;
 
 public final class TileBuffer {
 

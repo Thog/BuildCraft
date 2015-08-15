@@ -16,7 +16,8 @@ import net.minecraft.util.ResourceLocation;
 import buildcraft.api.enums.EnumEnergyStage;
 import buildcraft.api.mj.DefaultMjExternalStorage;
 import buildcraft.api.mj.DefaultMjInternalStorage;
-import buildcraft.api.mj.EnumMjType;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
@@ -32,11 +33,10 @@ import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
-public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection/* , IEnergyHandler *//* ,
-                                                                                                             * IEngine */, IHeatable, IMjHandler {
+public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection, IHeatable, IMjHandler {
     protected class SidedMjExternalStorage extends DefaultMjExternalStorage implements IMjConnection {
         public SidedMjExternalStorage(double maxPowerTransfered) {
-            super(EnumMjType.ENGINE, maxPowerTransfered);
+            super(EnumMjDeviceType.ENGINE, EnumMjPowerType.NORMAL, maxPowerTransfered);
         }
 
         @Override
@@ -70,8 +70,8 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
     private boolean isPumping = false; // Used for SMP synch
 
-    protected final SidedMjExternalStorage externalStorage;
-    protected final DefaultMjInternalStorage internalStorage;
+    protected IMjExternalStorage externalStorage;
+    protected DefaultMjInternalStorage internalStorage;
 
     protected TileEngineBase(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
         externalStorage = new SidedMjExternalStorage(maxPowerTransfered);
@@ -288,7 +288,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     }
 
     protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
-        return true;
+        return storage.getPowerType().canConvertFrom(getMjStorage().getPowerType());
     }
 
     // public Object getEnergyProvider(EnumFacing orientation) {
@@ -349,7 +349,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
                 return false;
             }
         }
-        return storage.getType().acceptsPowerFrom(EnumMjType.ENGINE);
+        return storage.getDeviceType().acceptsPowerFrom(EnumMjDeviceType.ENGINE);
         // return isPoweredTile(tile, orientation);
     }
 

@@ -33,7 +33,6 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.core.EntityLaser;
 import buildcraft.core.client.BuildCraftStateMapper;
 import buildcraft.core.lib.EntityResizableCuboid;

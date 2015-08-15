@@ -14,15 +14,11 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.IPipeConnectionForced;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportPower;
 
-public class PipePowerSandstone extends Pipe<PipeTransportPower>implements IPipeConnectionForced {
-
+public class PipePowerSandstone extends PipePowerBase implements IPipeConnectionForced {
     public PipePowerSandstone(Item item) {
-        super(new PipeTransportPower(), item);
-        transport.initFromPipe(getClass());
+        super(item);
     }
 
     @Override

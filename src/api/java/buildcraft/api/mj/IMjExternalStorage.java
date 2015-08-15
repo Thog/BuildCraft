@@ -10,7 +10,10 @@ import net.minecraft.world.World;
 public interface IMjExternalStorage {
     /** @return The type of this storage device. Depending on what it is, different actions will be taken when accepting
      *         power and receiving power. Should never return null. */
-    EnumMjType getType();
+    EnumMjDeviceType getDeviceType();
+
+    /** @return The type of power this storage deals with. */
+    EnumMjPowerType getPowerType();
 
     /** @param flowDirection The direction that the power should flow (If you are extracting from an engine below, this
      *            would be EnumFacing.UP). If you don't know which direction it is, it is safe to pass null.

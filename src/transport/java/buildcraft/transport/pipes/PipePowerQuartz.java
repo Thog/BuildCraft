@@ -11,14 +11,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportPower;
 
-public class PipePowerQuartz extends Pipe<PipeTransportPower> {
-
+public class PipePowerQuartz extends PipePowerBase {
     public PipePowerQuartz(Item item) {
-        super(new PipeTransportPower(), item);
+        super(item);
         transport.initFromPipe(getClass());
     }
 

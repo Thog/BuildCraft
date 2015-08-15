@@ -6,7 +6,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
 
@@ -17,10 +16,6 @@ public class PipePowerEmerald extends PipePowerWood {
 
     public PipePowerEmerald(Item item) {
         super(item);
-
-        battery = new RFBattery(2560 * 50, 2560, 0);
-
-        transport.initFromPipe(this.getClass());
     }
 
     @Override

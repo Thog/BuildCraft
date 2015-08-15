@@ -12,7 +12,7 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
 
     public ReferenceMjEngine() {
         // Create our storage things
-        externalStorage = new DefaultMjExternalStorage(EnumMjType.ENGINE, 40);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.ENGINE, EnumMjPowerType.NORMAL, 40);
         internalStorage = new DefaultMjInternalStorage(400, 40, 600, 0.2);
         externalStorage.setInternalStorage(internalStorage);
     }

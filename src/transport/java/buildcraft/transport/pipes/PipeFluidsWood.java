@@ -80,8 +80,8 @@ public class PipeFluidsWood extends Pipe<PipeTransportFluids>implements IEnergyH
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
 
         if (fluidToExtract <= 0) {
             return;

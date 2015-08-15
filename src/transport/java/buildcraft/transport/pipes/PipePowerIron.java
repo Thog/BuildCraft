@@ -72,8 +72,8 @@ public class PipePowerIron extends Pipe<PipeTransportPower> {
     }
 
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public void update() {
+        super.update();
         transport.maxPower = getMode().maxPower;
     }
 
