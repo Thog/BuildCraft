@@ -143,7 +143,9 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
                 return;
             }
 
-            robot.getBattery().extractEnergy(currentBuildingSlot.getPowerRequirement(), false);
+            double mj = currentBuildingSlot.getPowerRequirement();
+            robot.getInternalStorage().extractPower(robot.worldObj, mj, mj, false);
+
             launchingDelay = currentBuildingSlot.getStacksToDisplay().size() * BuildingItem.ITEMS_SPACE;
             markerToBuild.getBlueprintBuilder().buildSlot(robot.worldObj, (IBuildingItemsProvider) markerToBuild, currentBuildingSlot, robot.posX
                 + 0.125F, robot.posY + 0.125F, robot.posZ + 0.125F);
@@ -202,7 +204,7 @@ public class BoardRobotBuilder extends RedstoneBoardRobot {
     }
 
     private boolean hasEnoughEnergy() {
-        return robot.getEnergy() - currentBuildingSlot.getPowerRequirement() > EntityRobotBase.SAFETY_ENERGY;
+        return robot.getInternalStorage().currentPower() - currentBuildingSlot.getPowerRequirement() > EntityRobotBase.SAFETY_ENERGY;
     }
 
 }

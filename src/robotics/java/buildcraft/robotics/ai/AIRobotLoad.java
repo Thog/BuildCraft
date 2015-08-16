@@ -101,7 +101,7 @@ public class AIRobotLoad extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return 8;
+    public double getEnergyCost() {
+        return 0.8;
     }
 }

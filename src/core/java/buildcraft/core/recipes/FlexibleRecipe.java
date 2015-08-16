@@ -150,7 +150,7 @@ public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeVie
         CraftingResult<T> result = new CraftingResult<T>();
 
         result.recipe = this;
-        result.energyCost = energyCost;
+        result.powerCost = energyCost;
         result.craftingTime = craftingTime;
 
         for (ItemStack requirement : inputItems) {

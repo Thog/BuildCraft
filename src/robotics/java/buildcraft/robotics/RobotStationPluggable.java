@@ -10,8 +10,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
-import cofh.api.energy.IEnergyReceiver;
-
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.robots.DockingStation;
 import buildcraft.api.robots.IDockingStationProvider;
 import buildcraft.api.robots.RobotManager;
@@ -28,7 +31,7 @@ import buildcraft.transport.TileGenericPipe;
 
 import io.netty.buffer.ByteBuf;
 
-public class RobotStationPluggable extends PipePluggable implements IPipePluggableItem, IEnergyReceiver, IDebuggable, IDockingStationProvider {
+public class RobotStationPluggable extends PipePluggable implements IPipePluggableItem, IDebuggable, IDockingStationProvider, IMjHandler {
     public class RobotStationPluggableRenderer implements IPipePluggableStaticRenderer {
         private float zFightOffset = 1 / 4096.0F;
 
@@ -133,18 +136,23 @@ public class RobotStationPluggable extends PipePluggable implements IPipePluggab
     private DockingStationPipe station;
     private boolean isValid = false;
 
-    public RobotStationPluggable() {
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
 
+    public RobotStationPluggable() {
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.TRANSPORT, 10);
+        internalStorage = new DefaultMjInternalStorage(100, 1, 400, 1);
+        externalStorage.setInternalStorage(internalStorage);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
-
+        nbt.setTag("internalStorage", internalStorage.writeToNBT());
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
-
+        internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
     }
 
     @Override
@@ -238,30 +246,6 @@ public class RobotStationPluggable extends PipePluggable implements IPipePluggab
     }
 
     @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        if (station != null && station.robotTaking() != null && station.robotTaking().getBattery() != null && station.robotTaking()
-                .getDockingStation() == station) {
-            return ((EntityRobot) station.robotTaking()).receiveEnergy(maxReceive, simulate);
-        }
-        return 0;
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        return 0;
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return 0;
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
-    }
-
-    @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
         if (station == null) {
             left.add("RobotStationPluggable: No station found!");
@@ -272,5 +256,10 @@ public class RobotStationPluggable extends PipePluggable implements IPipePluggab
                 ((IDebuggable) station.robotTaking()).getDebugInfo(left, right, side);
             }
         }
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

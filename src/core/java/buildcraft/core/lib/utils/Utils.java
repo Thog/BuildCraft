@@ -33,7 +33,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 import buildcraft.api.core.IAreaProvider;
-import buildcraft.api.power.IEngine;
 import buildcraft.api.tiles.ITileAreaProvider;
 import buildcraft.api.transport.IInjectable;
 import buildcraft.api.transport.IPipeTile;
@@ -85,7 +84,7 @@ public final class Utils {
 
             TileEntity tile = world.getTileEntity(newpos);
             ITransactor transactor = Transactor.getTransactorFor(tile);
-            if (transactor != null && !(tile instanceof IEngine) && transactor.add(stack, orientation.getOpposite(), false).stackSize > 0) {
+            if (transactor != null && transactor.add(stack, orientation.getOpposite(), false).stackSize > 0) {
                 return transactor.add(stack, orientation.getOpposite(), true).stackSize;
             }
         }

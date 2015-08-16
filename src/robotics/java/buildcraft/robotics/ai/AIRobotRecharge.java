@@ -31,13 +31,13 @@ public class AIRobotRecharge extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
+    public double getEnergyCost() {
         return 0;
     }
 
     @Override
     public void update() {
-        if (robot.getEnergy() >= EntityRobotBase.MAX_ENERGY - 500) {
+        if (robot.getInternalStorage().currentPower() >= EntityRobotBase.MAX_ENERGY - 50) {
             terminate();
         }
     }

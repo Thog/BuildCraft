@@ -13,12 +13,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.api.mj.DefaultMjInternalStorage;
 import buildcraft.api.mj.EnumMjDeviceType;
 import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
+import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportPower;
 
@@ -114,8 +115,21 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         List<DefaultMjInternalStorage> toDo = Lists.newArrayList();
         for (EnumFacing face : EnumFacing.values()) {
             if (!container.isPipeConnected(face)) {
-                // if there is not a pipe part here then we need to
-                return;
+                // if there is not a pipe part here then we need to check for pluggables that require power
+                if (!container.hasPipePluggable(face)) {
+                    continue;
+                }
+
+                PipePluggable pluggable = container.getPipePluggable(face);
+                if (pluggable instanceof IMjHandler) {
+                    IMjExternalStorage external = ((IMjHandler) pluggable).getMjStorage();
+                    if (isValidDestination(external)) {
+                        // If its not a valid destination, then don't add it to the totalSuction calculation below.
+                        faceOtherMap.put(face, external);
+                    }
+                }
+
+                continue;
             }
             DefaultMjInternalStorage storage = pipePartMap.get(face);
             storage.tick(getWorld());

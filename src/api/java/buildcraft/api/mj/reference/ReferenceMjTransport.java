@@ -1,4 +1,4 @@
-package buildcraft.api.mj;
+package buildcraft.api.mj.reference;
 
 import java.util.EnumMap;
 import java.util.Map.Entry;
@@ -9,6 +9,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 
 /** This particular reference implemtation is not mean to be used, rather is an example that you can follow to properly
  * implement a tile entity that transports power. */

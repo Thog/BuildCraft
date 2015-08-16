@@ -19,19 +19,19 @@ public class AIRobotMain extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
+    public double getEnergyCost() {
         return 0;
     }
 
     @Override
     public void preempt(AIRobot ai) {
-        if (robot.getEnergy() <= EntityRobotBase.SHUTDOWN_ENERGY && (robot.getDockingStation() == null || !robot.getDockingStation()
-                .providesPower())) {
+        if (robot.getInternalStorage().currentPower() <= EntityRobotBase.SHUTDOWN_ENERGY && (robot.getDockingStation() == null || !robot
+                .getDockingStation().providesPower())) {
             if (!(ai instanceof AIRobotShutdown)) {
                 BCLog.logger.info("Shutting down robot " + robot.toString() + " - no power");
                 startDelegateAI(new AIRobotShutdown(robot));
             }
-        } else if (robot.getEnergy() < EntityRobotBase.SAFETY_ENERGY) {
+        } else if (robot.getInternalStorage().currentPower() < EntityRobotBase.SAFETY_ENERGY) {
             if (!(ai instanceof AIRobotRecharge) && !(ai instanceof AIRobotShutdown)) {
                 if (rechargeCooldown-- <= 0) {
                     startDelegateAI(new AIRobotRecharge(robot));

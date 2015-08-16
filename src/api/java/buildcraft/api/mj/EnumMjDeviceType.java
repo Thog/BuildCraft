@@ -14,41 +14,32 @@ public enum EnumMjDeviceType {
     /** Something that gives out no power, but accepts power from transport and engines. */
     MACHINE(4);
 
-    private final List<EnumMjDeviceType> from, to;
+    private final List<EnumMjDeviceType> to;
     private final double flowDivisor;
 
     static {
-        ENGINE.from.add(ENGINE);
         ENGINE.to.add(ENGINE);
         ENGINE.to.add(TRANSPORT);
         ENGINE.to.add(MACHINE);
 
-        STORAGE.from.add(TRANSPORT);
         STORAGE.to.add(TRANSPORT);
 
-        TRANSPORT.from.add(ENGINE);
-        TRANSPORT.from.add(STORAGE);
-        TRANSPORT.from.add(TRANSPORT);
         TRANSPORT.to.add(STORAGE);
         TRANSPORT.to.add(TRANSPORT);
         TRANSPORT.to.add(MACHINE);
-
-        MACHINE.from.add(ENGINE);
-        MACHINE.from.add(TRANSPORT);
     }
 
     EnumMjDeviceType(double flowDivisor) {
-        this.from = Lists.newArrayList();
         this.to = Lists.newArrayList();
         this.flowDivisor = flowDivisor;
     }
 
-    public boolean acceptsPowerFrom(EnumMjDeviceType type) {
-        return from.contains(type);
+    public boolean givesPowerTo(EnumMjDeviceType type) {
+        return type == this || to.contains(type);
     }
 
-    public boolean givesPowerTo(EnumMjDeviceType type) {
-        return to.contains(type);
+    public boolean acceptsPowerFrom(EnumMjDeviceType type) {
+        return type.givesPowerTo(this);
     }
 
     public double getFlowDivisor() {

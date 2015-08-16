@@ -142,7 +142,7 @@ public class AIRobotFetchItem extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return 15;
+    public double getEnergyCost() {
+        return 1.5;
     }
 }

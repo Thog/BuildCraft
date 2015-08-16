@@ -4,8 +4,9 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.silicon.tile;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -17,21 +18,24 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.power.ILaserTarget;
-import buildcraft.api.power.ILaserTargetBlock;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.IMjLaserStorage;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.Box;
 import buildcraft.core.EntityLaser;
 import buildcraft.core.LaserData;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.block.TileBuildCraft;
-import buildcraft.core.lib.utils.BlockUtils;
 import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
-public class TileLaser extends TileBuildCraft implements IHasWork, IControllable {
+public class TileLaser extends TileBuildCraft implements IHasWork, IControllable, IMjHandler {
 
     private static final float LASER_OFFSET = 2.0F / 16.0F;
     private static final short POWER_AVERAGING = 100;
@@ -41,15 +45,27 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
     private final SafeTimeTracker laserTickTracker = new SafeTimeTracker(10);
     private final SafeTimeTracker searchTracker = new SafeTimeTracker(100, 100);
     private final SafeTimeTracker networkTracker = new SafeTimeTracker(20, 3);
-    private ILaserTarget laserTarget;
     private int powerIndex = 0;
 
     private short powerAverage = 0;
     private final short[] power = new short[POWER_AVERAGING];
 
+    private BlockPos targetPos;
+    private IMjLaserStorage laserTarget;
+
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjExternalStorage externalLaserStorage;
+    private final DefaultMjInternalStorage internalStorage;
+
     public TileLaser() {
         super();
-        this.setBattery(new RFBattery(10000, 250, 0));
+        internalStorage = new DefaultMjInternalStorage(1000, 25, 400, 2);
+
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, 5);
+        externalStorage.setInternalStorage(internalStorage);
+
+        externalLaserStorage = new DefaultMjExternalStorage(EnumMjDeviceType.ENGINE, EnumMjPowerType.LASER, 0);
+        externalLaserStorage.setInternalStorage(internalStorage);
     }
 
     @Override
@@ -95,7 +111,7 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         }
 
         // Disable the laser and do nothing if no energy is available.
-        if (getBattery().getEnergyStored() == 0) {
+        if (!internalStorage.hasActivated()) {
             removeLaser();
             return;
         }
@@ -110,8 +126,8 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         }
 
         // Consume power and transfer it to the table.
-        int localPower = getBattery().useEnergy(0, getMaxPowerSent(), false);
-        laserTarget.receiveLaserEnergy(localPower);
+        double localPower = internalStorage.extractPower(getWorld(), 0, getMaxPowerSent(), false);
+        laserTarget.insertPower(getWorld(), laserTarget.getTargetFace().getOpposite(), externalLaserStorage, localPower, false);
 
         if (laser != null) {
             pushPower(localPower);
@@ -126,7 +142,7 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         return 40;
     }
 
-    protected void onPowerSent(int power) {}
+    protected void onPowerSent(double power) {}
 
     protected boolean canFindTable() {
         return searchTracker.markTimeIfDelay(worldObj);
@@ -137,7 +153,7 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
     }
 
     protected boolean isValidTable() {
-        if (laserTarget == null || laserTarget.isInvalidTarget() || !laserTarget.requiresLaserEnergy()) {
+        if (laserTarget == null || !laserTarget.canCurrentlyRecievePower()) {
             return false;
         }
 
@@ -158,17 +174,20 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
             min = min.offset(facing, -5);
         }
 
-        List<ILaserTarget> targets = new LinkedList<ILaserTarget>();
+        List<IMjLaserStorage> targets = Lists.newLinkedList();
+        List<BlockPos> positions = Lists.newArrayList();
 
         for (BlockPos pos : (Iterable<BlockPos>) BlockPos.getAllInBox(min, max)) {
-            if (BlockUtils.getBlock(worldObj, pos) instanceof ILaserTargetBlock) {
-                TileEntity tile = worldObj.getTileEntity(pos);
-                if (tile instanceof ILaserTarget) {
-                    ILaserTarget table = (ILaserTarget) tile;
-
-                    if (table.requiresLaserEnergy()) {
-                        targets.add(table);
-                    }
+            TileEntity tile = worldObj.getTileEntity(pos);
+            if (tile == null || !(tile instanceof IMjHandler)) {
+                continue;
+            }
+            IMjExternalStorage store = ((IMjHandler) tile).getMjStorage();
+            if (store instanceof IMjLaserStorage) {
+                IMjLaserStorage laser = (IMjLaserStorage) store;
+                if (laser.canCurrentlyRecievePower()) {
+                    targets.add(laser);
+                    positions.add(pos);
                 }
             }
         }
@@ -177,7 +196,9 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
             return;
         }
 
-        laserTarget = targets.get(worldObj.rand.nextInt(targets.size()));
+        int index = worldObj.rand.nextInt(targets.size());
+        laserTarget = targets.get(index);
+        targetPos = positions.get(index);
     }
 
     protected void updateLaser() {
@@ -210,8 +231,8 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
 
         Vec3 head = Utils.convertMiddle(getPos()).addVector(px, py, pz);
 
-        Vec3 tail = Utils.convert(laserTarget.getPos()).addVector(0.475 + (worldObj.rand.nextDouble() - 0.5) / 5d, 9 / 16d, 0.475 + (worldObj.rand
-                .nextDouble() - 0.5) / 5d);
+        Vec3 tail = Utils.convert(targetPos).addVector(0.475 + (worldObj.rand.nextDouble() - 0.5) / 5d, 9 / 16d, 0.475 + (worldObj.rand.nextDouble()
+            - 0.5) / 5d);
 
         laser.head = head;
         laser.tail = tail;
@@ -274,7 +295,7 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         return isValidTable();
     }
 
-    private void pushPower(int received) {
+    private void pushPower(double received) {
         powerAverage -= power[powerIndex];
         powerAverage += received;
         power[powerIndex] = (short) received;
@@ -307,5 +328,10 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
     @Override
     public boolean acceptsControlMode(Mode mode) {
         return mode == IControllable.Mode.On || mode == IControllable.Mode.Off;
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

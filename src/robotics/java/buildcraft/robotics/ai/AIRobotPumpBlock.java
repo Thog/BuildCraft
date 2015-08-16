@@ -54,8 +54,8 @@ public class AIRobotPumpBlock extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return 5;
+    public double getEnergyCost() {
+        return 0.5;
     }
 
     @Override

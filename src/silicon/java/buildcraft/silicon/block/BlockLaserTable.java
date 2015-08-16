@@ -20,7 +20,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.enums.EnumLaserTableType;
-import buildcraft.api.power.ILaserTargetBlock;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.silicon.BuildCraftSilicon;
@@ -31,7 +30,7 @@ import buildcraft.silicon.tile.TileIntegrationTable;
 import buildcraft.silicon.tile.TileProgrammingTable;
 import buildcraft.silicon.tile.TileStampingTable;
 
-public class BlockLaserTable extends BlockBuildCraft implements ILaserTargetBlock {
+public class BlockLaserTable extends BlockBuildCraft {
     public static final int TABLE_MAX = 6;
 
     public BlockLaserTable() {

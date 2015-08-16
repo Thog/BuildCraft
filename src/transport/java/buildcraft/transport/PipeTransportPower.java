@@ -13,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyReceiver;
 
 import buildcraft.api.core.SafeTimeTracker;
@@ -26,7 +25,6 @@ import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.CompatHooks;
-import buildcraft.core.DefaultProps;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketPowerUpdate;
 import buildcraft.transport.pipes.PipePowerCobblestone;
@@ -52,7 +50,7 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
     public int[] nextPowerQuery = new int[6];
     public double[] internalNextPower = new double[6];
     public int overload;
-    public int maxPower = 80;
+    public double maxPower = 8;
     public float powerResistance;
 
     public int[] dbgEnergyInput = new int[6];
@@ -188,160 +186,164 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
         return CompatHooks.INSTANCE.getEnergyProvider(tiles[side]);
     }
 
-    @Override
-    public void updateEntity() {
-        if (container.getWorld().isRemote) {
-            return;
-        }
+    // @Override
+    // public void updateEntity() {
+    // if (container.getWorld().isRemote) {
+    // return;
+    // }
+    //
+    // step();
+    //
+    // init();
+    //
+    // for (EnumFacing side : EnumFacing.VALUES) {
+    // if (tiles[side.ordinal()] != null && tiles[side.ordinal()].isInvalid()) {
+    // updateTile(side);
+    // }
+    // }
+    //
+    // // Send the power to nearby pipes who requested it
+    // System.arraycopy(displayPower, 0, prevDisplayPower, 0, 6);
+    // Arrays.fill(displayPower, (short) 0);
+    //
+    // for (int i = 0; i < 6; ++i) {
+    // if (internalPower[i] > 0) {
+    // int totalPowerQuery = 0;
+    // for (int j = 0; j < 6; ++j) {
+    // if (j != i && powerQuery[j] > 0) {
+    // Object ep = providers[j];
+    // if (ep instanceof IPipeTile || ep instanceof IEnergyReceiver || ep instanceof IEnergyHandler) {
+    // totalPowerQuery += powerQuery[j];
+    // }
+    // }
+    // }
+    //
+    // if (totalPowerQuery > 0) {
+    // for (int j = 0; j < 6; ++j) {
+    // if (j != i && powerQuery[j] > 0) {
+    // Object ep = providers[j];
+    // double watts = Math.min(internalPower[i] * powerQuery[j] / totalPowerQuery, internalPower[i]);
+    //
+    // if (ep instanceof IPipeTile) {
+    // Pipe<?> nearbyPipe = (Pipe<?>) ((IPipeTile) ep).getPipe();
+    // PipeTransportPower nearbyTransport = (PipeTransportPower) nearbyPipe.transport;
+    // watts = nearbyTransport.receiveEnergy(EnumFacing.VALUES[j].getOpposite(), watts);
+    // internalPower[i] -= watts;
+    // dbgEnergyOutput[j] += watts;
+    // } else {
+    // int iWatts = (int) watts;
+    // if (ep instanceof IEnergyHandler) {
+    // IEnergyHandler handler = (IEnergyHandler) ep;
+    // if (handler.canConnectEnergy(EnumFacing.VALUES[j].getOpposite())) {
+    // watts = handler.receiveEnergy(EnumFacing.VALUES[j].getOpposite(), iWatts, false);
+    // }
+    // internalPower[i] -= iWatts;
+    // dbgEnergyOutput[j] += iWatts;
+    // } else if (ep instanceof IEnergyReceiver) {
+    // IEnergyReceiver handler = (IEnergyReceiver) ep;
+    // if (handler.canConnectEnergy(EnumFacing.VALUES[j].getOpposite())) {
+    // watts = handler.receiveEnergy(EnumFacing.VALUES[j].getOpposite(), iWatts, false);
+    // }
+    // internalPower[i] -= iWatts;
+    // dbgEnergyOutput[j] += iWatts;
+    // }
+    // }
+    //
+    // displayPower[j] += watts;
+    // displayPower[i] += watts;
+    // }
+    // }
+    // }
+    // }
+    // }
+    // float highestPower = 0.0F;
+    // for (int i = 0; i < 6; i++) {
+    // displayPower[i] = (short) Math.floor((float) (prevDisplayPower[i] * (DISPLAY_SMOOTHING - 1) + displayPower[i]) /
+    // DISPLAY_SMOOTHING);
+    // if (displayPower[i] > highestPower) {
+    // highestPower = displayPower[i];
+    // }
+    // }
+    // overload += highestPower > ((float) maxPower) * 0.95F ? 1 : -1;
+    // if (overload < 0) {
+    // overload = 0;
+    // }
+    // if (overload > OVERLOAD_TICKS) {
+    // overload = OVERLOAD_TICKS;
+    // }
+    //
+    // // Compute the tiles requesting energy that are not power pipes
+    // for (EnumFacing dir : EnumFacing.VALUES) {
+    // if (!outputOpen(dir)) {
+    // continue;
+    // }
+    //
+    // Object tile = providers[dir.ordinal()];
+    //
+    // if (tile instanceof IPipeTile && ((Pipe<?>) ((IPipeTile) tile).getPipe()).transport instanceof
+    // PipeTransportPower) {
+    // continue;
+    // }
+    // if (tile instanceof IEnergyHandler) {
+    // IEnergyHandler handler = (IEnergyHandler) tile;
+    // if (handler.canConnectEnergy(dir.getOpposite())) {
+    // int request = handler.receiveEnergy(dir.getOpposite(), this.maxPower, true);
+    // if (request > 0) {
+    // requestEnergy(dir, request);
+    // }
+    // }
+    // } else if (tile instanceof IEnergyReceiver) {
+    // IEnergyReceiver handler = (IEnergyReceiver) tile;
+    // if (handler.canConnectEnergy(dir.getOpposite())) {
+    // int request = handler.receiveEnergy(dir.getOpposite(), this.maxPower, true);
+    // if (request > 0) {
+    // requestEnergy(dir, request);
+    // }
+    // }
+    // }
+    // }
+    //
+    // // Sum the amount of energy requested on each side
+    // int[] transferQuery = new int[6];
+    // for (int i = 0; i < 6; ++i) {
+    // transferQuery[i] = 0;
+    // if (!inputOpen(EnumFacing.getFront(i))) {
+    // continue;
+    // }
+    // for (int j = 0; j < 6; ++j) {
+    // if (j != i) {
+    // transferQuery[i] += powerQuery[j];
+    // }
+    // }
+    // transferQuery[i] = Math.min(transferQuery[i], maxPower);
+    // }
+    //
+    // // Transfer the requested energy to nearby pipes
+    // for (int i = 0; i < 6; ++i) {
+    // if (transferQuery[i] != 0 && tiles[i] != null) {
+    // TileEntity entity = tiles[i];
+    // if (entity instanceof IPipeTile) {
+    // IPipeTile nearbyTile = (IPipeTile) entity;
+    // if (nearbyTile.getPipe() == null) {
+    // continue;
+    // }
+    // PipeTransportPower nearbyTransport = (PipeTransportPower) ((Pipe<?>) nearbyTile.getPipe()).transport;
+    // nearbyTransport.requestEnergy(EnumFacing.VALUES[i].getOpposite(), transferQuery[i]);
+    // }
+    // }
+    // }
+    //
+    // if (tracker.markTimeIfDelay(container.getWorld())) {
+    // PacketPowerUpdate packet = new PacketPowerUpdate(container.getPos());
+    //
+    // packet.displayPower = displayPower;
+    // packet.overload = isOverloaded();
+    // BuildCraftTransport.instance.sendToPlayers(packet, container.getWorld(), container.getPos(),
+    // DefaultProps.PIPE_CONTENTS_RENDER_DIST);
+    // }
+    // }
 
-        step();
-
-        init();
-
-        for (EnumFacing side : EnumFacing.VALUES) {
-            if (tiles[side.ordinal()] != null && tiles[side.ordinal()].isInvalid()) {
-                updateTile(side);
-            }
-        }
-
-        // Send the power to nearby pipes who requested it
-        System.arraycopy(displayPower, 0, prevDisplayPower, 0, 6);
-        Arrays.fill(displayPower, (short) 0);
-
-        for (int i = 0; i < 6; ++i) {
-            if (internalPower[i] > 0) {
-                int totalPowerQuery = 0;
-                for (int j = 0; j < 6; ++j) {
-                    if (j != i && powerQuery[j] > 0) {
-                        Object ep = providers[j];
-                        if (ep instanceof IPipeTile || ep instanceof IEnergyReceiver || ep instanceof IEnergyHandler) {
-                            totalPowerQuery += powerQuery[j];
-                        }
-                    }
-                }
-
-                if (totalPowerQuery > 0) {
-                    for (int j = 0; j < 6; ++j) {
-                        if (j != i && powerQuery[j] > 0) {
-                            Object ep = providers[j];
-                            double watts = Math.min(internalPower[i] * powerQuery[j] / totalPowerQuery, internalPower[i]);
-
-                            if (ep instanceof IPipeTile) {
-                                Pipe<?> nearbyPipe = (Pipe<?>) ((IPipeTile) ep).getPipe();
-                                PipeTransportPower nearbyTransport = (PipeTransportPower) nearbyPipe.transport;
-                                watts = nearbyTransport.receiveEnergy(EnumFacing.VALUES[j].getOpposite(), watts);
-                                internalPower[i] -= watts;
-                                dbgEnergyOutput[j] += watts;
-                            } else {
-                                int iWatts = (int) watts;
-                                if (ep instanceof IEnergyHandler) {
-                                    IEnergyHandler handler = (IEnergyHandler) ep;
-                                    if (handler.canConnectEnergy(EnumFacing.VALUES[j].getOpposite())) {
-                                        watts = handler.receiveEnergy(EnumFacing.VALUES[j].getOpposite(), iWatts, false);
-                                    }
-                                    internalPower[i] -= iWatts;
-                                    dbgEnergyOutput[j] += iWatts;
-                                } else if (ep instanceof IEnergyReceiver) {
-                                    IEnergyReceiver handler = (IEnergyReceiver) ep;
-                                    if (handler.canConnectEnergy(EnumFacing.VALUES[j].getOpposite())) {
-                                        watts = handler.receiveEnergy(EnumFacing.VALUES[j].getOpposite(), iWatts, false);
-                                    }
-                                    internalPower[i] -= iWatts;
-                                    dbgEnergyOutput[j] += iWatts;
-                                }
-                            }
-
-                            displayPower[j] += watts;
-                            displayPower[i] += watts;
-                        }
-                    }
-                }
-            }
-        }
-        float highestPower = 0.0F;
-        for (int i = 0; i < 6; i++) {
-            displayPower[i] = (short) Math.floor((float) (prevDisplayPower[i] * (DISPLAY_SMOOTHING - 1) + displayPower[i]) / DISPLAY_SMOOTHING);
-            if (displayPower[i] > highestPower) {
-                highestPower = displayPower[i];
-            }
-        }
-        overload += highestPower > ((float) maxPower) * 0.95F ? 1 : -1;
-        if (overload < 0) {
-            overload = 0;
-        }
-        if (overload > OVERLOAD_TICKS) {
-            overload = OVERLOAD_TICKS;
-        }
-
-        // Compute the tiles requesting energy that are not power pipes
-        for (EnumFacing dir : EnumFacing.VALUES) {
-            if (!outputOpen(dir)) {
-                continue;
-            }
-
-            Object tile = providers[dir.ordinal()];
-
-            if (tile instanceof IPipeTile && ((Pipe<?>) ((IPipeTile) tile).getPipe()).transport instanceof PipeTransportPower) {
-                continue;
-            }
-            if (tile instanceof IEnergyHandler) {
-                IEnergyHandler handler = (IEnergyHandler) tile;
-                if (handler.canConnectEnergy(dir.getOpposite())) {
-                    int request = handler.receiveEnergy(dir.getOpposite(), this.maxPower, true);
-                    if (request > 0) {
-                        requestEnergy(dir, request);
-                    }
-                }
-            } else if (tile instanceof IEnergyReceiver) {
-                IEnergyReceiver handler = (IEnergyReceiver) tile;
-                if (handler.canConnectEnergy(dir.getOpposite())) {
-                    int request = handler.receiveEnergy(dir.getOpposite(), this.maxPower, true);
-                    if (request > 0) {
-                        requestEnergy(dir, request);
-                    }
-                }
-            }
-        }
-
-        // Sum the amount of energy requested on each side
-        int[] transferQuery = new int[6];
-        for (int i = 0; i < 6; ++i) {
-            transferQuery[i] = 0;
-            if (!inputOpen(EnumFacing.getFront(i))) {
-                continue;
-            }
-            for (int j = 0; j < 6; ++j) {
-                if (j != i) {
-                    transferQuery[i] += powerQuery[j];
-                }
-            }
-            transferQuery[i] = Math.min(transferQuery[i], maxPower);
-        }
-
-        // Transfer the requested energy to nearby pipes
-        for (int i = 0; i < 6; ++i) {
-            if (transferQuery[i] != 0 && tiles[i] != null) {
-                TileEntity entity = tiles[i];
-                if (entity instanceof IPipeTile) {
-                    IPipeTile nearbyTile = (IPipeTile) entity;
-                    if (nearbyTile.getPipe() == null) {
-                        continue;
-                    }
-                    PipeTransportPower nearbyTransport = (PipeTransportPower) ((Pipe<?>) nearbyTile.getPipe()).transport;
-                    nearbyTransport.requestEnergy(EnumFacing.VALUES[i].getOpposite(), transferQuery[i]);
-                }
-            }
-        }
-
-        if (tracker.markTimeIfDelay(container.getWorld())) {
-            PacketPowerUpdate packet = new PacketPowerUpdate(container.getPos());
-
-            packet.displayPower = displayPower;
-            packet.overload = isOverloaded();
-            BuildCraftTransport.instance.sendToPlayers(packet, container.getWorld(), container.getPos(), DefaultProps.PIPE_CONTENTS_RENDER_DIST);
-        }
-    }
-
+    // TODO (PASS 0): Fix power pipes!
     public boolean isOverloaded() {
         return overload >= OVERLOAD_TICKS;
     }

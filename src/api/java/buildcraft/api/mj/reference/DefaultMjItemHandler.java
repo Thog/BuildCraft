@@ -1,9 +1,10 @@
-package buildcraft.api.mj;
+package buildcraft.api.mj.reference;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import buildcraft.api.enums.EnumInventoryDirection;
+import buildcraft.api.mj.IMjItemHandler;
 
 public class DefaultMjItemHandler implements IMjItemHandler {
     public static class MjItemPower {

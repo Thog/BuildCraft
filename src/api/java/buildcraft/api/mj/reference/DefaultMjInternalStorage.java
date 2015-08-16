@@ -1,9 +1,10 @@
-package buildcraft.api.mj;
+package buildcraft.api.mj.reference;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 import buildcraft.api.core.ISerializable;
+import buildcraft.api.mj.IMjInternalStorage;
 
 import io.netty.buffer.ByteBuf;
 

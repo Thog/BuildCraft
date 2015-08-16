@@ -12,15 +12,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 import buildcraft.api.enums.EnumEnergyStage;
-import buildcraft.api.mj.DefaultMjExternalStorage;
-import buildcraft.api.mj.DefaultMjInternalStorage;
 import buildcraft.api.mj.EnumMjDeviceType;
 import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage.IConnectionLimiter;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IHeatable;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.api.transport.IPipeConnection;
@@ -34,17 +36,6 @@ import buildcraft.core.lib.utils.Utils;
 import io.netty.buffer.ByteBuf;
 
 public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection, IHeatable, IMjHandler {
-    protected class SidedMjExternalStorage extends DefaultMjExternalStorage implements IMjConnection {
-        public SidedMjExternalStorage(double maxPowerTransfered) {
-            super(EnumMjDeviceType.ENGINE, EnumMjPowerType.NORMAL, maxPowerTransfered);
-        }
-
-        @Override
-        public boolean canConnectPower(EnumFacing face, IMjExternalStorage from) {
-            return orientation == face;
-        }
-    }
-
     // TEMP
     public static final ResourceLocation TRUNK_BLUE_TEXTURE = new ResourceLocation("buildcraftcore:textures/blocks/engine/trunk_blue.png");
     public static final ResourceLocation TRUNK_GREEN_TEXTURE = new ResourceLocation("buildcraftcore:textures/blocks/engine/trunk_green.png");
@@ -70,11 +61,17 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
     private boolean isPumping = false; // Used for SMP synch
 
-    protected IMjExternalStorage externalStorage;
+    protected DefaultMjExternalStorage externalStorage;
     protected DefaultMjInternalStorage internalStorage;
 
     protected TileEngineBase(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
-        externalStorage = new SidedMjExternalStorage(maxPowerTransfered);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.ENGINE, EnumMjPowerType.NORMAL, maxPowerTransfered);
+        externalStorage.addLimiter(new IConnectionLimiter() {
+            @Override
+            public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage me, IMjExternalStorage other, boolean flowingIn) {
+                return orientation == flow;
+            }
+        });
         internalStorage = new DefaultMjInternalStorage(maxPower, activationPower, lossDelay, lossRate);
         externalStorage.setInternalStorage(internalStorage);
     }

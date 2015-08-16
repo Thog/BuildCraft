@@ -24,12 +24,16 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.power.IRedstoneEngineReceiver;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.EntityResizableCuboid;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.TileBuffer;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.fluids.SingleUseTank;
@@ -42,7 +46,13 @@ import buildcraft.factory.FactoryProxy;
 
 import io.netty.buffer.ByteBuf;
 
-public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler, IRedstoneEngineReceiver {
+public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler, IMjHandler {
+
+    private static final double MAX_POWER = 100;
+    private static final double MAX_TRANSFERED = 15;
+    private static final double POWER_ACTIVATION = 10;
+    private static final long LOSS_DELAY = 400;
+    private static final double LOSS_RATE = 1;
 
     public static final int REBUID_DELAY = 512;
     public static int MAX_LIQUID = FluidContainerRegistry.BUCKET_VOLUME * 16;
@@ -63,9 +73,15 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
     // tick % 16 => min. 16 ticks per network update
     private SafeTimeTracker updateTracker = new SafeTimeTracker(Math.max(16, BuildCraftCore.updateFactor));
 
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
+
     public TilePump() {
         super();
-        this.setBattery(new RFBattery(1000, 150, 0));
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.NORMAL, MAX_TRANSFERED);
+        internalStorage = new DefaultMjInternalStorage(MAX_POWER, POWER_ACTIVATION, LOSS_DELAY, LOSS_RATE);
+        externalStorage.setInternalStorage(internalStorage);
+        // this.setBattery(new RFBattery(1000, 150, 0));
     }
 
     @Override
@@ -115,7 +131,7 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         FluidStack fluidToPump = index != null ? BlockUtils.drainBlock(worldObj, index, false) : null;
         if (fluidToPump != null) {
             if (isFluidAllowed(fluidToPump.getFluid()) && tank.fill(fluidToPump, false) == fluidToPump.amount) {
-                if (getBattery().useEnergy(100, 100, false) > 0) {
+                if (internalStorage.extractPower(getWorld(), 10, 10, false) > 0) {
                     if (fluidToPump.getFluid() != FluidRegistry.WATER || BuildCraftCore.consumeWaterSources || numFluidBlocksFound < 9) {
                         index = getNextIndexToPump(true);
                         BlockUtils.drainBlock(worldObj, index, true);
@@ -350,6 +366,7 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
 
         aimY = data.getInteger("aimY");
         tubeY = data.getFloat("tubeY");
+        internalStorage.readFromNBT(data.getCompoundTag("internalStorage"));
     }
 
     @Override
@@ -367,6 +384,8 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         } else {
             data.setFloat("tubeY", pos.getY());
         }
+
+        data.setTag("internalStorage", internalStorage.writeToNBT());
     }
 
     @Override
@@ -385,7 +404,7 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         buf.writeShort(aimY);
         buf.writeFloat((float) tubeY);
         buf.writeBoolean(powered);
-        ledState = ((tick - tickPumped) < 48 ? 16 : 0) | (getBattery().getEnergyStored() * 15 / getBattery().getMaxEnergyStored());
+        ledState = ((tick - tickPumped) < 48 ? 16 : 0) | (int) (internalStorage.currentPower() * 4 / internalStorage.maxPower());
         buf.writeByte(ledState);
     }
 
@@ -480,11 +499,6 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         return new FluidTankInfo[] { tank.getInfo() };
     }
 
-    @Override
-    public boolean canConnectRedstoneEngine(EnumFacing side) {
-        return true;
-    }
-
     public int getIconGlowLevel(int renderPass) {
         if (renderPass == 1) { // Red LED
             return ledState & 15;
@@ -493,5 +507,10 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         } else {
             return -1;
         }
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

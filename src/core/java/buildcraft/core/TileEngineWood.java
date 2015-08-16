@@ -8,11 +8,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 import buildcraft.api.enums.EnumEnergyStage;
-import buildcraft.api.mj.DefaultMjExternalStorage;
 import buildcraft.api.mj.EnumMjDeviceType;
 import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.engines.TileEngineBase;
 

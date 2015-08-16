@@ -6,38 +6,35 @@ import com.google.common.collect.Lists;
 
 public enum EnumMjPowerType {
     /** Low power type that is used (for example) for extracting items out of a chest or crafting a single item over a
-     * second. This will generally be 1/100ths of an MJ. This is not convertible between types */
+     * second. This will generally be 1/10ths of an MJ. This is down convertible from NORMAL, but not up convertible.
+     * This generally must be directly connected to the target to be used without loss. */
     REDSTONE,
     /** Normal power type that is used (for example) for placing and breaking items in the world or moving itself about.
-     * This will generally be convertible to and from the LASER type , and down convertible to the REDSTONE type */
+     * This will generally be convertible to and from the LASER type , and down convertible to the REDSTONE type. This
+     * kind needs kinesis pipes to transfer without loss. */
     NORMAL,
-    /** Higher power type that can travel through air without losing power, this will generally be in the 100's of
-     * MJ. */
+    /** Higher power type that can travel through air without losing power, this will generally be in the 100's of MJ.
+     * If you want to receive this you will need to implement IMjLaserTarget on your tile entity. */
     LASER;
 
-    private final List<EnumMjPowerType> from, to;
+    private final List<EnumMjPowerType> to;
 
     static {
-        REDSTONE.from.add(NORMAL);
-
-        NORMAL.from.add(LASER);
-        NORMAL.from.add(LASER);
         NORMAL.to.add(REDSTONE);
+        NORMAL.to.add(LASER);
 
-        LASER.from.add(NORMAL);
         LASER.to.add(NORMAL);
     }
 
     private EnumMjPowerType() {
-        from = Lists.newArrayList();
         to = Lists.newArrayList();
     }
 
-    public boolean canConvertFrom(EnumMjPowerType type) {
-        return from.contains(type) || type == this;
+    public boolean canConvertTo(EnumMjPowerType type) {
+        return type == this || to.contains(type);
     }
 
-    public boolean canConvertTo(EnumMjPowerType type) {
-        return to.contains(type) || type == this;
+    public boolean canConvertFrom(EnumMjPowerType type) {
+        return type.canConvertTo(this);
     }
 }

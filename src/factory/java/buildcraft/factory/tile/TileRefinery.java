@@ -22,13 +22,18 @@ import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.core.SafeTimeTracker;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.recipes.CraftingResult;
 import buildcraft.api.recipes.IFlexibleCrafter;
 import buildcraft.api.recipes.IFlexibleRecipe;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.BuildCraftCore;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.fluids.SingleUseTank;
 import buildcraft.core.lib.fluids.TankManager;
@@ -38,7 +43,14 @@ import buildcraft.core.recipes.RefineryRecipeManager;
 
 import io.netty.buffer.ByteBuf;
 
-public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInventory, IHasWork, IFlexibleCrafter, ICommandReceiver, IDebuggable {
+public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInventory, IHasWork, IFlexibleCrafter, ICommandReceiver, IDebuggable,
+        IMjHandler {
+
+    private static final double MAX_POWER = 1000;
+    private static final double MAX_TRANSFERED = 150;
+    private static final double POWER_ACTIVATION = 100;
+    private static final long LOSS_DELAY = 400;
+    private static final double LOSS_RATE = 1;
 
     public static int FLUID_PER_SLOT = FluidContainerRegistry.BUCKET_VOLUME * 4;
 
@@ -59,9 +71,15 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
 
     private String currentRecipeId = "";
 
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
+
     public TileRefinery() {
         super();
-        this.setBattery(new RFBattery(10000, 1500, 0));
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.NORMAL, MAX_TRANSFERED);
+        internalStorage = new DefaultMjInternalStorage(MAX_POWER, POWER_ACTIVATION, LOSS_DELAY, LOSS_RATE);
+        externalStorage.setInternalStorage(internalStorage);
+        // this.setBattery(new RFBattery(10000, 1500, 0));
     }
 
     @Override
@@ -134,7 +152,7 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
 
         isActive = true;
 
-        if (getBattery().getEnergyStored() >= craftingResult.energyCost) {
+        if (internalStorage.currentPower() >= craftingResult.powerCost) {
             increaseAnimation();
         } else {
             decreaseAnimation();
@@ -144,7 +162,7 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
             return;
         }
 
-        if (getBattery().useEnergy(craftingResult.energyCost, craftingResult.energyCost, false) > 0) {
+        if (internalStorage.extractPower(getWorld(), craftingResult.powerCost, craftingResult.powerCost, false) > 0) {
             CraftingResult<FluidStack> r = currentRecipe.craft(this, false);
             result.fill(r.crafted.copy(), true);
         }
@@ -418,5 +436,10 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
         left.add("Result");
         left.add(" " + result.getFluidAmount() + "/" + result.getCapacity() + "mB");
         left.add(" " + (result.getFluid() == null ? "empty" : result.getFluidType().getLocalizedName(result.getFluid())));
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

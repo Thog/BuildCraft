@@ -59,7 +59,7 @@ public class AIRobotShutdown extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
+    public double getEnergyCost() {
         return 0;
     }
 }

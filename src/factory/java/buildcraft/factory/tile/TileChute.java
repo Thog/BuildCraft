@@ -10,55 +10,80 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.world.World;
 
-import cofh.api.energy.IEnergyHandler;
-
-import buildcraft.api.power.IRedstoneEngineReceiver;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage.IConnectionLimiter;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.transport.IInjectable;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.inventory.ITransactor;
 import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.inventory.Transactor;
 
-public class TileChute extends TileBuildCraft implements IInventory, IEnergyHandler, IRedstoneEngineReceiver {
+public class TileChute extends TileBuildCraft implements IInventory, IMjHandler {
 
     private final SimpleInventory inventory = new SimpleInventory(4, "Chute", 64);
     private boolean isEmpty;
 
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
+
+    public TileChute() {
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.REDSTONE, 1.0);
+        externalStorage.addLimiter(new IConnectionLimiter() {
+            @Override
+            public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage thisOne, IMjExternalStorage other, boolean in) {
+                return flow.getAxis() != Axis.Y;
+            }
+        });
+        internalStorage = new DefaultMjInternalStorage(2.0, 1.0, 400, 0.1);
+        externalStorage.setInternalStorage(internalStorage);
+    }
+
     @Override
     public void initialize() {
-        this.setBattery(new RFBattery(10, 10, 0));
         inventory.addListener(this);
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
-        super.readFromNBT(nbtTagCompound);
+    public void readFromNBT(NBTTagCompound nbt) {
+        super.readFromNBT(nbt);
+        // NBTTagCompound inventoryNbt = nbt;
 
-        NBTTagCompound p = nbtTagCompound;
-
-        if (nbtTagCompound.hasKey("inventory")) {
-            // to support pre 6.0 loading
-            p = nbtTagCompound.getCompoundTag("inventory");
-        }
-
-        inventory.readFromNBT(p);
+        // if (nbt.hasKey("inventory")) {
+        // // to support pre 6.0 loading
+        // inventoryNbt = nbt.getCompoundTag("inventory");
+        // }
+        // inventory.readFromNBT(inventoryNbt);
+        inventory.readFromNBT(nbt);
         inventory.markDirty();
+
+        internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        super.writeToNBT(nbtTagCompound);
-
-        inventory.writeToNBT(nbtTagCompound);
+    public void writeToNBT(NBTTagCompound nbt) {
+        super.writeToNBT(nbt);
+        nbt.setTag("internalStorage", internalStorage.writeToNBT());
+        inventory.writeToNBT(nbt);
     }
 
     @Override
     public void update() {
         super.update();
-        if (worldObj.isRemote || isEmpty || worldObj.getTotalWorldTime() % 2 != 0) {
+        if (worldObj.isRemote) {
+            return;
+        }
+
+        internalStorage.tick(getWorld());
+
+        if (isEmpty || worldObj.getTotalWorldTime() % 2 != 0) {
             return;
         }
 
@@ -67,11 +92,11 @@ public class TileChute extends TileBuildCraft implements IInventory, IEnergyHand
         ITransactor transactor = Transactor.getTransactorFor(outputTile);
 
         if (transactor == null) {
-            if (outputTile instanceof IInjectable && getBattery().getEnergyStored() >= 10) {
+            if (outputTile instanceof IInjectable && internalStorage.currentPower() >= 1) {
                 ItemStack stackToOutput = null;
                 int internalSlot = 0;
 
-                getBattery().useEnergy(10, 10, false);
+                internalStorage.extractPower(getWorld(), 1, 1, false);
 
                 for (; internalSlot < inventory.getSizeInventory(); internalSlot++) {
                     ItemStack stackInSlot = inventory.getStackInSlot(internalSlot);
@@ -181,19 +206,12 @@ public class TileChute extends TileBuildCraft implements IInventory, IEnergyHand
     }
 
     @Override
-    public boolean canConnectRedstoneEngine(EnumFacing side) {
-        // blocks up and down
-        return side.ordinal() >= 2;
-    }
-
-    @Override
     public String getOwner() {
         return super.getOwner();
     }
 
     @Override
-    public boolean canConnectEnergy(EnumFacing side) {
-        // blocks up and down
-        return side.ordinal() >= 2 && !(getTile(side) instanceof IPipeTile);
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

@@ -1,8 +1,14 @@
-package buildcraft.api.mj;
+package buildcraft.api.mj.reference;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
+
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.IMjInternalStorage;
 
 /** This particular reference implemtation is not mean to be used, rather is a base example that you can follow to
  * properly implement a machine that uses power */

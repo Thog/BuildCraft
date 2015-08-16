@@ -35,6 +35,15 @@ import buildcraft.energy.BuildCraftEnergy;
 
 public class TileEngineIron extends TileEngineWithInventory implements IFluidHandler {
 
+    static final double MAX_OUTPUT = 1;
+    static final double MIN_OUTPUT = MAX_OUTPUT / 3;
+    static final double TARGET_OUTPUT = 0.0375;
+    static final double MAX_POWER = 10000;
+    static final double MAX_TRANSFERED = 2000;
+    static final double ACTIVATION_POWER = 40;
+    static final long LOSS_DELAY = 200;
+    static final double LOSS_RATE = 2;
+
     public static int MAX_LIQUID = FluidContainerRegistry.BUCKET_VOLUME * 10;
     public static float HEAT_PER_RF = 0.00023F;
     public static float COOLDOWN_RATE = 0.05F;
@@ -55,7 +64,7 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
     private BiomeGenBase biomeCache;
 
     public TileEngineIron() {
-        super(1);
+        super(MAX_POWER, MAX_TRANSFERED, ACTIVATION_POWER, LOSS_DELAY, LOSS_RATE, 1);
         tankManager.add(tankFuel);
         tankManager.add(tankCoolant);
     }
@@ -177,7 +186,7 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
 
                 currentOutput = currentFuel.getPowerPerCycle();
 
-                addEnergy(currentFuel.getPowerPerCycle());
+                internalStorage.insertPower(getWorld(), currentFuel.getPowerPerCycle(), false);
                 heat += currentFuel.getPowerPerCycle() * HEAT_PER_RF * getBiomeTempScalar();
             }
         } else if (penaltyCooling <= 0) {
@@ -197,8 +206,8 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
     }
 
     @Override
-    public void engineUpdate() {
-        super.engineUpdate();
+    public void update() {
+        super.update();
 
         ItemStack stack = getStackInSlot(0);
         if (stack != null) {
@@ -424,30 +433,8 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
     public FluidStack getCoolant() {
         return tankCoolant.getFluid();
     }
-
-    @Override
-    public int maxEnergyReceived() {
-        return 20000;
-    }
-
-    @Override
-    public int maxEnergyExtracted() {
-        return 5000;
-    }
-
-    @Override
-    public int getMaxEnergy() {
-        return 100000;
-    }
-
-    @Override
-    public int calculateCurrentOutput() {
-        if (currentFuel == null) {
-            return 0;
-        } else {
-            return currentFuel.getPowerPerCycle();
-        }
-    }
+    /* public double calculateCurrentOutput() { if (currentFuel == null) { return 0; } else { return
+     * currentFuel.getPowerPerCycle(); } } */
 
     @Override
     public boolean hasCustomName() {

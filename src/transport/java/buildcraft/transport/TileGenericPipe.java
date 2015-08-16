@@ -41,7 +41,7 @@ import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
-import buildcraft.api.mj.NonExistantStorage;
+import buildcraft.api.mj.reference.NonExistantStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeConnection;

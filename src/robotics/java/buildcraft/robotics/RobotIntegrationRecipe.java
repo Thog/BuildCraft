@@ -69,7 +69,7 @@ public class RobotIntegrationRecipe extends IntegrationRecipeBC {
         }
         RedstoneBoardRobotNBT boardNBT = (RedstoneBoardRobotNBT) ItemRedstoneBoard.getBoardNBT(expansions.get(0));
 
-        int energy = ItemRobot.getEnergy(input);
+        double energy = ItemRobot.getPower(input);
         if (energy == 0) {
             energy = EntityRobotBase.SAFETY_ENERGY;
         }

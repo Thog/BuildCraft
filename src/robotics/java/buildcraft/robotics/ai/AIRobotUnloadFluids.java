@@ -68,7 +68,7 @@ public class AIRobotUnloadFluids extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return 10;
+    public double getEnergyCost() {
+        return 1;
     }
 }

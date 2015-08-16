@@ -72,8 +72,8 @@ public class AIRobotStripesHandler extends AIRobot implements IStripesActivator 
     }
 
     @Override
-    public int getEnergyCost() {
-        return 15;
+    public double getEnergyCost() {
+        return 1.5;
     }
 
     @Override

@@ -13,14 +13,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import cofh.api.energy.IEnergyStorage;
-
 import buildcraft.api.boards.RedstoneBoardRobot;
 import buildcraft.api.core.IZone;
+import buildcraft.api.mj.IMjInternalStorage;
 
 public abstract class EntityRobotBase extends EntityLiving implements IInventory, IFluidHandler {
 
-    public static final int MAX_ENERGY = 100000;
+    public static final int MAX_ENERGY = 10000;
     public static final int SAFETY_ENERGY = MAX_ENERGY / 5;
     public static final int SHUTDOWN_ENERGY = 0;
     public static final long NULL_ROBOT_ID = Long.MAX_VALUE;
@@ -47,9 +46,7 @@ public abstract class EntityRobotBase extends EntityLiving implements IInventory
 
     public abstract float getAimPitch();
 
-    public abstract int getEnergy();
-
-    public abstract IEnergyStorage getBattery();
+    public abstract IMjInternalStorage getInternalStorage();
 
     public abstract DockingStation getDockingStation();
 

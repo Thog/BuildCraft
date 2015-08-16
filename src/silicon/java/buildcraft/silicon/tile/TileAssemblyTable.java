@@ -44,6 +44,10 @@ public class TileAssemblyTable extends TileLaserTableBase implements IInventory,
     private HashSet<String> plannedOutput = new HashSet<String>();
     private boolean queuedNetworkUpdate = false;
 
+    public TileAssemblyTable() {
+        super(maxPower, maxTransfered, lossDelay, lossRate);
+    }
+
     public List<CraftingResult<ItemStack>> getPotentialOutputs() {
         List<CraftingResult<ItemStack>> result = new LinkedList<CraftingResult<ItemStack>>();
 
@@ -87,8 +91,8 @@ public class TileAssemblyTable extends TileLaserTableBase implements IInventory,
             }
         }
 
-        if (getEnergy() >= currentRecipe.craft(this, true).energyCost) {
-            setEnergy(0);
+        if (internalStorage.currentPower() >= currentRecipe.craft(this, true).powerCost) {
+            internalStorage.extractPower(getWorld(), 0, Integer.MAX_VALUE, false);
 
             if (currentRecipe.canBeCrafted(this)) {
                 ItemStack remaining = currentRecipe.craft(this, false).crafted.copy();
@@ -261,12 +265,12 @@ public class TileAssemblyTable extends TileLaserTableBase implements IInventory,
     }
 
     @Override
-    public int getRequiredEnergy() {
+    public double getRequiredPower() {
         if (currentRecipe != null) {
             CraftingResult<ItemStack> result = currentRecipe.craft(this, true);
 
             if (result != null) {
-                return result.energyCost;
+                return result.powerCost;
             } else {
                 return 0;
             }

@@ -10,20 +10,42 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.power.ILaserTarget;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
+import buildcraft.api.mj.reference.DefaultMjLaserExternalStorage;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.utils.Average;
 
-public abstract class TileLaserTableBase extends TileBuildCraft implements ILaserTarget, IInventory, IHasWork {
+public abstract class TileLaserTableBase extends TileBuildCraft implements IInventory, IHasWork, IMjHandler {
+    private static final AxisAlignedBB TARGET = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 
-    public int clientRequiredEnergy = 0;
+    public double clientRequiredPower = 0;
+    public double clientPower = 0;
+    public double clientRecentPowerAverage;
+    private int clientRawPower, clientRawRequired, clientRawRecent;
     protected SimpleInventory inv = new SimpleInventory(getSizeInventory(), "inv", 64);
-    private int energy = 0;
-    private int recentEnergyAverage;
     private Average recentEnergyAverageUtil = new Average(20);
+
+    protected final DefaultMjLaserExternalStorage externalStorage;
+    protected final DefaultMjInternalStorage internalStorage;
+
+    public TileLaserTableBase(double maxPower, double maxTransfered, long lossDelay, double lossRate) {
+        externalStorage = new DefaultMjLaserExternalStorage(EnumMjDeviceType.MACHINE, maxTransfered, EnumFacing.UP, TARGET) {
+            @Override
+            public boolean canCurrentlyRecievePower() {
+                return requiresLaserEnergy();
+            }
+        };
+        internalStorage = new DefaultMjInternalStorage(maxPower, 0, lossDelay, lossRate);
+        externalStorage.setInternalStorage(internalStorage);
+    }
 
     @Override
     public void update() {
@@ -31,54 +53,26 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
         recentEnergyAverageUtil.tick();
     }
 
-    public int getEnergy() {
-        return energy;
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
-
-    public void addEnergy(int energy) {
-        this.energy += energy;
-    }
-
-    public void subtractEnergy(int energy) {
-        this.energy -= energy;
-    }
-
-    public abstract int getRequiredEnergy();
+    public abstract double getRequiredPower();
 
     public int getProgressScaled(int ratio) {
-        if (clientRequiredEnergy == 0) {
+        if (clientRequiredPower == 0) {
             return 0;
-        } else if (energy >= clientRequiredEnergy) {
+        } else if (clientPower >= clientRequiredPower) {
             return ratio;
         } else {
-            return (int) ((double) energy / (double) clientRequiredEnergy * ratio);
+            return (int) (ratio * clientPower / clientRequiredPower);
         }
     }
 
-    public int getRecentEnergyAverage() {
-        return recentEnergyAverage;
+    public double getRecentPowerAverage() {
+        return clientRecentPowerAverage;
     }
 
     public abstract boolean canCraft();
 
-    @Override
     public boolean requiresLaserEnergy() {
-        return canCraft() && energy < getRequiredEnergy() * 5F;
-    }
-
-    @Override
-    public void receiveLaserEnergy(int energy) {
-        this.energy += energy;
-        recentEnergyAverageUtil.push(energy);
-    }
-
-    @Override
-    public boolean isInvalidTarget() {
-        return isInvalid();
+        return canCraft() && internalStorage.currentPower() < getRequiredPower() * 5;
     }
 
     @Override
@@ -121,55 +115,60 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         inv.writeToNBT(nbt, "inv");
-        nbt.setInteger("energy", energy);
+        nbt.setTag("internalStorage", internalStorage.writeToNBT());
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         inv.readFromNBT(nbt, "inv");
-        energy = nbt.getInteger("energy");
+        internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
     }
 
     public void getGUINetworkData(int id, int data) {
-        int currentStored = energy;
-        int requiredEnergy = clientRequiredEnergy;
 
         switch (id) {
             case 0:
-                requiredEnergy = (requiredEnergy & 0xFFFF0000) | (data & 0xFFFF);
-                clientRequiredEnergy = requiredEnergy;
+                clientRawRequired = (clientRawRequired & 0xFFFF0000) | (data & 0xFFFF);
+                clientRequiredPower = Float.intBitsToFloat(clientRawRequired);
                 break;
             case 1:
-                currentStored = (currentStored & 0xFFFF0000) | (data & 0xFFFF);
-                energy = currentStored;
+                clientRawRequired = (clientRawRequired & 0xFFFF) | ((data & 0xFFFF) << 16);
+                clientRequiredPower = Float.intBitsToFloat(clientRawRequired);
                 break;
             case 2:
-                requiredEnergy = (requiredEnergy & 0xFFFF) | ((data & 0xFFFF) << 16);
-                clientRequiredEnergy = requiredEnergy;
+                clientRawPower = (clientRawPower & 0xFFFF0000) | (data & 0xFFFF);
+                clientPower = Float.intBitsToFloat(clientRawPower);
                 break;
             case 3:
-                currentStored = (currentStored & 0xFFFF) | ((data & 0xFFFF) << 16);
-                energy = currentStored;
+                clientRawPower = (clientRawPower & 0xFFFF) | ((data & 0xFFFF) << 16);
+                clientPower = Float.intBitsToFloat(clientRawPower);
                 break;
             case 4:
-                recentEnergyAverage = recentEnergyAverage & 0xFFFF0000 | (data & 0xFFFF);
+                clientRawRecent = clientRawRecent & 0xFFFF0000 | (data & 0xFFFF);
+                clientRecentPowerAverage = Float.intBitsToFloat(clientRawRecent);
                 break;
             case 5:
-                recentEnergyAverage = (recentEnergyAverage & 0xFFFF) | ((data & 0xFFFF) << 16);
+                clientRawRecent = (clientRawRecent & 0xFFFF) | ((data & 0xFFFF) << 16);
+                clientRecentPowerAverage = Float.intBitsToFloat(clientRawRecent);
                 break;
         }
     }
 
     public void sendGUINetworkData(Container container, ICrafting iCrafting) {
-        int requiredEnergy = getRequiredEnergy();
-        int currentStored = energy;
+        int requiredEnergy = Float.floatToRawIntBits((float) getRequiredPower());
+        int currentStored = Float.floatToRawIntBits((float) internalStorage.currentPower());
         int lRecentEnergy = (int) (recentEnergyAverageUtil.getAverage() * 100f);
         iCrafting.sendProgressBarUpdate(container, 0, requiredEnergy & 0xFFFF);
-        iCrafting.sendProgressBarUpdate(container, 1, currentStored & 0xFFFF);
-        iCrafting.sendProgressBarUpdate(container, 2, (requiredEnergy >>> 16) & 0xFFFF);
+        iCrafting.sendProgressBarUpdate(container, 1, (requiredEnergy >>> 16) & 0xFFFF);
+        iCrafting.sendProgressBarUpdate(container, 2, currentStored & 0xFFFF);
         iCrafting.sendProgressBarUpdate(container, 3, (currentStored >>> 16) & 0xFFFF);
         iCrafting.sendProgressBarUpdate(container, 4, lRecentEnergy & 0xFFFF);
         iCrafting.sendProgressBarUpdate(container, 5, (lRecentEnergy >>> 16) & 0xFFFF);
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

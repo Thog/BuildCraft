@@ -39,6 +39,10 @@ import buildcraft.api.boards.RedstoneBoardRobot;
 import buildcraft.api.boards.RedstoneBoardRobotNBT;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IZone;
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.IMjInternalStorage;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.robots.AIRobot;
 import buildcraft.api.robots.DockingStation;
 import buildcraft.api.robots.EntityRobotBase;
@@ -50,7 +54,6 @@ import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.LaserData;
 import buildcraft.core.item.ItemWrench;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.network.command.CommandWriter;
 import buildcraft.core.lib.network.command.ICommandReceiver;
 import buildcraft.core.lib.network.command.PacketCommand;
@@ -116,18 +119,19 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
     private NBTTagList stackRequestNBT;
 
-    private RFBattery battery = new RFBattery(MAX_ENERGY, MAX_ENERGY, 100);
-
     private boolean firstUpdateDone = false;
 
     private boolean isActiveClient = false;
 
     private long robotId = EntityRobotBase.NULL_ROBOT_ID;
 
-    private int energySpendPerCycle = 0;
+    private double energySpendPerCycle = 0;
     private int ticksCharging = 0;
     private float energyFX = 0;
     private Vec3 steamDirection = new Vec3(0, -1, 0);
+
+    private final DefaultMjExternalStorage externalStorage;
+    private final DefaultMjInternalStorage internalStorage;
 
     public EntityRobot(World world, RedstoneBoardRobotNBT boardNBT) {
         this(world);
@@ -154,6 +158,10 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
         width = 0.25F;
         height = 0.25F;
+
+        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, 10);
+        internalStorage = new DefaultMjInternalStorage(10, 10, 10, 10);// TODO: set the power variables
+        externalStorage.setInternalStorage(internalStorage);
     }
 
     @Override
@@ -176,7 +184,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
         dataWatcher.addObject(DATA_ITEM_AIM_PITCH, Float.valueOf(0));
         dataWatcher.addObject(DATA_ENERGY_SPEND_PER_CYCLE, Integer.valueOf(0));
         dataWatcher.addObject(DATA_ACTIVE_CLIENT, Byte.valueOf((byte) 0));
-        dataWatcher.addObject(DATA_BATTERY_ENERGY, Integer.valueOf(0));
+        dataWatcher.addObject(DATA_BATTERY_ENERGY, Float.valueOf(0));
     }
 
     protected void updateDataClient() {
@@ -196,7 +204,8 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
         itemAimPitch = dataWatcher.getWatchableObjectFloat(DATA_ITEM_AIM_PITCH);
         energySpendPerCycle = dataWatcher.getWatchableObjectInt(DATA_ENERGY_SPEND_PER_CYCLE);
         isActiveClient = dataWatcher.getWatchableObjectByte(DATA_ACTIVE_CLIENT) == 1;
-        battery.setEnergy(dataWatcher.getWatchableObjectInt(DATA_BATTERY_ENERGY));
+        internalStorage.extractPower(worldObj, 0, Integer.MAX_VALUE, false);
+        internalStorage.insertPower(worldObj, dataWatcher.getWatchableObjectFloat(DATA_BATTERY_ENERGY), false);
     }
 
     protected void updateDataServer() {
@@ -275,7 +284,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
             // The client-side sleep indicator should also display if the robot is charging.
             // To not break gates and other things checking for sleep, this is done here.
             dataWatcher.updateObject(DATA_ACTIVE_CLIENT, Byte.valueOf((byte) ((isActive() && ticksCharging == 0) ? 1 : 0)));
-            dataWatcher.updateObject(DATA_BATTERY_ENERGY, getEnergy());
+            dataWatcher.updateObject(DATA_BATTERY_ENERGY, getInternalStorage().currentPower());
 
             if (needsUpdate) {
                 updateDataServer();
@@ -359,7 +368,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
     private void spawnEnergyFX() {
         Minecraft.getMinecraft().effectRenderer.addEffect(new EntityRobotEnergyParticle(worldObj, posX + steamDirection.xCoord * 0.25, posY
             + steamDirection.yCoord * 0.25, posZ + steamDirection.zCoord * 0.25, steamDirection.xCoord * 0.05, steamDirection.yCoord * 0.05,
-                steamDirection.zCoord * 0.05, energySpendPerCycle * 0.075F < 1 ? 1 : energySpendPerCycle * 0.075F));
+                steamDirection.zCoord * 0.05, (float) (energySpendPerCycle * 0.075F < 1 ? 1 : energySpendPerCycle * 0.075F)));
     }
 
     @Override
@@ -457,9 +466,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
         laser.writeToNBT(nbtLaser);
         nbt.setTag("laser", nbtLaser);
 
-        NBTTagCompound batteryNBT = new NBTTagCompound();
-        battery.writeToNBT(batteryNBT);
-        nbt.setTag("battery", batteryNBT);
+        nbt.setTag("internalStorage", internalStorage.writeToNBT());
 
         if (itemInUse != null) {
             NBTTagCompound itemNBT = new NBTTagCompound();
@@ -528,7 +535,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
         laser.readFromNBT(nbt.getCompoundTag("laser"));
 
-        battery.readFromNBT(nbt.getCompoundTag("battery"));
+        internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
 
         wearables.clear();
         if (nbt.hasKey("wearables")) {
@@ -906,16 +913,6 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
     }
 
     @Override
-    public int getEnergy() {
-        return battery.getEnergyStored();
-    }
-
-    @Override
-    public RFBattery getBattery() {
-        return battery;
-    }
-
-    @Override
     protected boolean canDespawn() {
         return false;
     }
@@ -1054,7 +1051,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
     private List<ItemStack> getDrops() {
         List<ItemStack> drops = new ArrayList<ItemStack>();
-        drops.add(ItemRobot.createRobotStack(board.getNBTHandler(), battery.getEnergyStored()));
+        drops.add(ItemRobot.createRobotStack(board.getNBTHandler(), internalStorage.currentPower()));
         if (itemInUse != null) {
             drops.add(itemInUse);
         }
@@ -1238,7 +1235,8 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
     @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
-        left.add("Robot " + board.getNBTHandler().getID() + " (" + getBattery().getEnergyStored() + "/" + getBattery().getMaxEnergyStored() + " RF)");
+        left.add("Robot " + board.getNBTHandler().getID() + " (" + getInternalStorage().currentPower() + "/" + getInternalStorage().maxPower()
+            + " Mj)");
         left.add(String.format("Position: %.2f, %.2f, %.2f", posX, posY, posZ));
         left.add("AI tree:");
         AIRobot aiRobot = mainAI;
@@ -1250,17 +1248,17 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
             aiRobot = aiRobot.getDelegateAI();
         }
     }
-
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        int energyReceived = getBattery().receiveEnergy(maxReceive, simulate);
-
-        // 5 RF/t is set as the "sleep threshold" for detecting charging.
-        if (!simulate && energyReceived > 5 && ticksCharging <= 25) {
-            ticksCharging += 5;
-        }
-
-        return energyReceived;
-    }
+    //
+    // public int receiveEnergy(int maxReceive, boolean simulate) {
+    // int energyReceived = getBattery().receiveEnergy(maxReceive, simulate);
+    //
+    // // 5 RF/t is set as the "sleep threshold" for detecting charging.
+    // if (!simulate && energyReceived > 5 && ticksCharging <= 25) {
+    // ticksCharging += 5;
+    // }
+    //
+    // return energyReceived;
+    // }
 
     public List<ItemStack> getWearables() {
         return wearables;
@@ -1283,4 +1281,9 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
     @Override
     public void clear() {}
+
+    @Override
+    public IMjInternalStorage getInternalStorage() {
+        return internalStorage;
+    }
 }

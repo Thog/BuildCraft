@@ -79,7 +79,7 @@ public class AIRobotAttack extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
+    public double getEnergyCost() {
         return BuilderAPI.BREAK_ENERGY * 2 / 20;
     }
 }

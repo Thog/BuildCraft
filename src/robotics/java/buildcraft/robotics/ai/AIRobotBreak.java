@@ -122,8 +122,8 @@ public class AIRobotBreak extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return (int) Math.ceil((float) BuilderAPI.BREAK_ENERGY * 2 / 30.0F);
+    public double getEnergyCost() {
+        return BuilderAPI.BREAK_ENERGY / 15.0;
     }
 
     @Override

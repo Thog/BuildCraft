@@ -19,12 +19,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
 
 import buildcraft.api.core.IInvSlot;
-import buildcraft.api.mj.DefaultMjExternalStorage;
-import buildcraft.api.mj.DefaultMjInternalStorage;
 import buildcraft.api.mj.EnumMjDeviceType;
 import buildcraft.api.mj.EnumMjPowerType;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.gui.ContainerDummy;
@@ -68,7 +68,7 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
 
     public TileAutoWorkbench() {
         externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.REDSTONE, 1.6);
-        internalStorage = new DefaultMjInternalStorage(3.2, 1.6, 400, 0.2);
+        internalStorage = new DefaultMjInternalStorage(3.2, 1.6, 400, 0.16);
         externalStorage.setInternalStorage(internalStorage);
     }
 
@@ -270,6 +270,8 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
             return;
         }
 
+        internalStorage.tick(getWorld());
+
         if (scheduledCacheRebuild) {
             craftMatrix.rebuildCache();
             scheduledCacheRebuild = false;
@@ -288,13 +290,13 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
             return;
         }
 
-        int updateNext = update + getBattery().getEnergyStored() + 1;
+        int updateNext = update + (int) (internalStorage.currentPower() * 10) + 1;
         int updateThreshold = (update & ~15) + 16;
         update = Math.min(updateThreshold, updateNext);
         if ((update % UPDATE_TIME) == 0) {
             updateCrafting();
         }
-        getBattery().setEnergy(0);
+        internalStorage.extractPower(getWorld(), 1.6, 1.6, false);
     }
 
     public int getProgressScaled(int i) {
@@ -421,6 +423,6 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
 
     @Override
     public IMjExternalStorage getMjStorage() {
-        return storage;
+        return externalStorage;
     }
 }

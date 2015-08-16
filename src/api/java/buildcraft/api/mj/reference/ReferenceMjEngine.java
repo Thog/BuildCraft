@@ -1,9 +1,15 @@
-package buildcraft.api.mj;
+package buildcraft.api.mj.reference;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.IMjInternalStorage;
 
 /** This particular engine implementation gives its power upwards, and pulses its power production every 40 ticks. */
 public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdatePlayerListBox {

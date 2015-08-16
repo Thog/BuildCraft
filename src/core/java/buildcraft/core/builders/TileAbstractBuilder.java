@@ -18,10 +18,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.blueprints.ITileBuilder;
-import buildcraft.api.mj.DefaultMjExternalStorage;
-import buildcraft.api.mj.DefaultMjInternalStorage;
 import buildcraft.api.mj.EnumMjDeviceType;
 import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.reference.DefaultMjExternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.LaserData;
 import buildcraft.core.internal.IBoxProvider;

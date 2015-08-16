@@ -74,7 +74,7 @@ public class RenderRobot extends Render {
         GL11.glTranslated(x, y, z);
 
         float robotYaw = this.interpolateRotation(robot.prevRenderYawOffset, robot.renderYawOffset, partialTicks);
-//        GL11.glRotatef(-robotYaw, 0.0f, 1.0f, 0.0f);
+        // GL11.glRotatef(-robotYaw, 0.0f, 1.0f, 0.0f);
 
         if (robot.getStackInSlot(0) != null) {
             GL11.glPushMatrix();
@@ -149,7 +149,7 @@ public class RenderRobot extends Render {
 
         if (robot.getTexture() != null) {
             renderManager.renderEngine.bindTexture(robot.getTexture());
-            float storagePercent = (float) robot.getBattery().getEnergyStored() / (float) robot.getBattery().getMaxEnergyStored();
+            float storagePercent = (float) robot.getInternalStorage().currentPower() / (float) robot.getInternalStorage().maxPower();
             doRenderRobot(1F / 16F, renderManager.renderEngine, storagePercent, robot.isActive());
         }
 

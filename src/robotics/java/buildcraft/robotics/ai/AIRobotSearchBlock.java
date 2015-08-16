@@ -123,8 +123,8 @@ public class AIRobotSearchBlock extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return 2;
+    public double getEnergyCost() {
+        return 0.2;
     }
 
 }

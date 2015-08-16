@@ -23,6 +23,10 @@ import io.netty.buffer.ByteBuf;
 public class TileEngineCreative extends TileEngineBase {
     private PowerMode powerMode = PowerMode.M2;
 
+    public TileEngineCreative() {
+        super(100, 100, 100, 0, 0);
+    }
+
     @Override
     protected EnumEnergyStage computeEnergyStage() {
         return EnumEnergyStage.BLUE;
@@ -40,7 +44,6 @@ public class TileEngineCreative extends TileEngineBase {
 
             if (equipped instanceof IToolWrench && ((IToolWrench) equipped).canWrench(player, pos)) {
                 powerMode = powerMode.getNext();
-                energy = 0;
 
                 if (!(player instanceof FakePlayer)) {
                     if (BuildCraftCore.hidePowerNumbers) {
@@ -99,36 +102,16 @@ public class TileEngineCreative extends TileEngineBase {
     }
 
     @Override
-    public void engineUpdate() {
-        super.engineUpdate();
+    public void update() {
+        super.update();
 
         if (isRedstonePowered) {
-            addEnergy(calculateCurrentOutput());
+            internalStorage.insertPower(getWorld(), powerMode.maxPower, false);
         }
     }
 
     @Override
     public boolean isBurning() {
         return isRedstonePowered;
-    }
-
-    @Override
-    public int maxEnergyReceived() {
-        return calculateCurrentOutput();
-    }
-
-    @Override
-    public int maxEnergyExtracted() {
-        return calculateCurrentOutput();
-    }
-
-    @Override
-    public int getMaxEnergy() {
-        return calculateCurrentOutput();
-    }
-
-    @Override
-    public int calculateCurrentOutput() {
-        return powerMode.maxPower;
     }
 }

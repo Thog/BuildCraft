@@ -1,7 +1,12 @@
-package buildcraft.api.mj;
+package buildcraft.api.mj.reference;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+
+import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjInternalStorage;
 
 /** A simple base class that by default does nothing. Useful if you have a tile entity that stores multiple different
  * states internally, but some of them do not implement power storage and use. */

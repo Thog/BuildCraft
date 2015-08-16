@@ -36,7 +36,7 @@ public abstract class AIRobotGoto extends AIRobot {
     }
 
     @Override
-    public int getEnergyCost() {
-        return 3;
+    public double getEnergyCost() {
+        return 0.3;
     }
 }
