@@ -10,8 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import cofh.api.energy.IEnergyHandler;
-
+import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IPipePluggableItem;
@@ -42,7 +41,7 @@ public class ItemPowerAdapter extends ItemBuildCraft implements IPipePluggableIt
 
     @Override
     public PipePluggable createPipePluggable(IPipe pipe, EnumFacing side, ItemStack stack) {
-        if (pipe.getTile().getPipeType() != IPipeTile.PipeType.POWER && pipe instanceof IEnergyHandler) {
+        if (pipe.getTile().getPipeType() != IPipeTile.PipeType.POWER && pipe instanceof IMjExternalStorage) {
             return new PowerAdapterPluggable();
         } else {
             return null;

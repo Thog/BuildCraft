@@ -8,46 +8,53 @@ import com.google.common.collect.Lists;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.core.BCLog;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjInternalStorage;
 
 public class DefaultMjExternalStorage implements IMjExternalStorage {
     /* Explicitly only a single method so we can support lambdas easily in the future */
     public interface IConnectionLimiter {
-        boolean allowConnection(World world, EnumFacing flowDirection, IMjExternalStorage me, IMjExternalStorage other, boolean flowingIn);
+        boolean allowConnection(World world, EnumFacing flowDirection, IMjExternalStorage from, IMjExternalStorage to, boolean flowingIn);
     }
 
     public static final IConnectionLimiter DEVICE_TYPE_LIMITER = new IConnectionLimiter() {
         @Override
-        public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage thisOne, IMjExternalStorage other, boolean flowingIn) {
-            EnumMjDeviceType thisDevice = thisOne.getDeviceType();
-            EnumMjDeviceType otherDevice = other.getDeviceType();
-            return flowingIn ? thisDevice.acceptsPowerFrom(otherDevice) : thisDevice.givesPowerTo(otherDevice);
+        public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage from, IMjExternalStorage to, boolean flowingIn) {
+            EnumFacing side = flowingIn ? flow : flow.getOpposite();
+            EnumMjDevice fromDevice = from.getDeviceType(side.getOpposite());
+            EnumMjDevice toDevice = to.getDeviceType(side);
+            return flowingIn ? fromDevice.acceptsPowerFrom(toDevice) : fromDevice.givesPowerTo(toDevice);
         }
     };
 
     public static final IConnectionLimiter POWER_TYPE_LIMITER = new IConnectionLimiter() {
         @Override
-        public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage thisOne, IMjExternalStorage other, boolean flowingIn) {
-            EnumMjPowerType thisDevice = thisOne.getPowerType();
-            EnumMjPowerType otherDevice = other.getPowerType();
-            return flowingIn ? thisDevice.canConvertFrom(otherDevice) : thisDevice.canConvertTo(otherDevice);
+        public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage from, IMjExternalStorage to, boolean flowingIn) {
+            EnumFacing side = flowingIn ? flow : flow.getOpposite();
+            EnumMjPower fromPower = from.getPowerType(side.getOpposite());
+            EnumMjPower toPower = to.getPowerType(side);
+            return flowingIn ? fromPower.canConvertFrom(toPower) : fromPower.canConvertTo(toPower);
         }
     };
 
     private IMjInternalStorage storage = null;
     private final double maxPowerTransfered;
-    private final EnumMjDeviceType deviceType;
-    private final EnumMjPowerType powerType;
+    private final EnumMjDevice deviceType;
+    private final EnumMjPower powerType;
     private List<IConnectionLimiter> connectionLimits = Lists.newArrayList();
 
-    public DefaultMjExternalStorage(EnumMjDeviceType type, double maxPowerTransfered) {
-        this(type, EnumMjPowerType.NORMAL, maxPowerTransfered);
+    // DEBUG!!!!
+
+    private final Throwable initPos;
+
+    public DefaultMjExternalStorage(EnumMjDevice type, double maxPowerTransfered) {
+        this(type, EnumMjPower.NORMAL, maxPowerTransfered);
     }
 
-    public DefaultMjExternalStorage(EnumMjDeviceType deviceType, EnumMjPowerType powerType, double maxPowerTransfered) {
+    public DefaultMjExternalStorage(EnumMjDevice deviceType, EnumMjPower powerType, double maxPowerTransfered) {
         this.deviceType = deviceType;
         if (deviceType == null) {
             throw new IllegalArgumentException("You must specify which device type this is!");
@@ -59,6 +66,7 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
         this.maxPowerTransfered = maxPowerTransfered;
         addLimiter(DEVICE_TYPE_LIMITER);
         addLimiter(POWER_TYPE_LIMITER);
+        initPos = new Throwable();
     }
 
     public void removeDefaultLimiters() {
@@ -72,13 +80,21 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
         connectionLimits.add(limiter);
     }
 
+    private IMjInternalStorage storage() {
+        if (storage == null) {
+            BCLog.logger.warn("This DefaultMjStorage was not set up correctly, this is the caller who made it incorrectly:");
+            initPos.printStackTrace();
+        }
+        return storage;
+    }
+
     @Override
-    public EnumMjDeviceType getDeviceType() {
+    public EnumMjDevice getDeviceType(EnumFacing side) {
         return deviceType;
     }
 
     @Override
-    public EnumMjPowerType getPowerType() {
+    public EnumMjPower getPowerType(EnumFacing side) {
         return powerType;
     }
 
@@ -88,14 +104,14 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
             return mj;
         }
         for (IConnectionLimiter limiter : connectionLimits) {
-            if (!limiter.allowConnection(world, flowDirection, this, from, true)) {
+            if (!limiter.allowConnection(world, flowDirection, from, this, true)) {
                 return mj;
             }
         }
         if (mj <= maxPowerTransfered) {
-            return storage.insertPower(world, mj, simulate);
+            return storage().insertPower(world, mj, simulate);
         } else {
-            double excess = storage.insertPower(world, maxPowerTransfered, simulate);
+            double excess = storage().insertPower(world, maxPowerTransfered, simulate);
             excess += maxPowerTransfered - mj;
             return excess;
         }
@@ -117,14 +133,14 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
         if (minMj > maxPowerTransfered) {
             minMj = maxPowerTransfered;
         }
-        return storage.extractPower(world, minMj, maxMj, simulate);
+        return storage().extractPower(world, minMj, maxMj, simulate);
     }
 
     @Override
     public double getSuction(World world, EnumFacing florDirection) {
-        double filled = storage.currentPower() / storage.maxPower();
+        double filled = storage().currentPower() / storage().maxPower();
         filled = 1 - filled;
-        return filled / getDeviceType().getFlowDivisor();
+        return filled / getDeviceType(null).getFlowDivisor();
     }
 
     /** This must be called after {@link #addLimiter(IConnectionLimiter)} to finalise the limiters */
@@ -136,5 +152,15 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
         } else {
             throw new IllegalStateException("You cannot set an internal storage when one has already been set!");
         }
+    }
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        return storage().currentPower();
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        return storage().maxPower();
     }
 }

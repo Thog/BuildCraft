@@ -20,9 +20,8 @@ public class TriggerRedstoneFaderInput extends BCStatement implements ITriggerIn
     public final int level;
 
     public TriggerRedstoneFaderInput(int level) {
-        super(new ResourceLocation(String.format("buildcrafttransport:triggers/redstone_%02d", level)), String.format("buildcraft:redtone.input.%02d",
-                level));
-
+        super(String.format("buildcraft:redtone.input.%02d", level));
+        this.location = new ResourceLocation(String.format("buildcrafttransport:triggers/redstone_%02d", level));
         this.level = level;
     }
 

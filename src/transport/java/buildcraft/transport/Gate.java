@@ -686,4 +686,9 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
         setRedstoneOutput(side != null, value);
         return true;
     }
+
+    @Override
+    public EnumFacing getFace() {
+        return direction;
+    }
 }

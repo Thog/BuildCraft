@@ -13,11 +13,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import cofh.api.energy.IEnergyReceiver;
-
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
@@ -106,7 +104,7 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
 
             }
             IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
-            return storage.getDeviceType().acceptsPowerFrom(EnumMjDeviceType.TRANSPORT);
+            return storage.getDeviceType(null).acceptsPowerFrom(EnumMjDevice.TRANSPORT);
         }
         /* if (tile instanceof IEngine) { // Disregard engines for this. return false; } if (tile instanceof
          * IEnergyHandler || tile instanceof IEnergyReceiver) { IEnergyConnection handler = (IEnergyConnection) tile; if
@@ -126,7 +124,7 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
                 return false;
             }
         }
-        return storage.getDeviceType() == EnumMjDeviceType.ENGINE && storage.getPowerType() == EnumMjPowerType.NORMAL;
+        return storage.getDeviceType(null) == EnumMjDevice.ENGINE && storage.getPowerType(null) == EnumMjPower.NORMAL;
         // if (tile instanceof TileBuildCraft && !(tile instanceof IEngine)) {
         // // Disregard non-engine BC tiles.
         // // While this, of course, does nothing to work with other mods,
@@ -179,7 +177,7 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
         EnumFacing fs = EnumFacing.getFront(side);
         if (container.hasPipePluggable(fs)) {
             Object pp = container.getPipePluggable(fs);
-            if (pp instanceof IEnergyReceiver) {
+            if (pp instanceof IMjExternalStorage) {
                 return pp;
             }
         }

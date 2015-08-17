@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.transport.BuildCraftTransport;
@@ -123,7 +123,7 @@ public class PipePowerWood extends PipePowerBase implements IDebuggable {
 
     @Override
     public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
-        if (from.getPowerType() == EnumMjPowerType.REDSTONE) {
+        if (from.getPowerType(null) == EnumMjPower.REDSTONE) {
             // If the from is a redstone engine than redirect the power to allow it to extract this tick
             allowExtraction = true;
             return 0;

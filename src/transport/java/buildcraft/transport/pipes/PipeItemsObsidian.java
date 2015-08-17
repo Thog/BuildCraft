@@ -17,13 +17,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.core.IIconProvider;
-import buildcraft.core.lib.RFBattery;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjInternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.core.lib.inventory.ITransactor;
 import buildcraft.core.lib.inventory.Transactor;
 import buildcraft.core.lib.inventory.filters.StackFilter;
@@ -38,8 +41,8 @@ import buildcraft.transport.TravelingItem;
 import buildcraft.transport.pipes.events.PipeEventItem;
 import buildcraft.transport.utils.TransportUtils;
 
-public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnergyHandler {
-    private RFBattery battery = new RFBattery(2560, 640, 0);
+public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IMjExternalStorage {
+    private final DefaultMjInternalStorage storage = new DefaultMjInternalStorage(256, 1, 400, 1);
 
     private int[] entitiesDropped;
     private int entitiesDroppedIndex = 0;
@@ -138,15 +141,14 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
     @Override
     public void update() {
         super.update();
+        storage.tick(getWorld());
 
-        if (battery.getEnergyStored() > 0) {
+        if (storage.currentPower() > 0) {
             for (int j = 1; j < 5; ++j) {
                 if (suckItem(j)) {
                     return;
                 }
             }
-
-            battery.useEnergy(0, 5, false);
         }
     }
 
@@ -157,6 +159,7 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
             return false;
         }
 
+        @SuppressWarnings("unchecked")
         List<Entity> discoveredEntities = container.getWorld().getEntitiesWithinAABB(Entity.class, box);
 
         for (Entity entity : discoveredEntities) {
@@ -172,7 +175,7 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
                     EnumFacing openOrientation = getOpenOrientation();
                     ItemStack stack = trans.remove(StackFilter.ALL, openOrientation, false);
 
-                    if (stack != null && battery.useEnergy(10, 10, false) > 0) {
+                    if (stack != null && storage.extractPower(getWorld(), 1, 1, false) > 0) {
                         trans.remove(StackFilter.ALL, openOrientation, true);
                         EntityItem entityitem = new EntityItem(container.getWorld(), cart.posX, cart.posY + 0.3F, cart.posZ, stack);
                         entityitem.setDefaultPickupDelay();
@@ -213,13 +216,13 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
 
                 TransportProxy.proxy.obsidianPipePickup(container.getWorld(), item, this.container);
 
-                int energyUsed = Math.min(10 * contained.stackSize * distance, battery.getEnergyStored());
+                double energyUsed = Math.min(contained.stackSize * distance, storage.currentPower());
 
-                if (distance == 0 || energyUsed / distance / 10 == contained.stackSize) {
+                if (distance == 0 || energyUsed / distance == contained.stackSize) {
                     stack = contained;
                     CoreProxy.proxy.removeEntity(entity);
                 } else {
-                    stack = contained.splitStack(energyUsed / distance / 10);
+                    stack = contained.splitStack((int) (energyUsed / distance));
                 }
 
                 speed = Math.sqrt(item.motionX * item.motionX + item.motionY * item.motionY + item.motionZ * item.motionZ);
@@ -228,7 +231,7 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
                 if (speed < 0.01) {
                     speed = 0.01;
                 }
-            } else if (entity instanceof EntityArrow && battery.useEnergy(distance * 10, distance * 10, false) > 0) {
+            } else if (entity instanceof EntityArrow && storage.extractPower(getWorld(), distance, distance, false) > 0) {
                 stack = new ItemStack(Items.arrow, 1);
                 CoreProxy.proxy.removeEntity(entity);
             } else {
@@ -274,36 +277,54 @@ public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IEnerg
                 }
             }
 
-            return battery.getEnergyStored() >= distance * 10;
+            return storage.currentPower() >= distance;
         } else if (entity instanceof EntityArrow) {
             EntityArrow arrow = (EntityArrow) entity;
-            return arrow.canBePickedUp == 1 && battery.getEnergyStored() >= distance * 10;
+            return arrow.canBePickedUp == 1 && storage.currentPower() >= distance;
         }
         return false;
     }
 
+    // IMjExternalHandler
+
     @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
+    public EnumMjDevice getDeviceType(EnumFacing side) {
+        return EnumMjDevice.MACHINE;
     }
 
     @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        return battery.receiveEnergy(maxReceive, simulate);
+    public EnumMjPower getPowerType(EnumFacing side) {
+        return EnumMjPower.REDSTONE;
     }
 
     @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+    public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
         return 0;
     }
 
     @Override
-    public int getEnergyStored(EnumFacing from) {
-        return battery.getEnergyStored();
+    public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+        if (mj < 0) {
+            return mj;
+        }
+        return storage.insertPower(getWorld(), mj, simulate);
     }
 
     @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return battery.getMaxEnergyStored();
+    public double getSuction(World world, EnumFacing flowDirection) {
+        return 0.75;
+    }
+
+    @Override
+    public void setInternalStorage(IMjInternalStorage storage) {}
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        return storage.currentPower();
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        return storage.maxPower();
     }
 }

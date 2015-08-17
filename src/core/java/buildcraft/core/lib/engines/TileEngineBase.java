@@ -15,8 +15,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import buildcraft.api.enums.EnumEnergyStage;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
@@ -65,10 +65,10 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     protected DefaultMjInternalStorage internalStorage;
 
     protected TileEngineBase(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.ENGINE, EnumMjPowerType.NORMAL, maxPowerTransfered);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.ENGINE, EnumMjPower.NORMAL, maxPowerTransfered);
         externalStorage.addLimiter(new IConnectionLimiter() {
             @Override
-            public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage me, IMjExternalStorage other, boolean flowingIn) {
+            public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage from, IMjExternalStorage to, boolean flowingIn) {
                 return orientation == flow;
             }
         });
@@ -285,7 +285,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     }
 
     protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
-        return storage.getPowerType().canConvertFrom(getMjStorage().getPowerType());
+        return storage.getPowerType(orientation.getOpposite()).canConvertFrom(getMjStorage().getPowerType(null));
     }
 
     // public Object getEnergyProvider(EnumFacing orientation) {
@@ -346,7 +346,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
                 return false;
             }
         }
-        return storage.getDeviceType().acceptsPowerFrom(EnumMjDeviceType.ENGINE);
+        return storage.getDeviceType(orientation.getOpposite()).acceptsPowerFrom(EnumMjDevice.ENGINE);
         // return isPoweredTile(tile, orientation);
     }
 
@@ -399,13 +399,13 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
         orientation = EnumFacing.values()[data.getByte("orientation")];
         progress = data.getFloat("progress");
-        // Back compat with 1.7.10
-        if (data.hasKey("energy")) {
-            int rfEnergy = data.getInteger("energy");
-            internalStorage.insertPower(getWorld(), rfEnergy / 10d, false);
-        } else {
-            internalStorage.readFromNBT(data.getCompoundTag("internalStorage"));
-        }
+        // // Back compat with 1.7.10
+        // if (data.hasKey("energy")) {
+        // int rfEnergy = data.getInteger("energy");
+        // internalStorage.insertPower(getWorld(), rfEnergy / 10d, false);
+        // } else {
+        internalStorage.readFromNBT(data.getCompoundTag("internalStorage"));
+        // }
         heat = data.getFloat("heat");
     }
 

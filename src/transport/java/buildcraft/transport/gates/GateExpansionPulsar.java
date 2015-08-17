@@ -9,11 +9,11 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.gates.GateExpansionController;
 import buildcraft.api.gates.IGate;
 import buildcraft.api.gates.IGateExpansion;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatement;
 import buildcraft.transport.BuildCraftTransport;
@@ -94,9 +94,10 @@ public final class GateExpansionPulsar extends GateExpansionBuildcraft implement
                 return;
             }
 
-            if (pipeTile instanceof IEnergyHandler && (!singlePulse || !hasPulsed)) {
+            if (pipeTile instanceof IMjHandler && (!singlePulse || !hasPulsed)) {
                 gate.setPulsing(true);
-                ((IEnergyHandler) pipeTile).receiveEnergy(null, Math.min(1 << (count - 1), 64) * 10, false);
+                IMjExternalStorage storage = ((IMjHandler) pipeTile).getMjStorage();
+                storage.insertPower(pipeTile.getWorld(), gate.getFace().getOpposite(), null, Math.min(1 << (count - 1), 64), false);
                 hasPulsed = true;
             } else {
                 gate.setPulsing(true);

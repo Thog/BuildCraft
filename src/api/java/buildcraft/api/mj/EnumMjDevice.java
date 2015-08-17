@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public enum EnumMjDeviceType {
+public enum EnumMjDevice {
     /** Something that gives out power to anything, but only accepts power from other engines. */
     ENGINE(1),
     /** Something that gives out power to transport, and only accepts power from transport. */
@@ -14,7 +14,7 @@ public enum EnumMjDeviceType {
     /** Something that gives out no power, but accepts power from transport and engines. */
     MACHINE(4);
 
-    private final List<EnumMjDeviceType> to;
+    private final List<EnumMjDevice> to;
     private final double flowDivisor;
 
     static {
@@ -29,16 +29,16 @@ public enum EnumMjDeviceType {
         TRANSPORT.to.add(MACHINE);
     }
 
-    EnumMjDeviceType(double flowDivisor) {
+    EnumMjDevice(double flowDivisor) {
         this.to = Lists.newArrayList();
         this.flowDivisor = flowDivisor;
     }
 
-    public boolean givesPowerTo(EnumMjDeviceType type) {
+    public boolean givesPowerTo(EnumMjDevice type) {
         return type == this || to.contains(type);
     }
 
-    public boolean acceptsPowerFrom(EnumMjDeviceType type) {
+    public boolean acceptsPowerFrom(EnumMjDevice type) {
         return type.givesPowerTo(this);
     }
 

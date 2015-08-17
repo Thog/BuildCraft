@@ -5,8 +5,8 @@ import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
@@ -18,7 +18,7 @@ public class ReferenceMjEngine extends TileEntity implements IMjHandler, IUpdate
 
     public ReferenceMjEngine() {
         // Create our storage things
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.ENGINE, EnumMjPowerType.NORMAL, 40);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.ENGINE, EnumMjPower.NORMAL, 40);
         internalStorage = new DefaultMjInternalStorage(400, 40, 600, 0.2);
         externalStorage.setInternalStorage(internalStorage);
     }

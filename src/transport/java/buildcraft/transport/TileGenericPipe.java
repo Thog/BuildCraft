@@ -36,8 +36,8 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.enums.EnumColor;
 import buildcraft.api.gates.IGateExpansion;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
@@ -259,19 +259,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     public class SidedExternalStorage implements IMjExternalStorage {
-        @Override
-        public EnumMjDeviceType getDeviceType() {
-            return EnumMjDeviceType.TRANSPORT;
-        }
-
-        @Override
-        public EnumMjPowerType getPowerType() {
-            if (pipe instanceof IMjExternalStorage) {
-                return EnumMjPowerType.NORMAL;
-            } else {
-                return EnumMjPowerType.REDSTONE;
-            }
-        }
 
         private IMjExternalStorage getSidedStorage(EnumFacing side) {
             if (hasPipePluggable(side)) {
@@ -286,6 +273,16 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 return (IMjExternalStorage) pipe;
             }
             return NonExistantStorage.INSTANCE;
+        }
+
+        @Override
+        public EnumMjDevice getDeviceType(EnumFacing side) {
+            return getSidedStorage(side).getDeviceType(side);
+        }
+
+        @Override
+        public EnumMjPower getPowerType(EnumFacing side) {
+            return getSidedStorage(side).getPowerType(side);
         }
 
         @Override
@@ -305,6 +302,16 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
         @Override
         public void setInternalStorage(IMjInternalStorage storage) {}
+
+        @Override
+        public double currentPower(EnumFacing side) {
+            return getSidedStorage(side).currentPower(side);
+        }
+
+        @Override
+        public double maxPower(EnumFacing side) {
+            return getSidedStorage(side).maxPower(side);
+        }
     }
 
     public TileGenericPipe() {}
@@ -859,7 +866,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         for (EnumFacing side : EnumFacing.VALUES) {
-            TileBuffer t = cache[side.ordinal()];
+//            TileBuffer t = cache[side.ordinal()];
             // For blocks which are not loaded, keep the old connection value.
             // if (t.exists() || !initialized) {
             // t.refresh();
@@ -1151,7 +1158,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public PipePluggable getPipePluggable(EnumFacing side) {
-        if (side == null || side == null) {
+        if (side == null) {
             return null;
         }
 
@@ -1160,7 +1167,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public boolean hasPipePluggable(EnumFacing side) {
-        if (side == null || side == null) {
+        if (side == null) {
             return false;
         }
 

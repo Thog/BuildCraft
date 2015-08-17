@@ -10,8 +10,8 @@ import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 
@@ -23,7 +23,7 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
 
     public ReferenceMjTransport() {
         // Create our storage things
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.TRANSPORT, EnumMjPowerType.NORMAL, 20);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.TRANSPORT, EnumMjPower.NORMAL, 20);
         // Max power stored = 40MJ
         // Minimum power required to activate = 20MJ
         // How long to wait before losing power = 20 ticks
@@ -71,7 +71,7 @@ public final class ReferenceMjTransport extends TileEntity implements IMjHandler
             double otherSuction = storage.getSuction(getWorld(), face.getOpposite());
             // Only flow into things that require power more than we do, or if they are a machine (as they always
             // require power more than transports do)
-            if (otherSuction > thisSuction || storage.getDeviceType() == EnumMjDeviceType.MACHINE) {
+            if (otherSuction > thisSuction || storage.getDeviceType(null) == EnumMjDevice.MACHINE) {
                 suctionMap.put(face, otherSuction);
                 storageMap.put(face, storage);
                 totalSuction += otherSuction;

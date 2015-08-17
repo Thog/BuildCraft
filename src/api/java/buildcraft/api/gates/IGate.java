@@ -6,6 +6,8 @@ package buildcraft.api.gates;
 
 import java.util.List;
 
+import net.minecraft.util.EnumFacing;
+
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.StatementSlot;
@@ -17,6 +19,9 @@ public interface IGate extends ISidedStatementContainer {
     void setPulsing(boolean pulse);
 
     IPipe getPipe();
+
+    /** Gets the side of the pipe that the gate is on */
+    EnumFacing getFace();
 
     List<IStatement> getTriggers();
 

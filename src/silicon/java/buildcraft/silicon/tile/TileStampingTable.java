@@ -51,7 +51,7 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
             return;
         }
 
-        if (getEnergy() >= getRequiredEnergy()) {
+        if (internalStorage.currentPower() >= getRequiredPower()) {
             ItemStack input = this.getStackInSlot(0);
 
             if (input == null) {
@@ -97,7 +97,7 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
                 return;
             }
 
-            addEnergy(-getRequiredEnergy());
+            internalStorage.extractPower(getWorld(), 0, getRequiredPower(), false);
 
             craftSlot.onPickupFromSlot(getInternalPlayer().get(), result);
 
@@ -145,7 +145,7 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
     }
 
     @Override
-    public int getRequiredEnergy() {
+    public double getRequiredPower() {
         ItemStack stack = this.getStackInSlot(0);
         ItemStack output = this.getStackInSlot(1);
         if (output != null && output.stackSize == output.getMaxStackSize()) {
@@ -154,9 +154,9 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
         if (stack != null && stack.getItem() != null) {
             if (stack.getItem() instanceof ItemPackage) {
                 // tagMap size
-                return 400 * NBTUtils.getItemData(stack).getKeySet().size();
+                return 40 * NBTUtils.getItemData(stack).getKeySet().size();
             } else {
-                return 400;
+                return 40;
             }
         }
 
@@ -165,7 +165,7 @@ public class TileStampingTable extends TileLaserTableBase implements IHasWork, I
 
     @Override
     public boolean hasWork() {
-        return getRequiredEnergy() > 0;
+        return getRequiredPower() > 0;
     }
 
     @Override

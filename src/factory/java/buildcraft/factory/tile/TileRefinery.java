@@ -22,8 +22,8 @@ import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
@@ -76,7 +76,7 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
 
     public TileRefinery() {
         super();
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.NORMAL, MAX_TRANSFERED);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, EnumMjPower.NORMAL, MAX_TRANSFERED);
         internalStorage = new DefaultMjInternalStorage(MAX_POWER, POWER_ACTIVATION, LOSS_DELAY, LOSS_RATE);
         externalStorage.setInternalStorage(internalStorage);
         // this.setBattery(new RFBattery(10000, 1500, 0));

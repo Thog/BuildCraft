@@ -59,7 +59,7 @@ public class GuiAssemblyTable extends GuiAdvancedInterface {
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.assemblyCurrentRequired") + ":", x + 22, y + 20, subheaderColour);
             fontRendererObj.drawString(String.format("%d Mj", table.clientRequiredPower), x + 22, y + 32, textColour);
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.stored") + ":", x + 22, y + 44, subheaderColour);
-            fontRendererObj.drawString(String.format("%d Mj", table.clientEnergy), x + 22, y + 56, textColour);
+            fontRendererObj.drawString(String.format("%d Mj", table.clientPower), x + 22, y + 56, textColour);
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.assemblyRate") + ":", x + 22, y + 68, subheaderColour);
             fontRendererObj.drawString(String.format("%.1f Mj/s", table.getRecentPowerAverage() / 2000.0f), x + 22, y + 80, textColour);
 

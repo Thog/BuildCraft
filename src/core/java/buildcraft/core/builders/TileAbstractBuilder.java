@@ -18,8 +18,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.blueprints.ITileBuilder;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.core.BuildCraftCore;
@@ -34,7 +36,7 @@ import buildcraft.core.lib.network.command.PacketCommand;
 import io.netty.buffer.ByteBuf;
 
 public abstract class TileAbstractBuilder extends TileBuildCraft implements ITileBuilder, IInventory, IBoxProvider, IBuildingItemsProvider,
-        ICommandReceiver {
+        ICommandReceiver, IMjHandler {
 
     public LinkedList<LaserData> pathLasers = new LinkedList<LaserData>();
 
@@ -44,7 +46,7 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
     protected final DefaultMjInternalStorage internalStorage;
 
     protected TileAbstractBuilder(double maxPower, double maxPowerTransfered, double activationPower, long lossDelay, double lossRate) {
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.NORMAL, maxPowerTransfered);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, EnumMjPower.NORMAL, maxPowerTransfered);
         internalStorage = new DefaultMjInternalStorage(maxPower, activationPower, lossDelay, lossRate);
         externalStorage.setInternalStorage(internalStorage);
     }
@@ -162,5 +164,10 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
 
     public boolean drainBuild(FluidStack fluidStack, boolean realDrain) {
         return false;
+    }
+
+    @Override
+    public IMjExternalStorage getMjStorage() {
+        return externalStorage;
     }
 }

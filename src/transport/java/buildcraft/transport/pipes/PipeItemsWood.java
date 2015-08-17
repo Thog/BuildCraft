@@ -12,14 +12,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.core.IIconProvider;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjInternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.core.lib.RFBattery;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.InventoryWrapper;
 import buildcraft.core.lib.utils.Utils;
@@ -29,14 +32,15 @@ import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
 
-public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHandler {
-    protected RFBattery battery = new RFBattery(2560, 80, 0);
+public class PipeItemsWood extends Pipe<PipeTransportItems>implements IMjExternalStorage {
 
     protected int standardIconIndex = PipeIconProvider.TYPE.PipeItemsWood_Standard.ordinal();
     protected int solidIconIndex = PipeIconProvider.TYPE.PipeAllWood_Solid.ordinal();
-    protected float speedMultiplier = 1.0F;
+    protected double speedMultiplier = 1.0;
 
     private int ticksSincePull = 0;
+
+    protected DefaultMjInternalStorage storage = new DefaultMjInternalStorage(128, 0.1, 40, 1);
 
     private PipeLogicWood logic = new PipeLogicWood(this) {
         @Override
@@ -101,6 +105,8 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
             return;
         }
 
+        storage.tick(getWorld());
+
         ticksSincePull++;
 
         if (shouldTick()) {
@@ -108,7 +114,7 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
                 extractItems();
             }
 
-            battery.setEnergy(0);
+            storage.extractPower(getWorld(), 0, 1, false);
             ticksSincePull = 0;
             speedMultiplier = 1.0F;
         }
@@ -135,7 +141,7 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
                         }
                     }
 
-                    if (battery.getEnergyStored() >= stackSize * 10) {
+                    if (storage.currentPower() >= stackSize) {
                         return true;
                     }
                 }
@@ -143,7 +149,7 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
 
         }
 
-        return ticksSincePull >= 16 && battery.getEnergyStored() >= 10;
+        return ticksSincePull >= 16 && storage.currentPower() >= 1;
     }
 
     private void extractItems() {
@@ -176,7 +182,7 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
                 Vec3 entPos = Utils.convertMiddle(tile.getPos()).add(Utils.convert(side, -0.6));
 
                 TravelingItem entity = makeItem(entPos, stack);
-                entity.setSpeed(entity.getSpeed() * speedMultiplier);
+                entity.setSpeed((float) (entity.getSpeed() * speedMultiplier));
                 transport.injectItem(entity, side.getOpposite());
             }
         }
@@ -214,11 +220,11 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
             if (slot != null && slot.stackSize > 0 && inventory.canExtractItem(k, slot, from)) {
                 if (doRemove) {
                     int maxStackSize = slot.stackSize;
-                    int stackSize = Math.min(maxStackSize, battery.getEnergyStored() / 10);
+                    int stackSize = Math.min(maxStackSize, (int) storage.currentPower());
                     // TODO: Look into the Speed Multiplier again someday.
                     // speedMultiplier = Math.min(4.0F, battery.getEnergyStored() * 10 / stackSize);
-                    int energyUsed = (int) (stackSize * 10 * speedMultiplier);
-                    battery.useEnergy(energyUsed, energyUsed, false);
+                    int energyUsed = (int) (stackSize * speedMultiplier);
+                    storage.extractPower(getWorld(), 0, energyUsed, false);
 
                     return inventory.decrStackSize(k, stackSize);
                 } else {
@@ -231,27 +237,40 @@ public class PipeItemsWood extends Pipe<PipeTransportItems>implements IEnergyHan
     }
 
     @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
+    public EnumMjDevice getDeviceType(EnumFacing side) {
+        return EnumMjDevice.MACHINE;
     }
 
     @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        return battery.receiveEnergy(maxReceive, simulate);
+    public EnumMjPower getPowerType(EnumFacing side) {
+        return EnumMjPower.REDSTONE;
     }
 
     @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+    public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
         return 0;
     }
 
     @Override
-    public int getEnergyStored(EnumFacing from) {
-        return battery.getEnergyStored();
+    public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+        return storage.insertPower(world, mj, simulate);
     }
 
     @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return battery.getMaxEnergyStored();
+    public double getSuction(World world, EnumFacing flowDirection) {
+        return 1 - (storage.currentPower() / storage.maxPower());
+    }
+
+    @Override
+    public void setInternalStorage(IMjInternalStorage storage) {}
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        return storage.currentPower();
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        return storage.maxPower();
     }
 }

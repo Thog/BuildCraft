@@ -40,8 +40,8 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
     private PipeContents kind;
 
     public TriggerPipeContents(PipeContents kind) {
-        super(new ResourceLocation("buildcrafttransport:triggers/trigger_pipecontents_" + kind.name().toLowerCase(Locale.ENGLISH)),
-                "buildcraft:pipe.contents." + kind.name().toLowerCase(Locale.ENGLISH), "buildcraft.pipe.contents." + kind.name());
+        super("buildcraft:pipe.contents." + kind.name().toLowerCase(Locale.ENGLISH), "buildcraft.pipe.contents." + kind.name());
+        this.location = new ResourceLocation("buildcrafttransport:triggers/trigger_pipecontents_" + kind.name().toLowerCase(Locale.ENGLISH));
         this.kind = kind;
         kind.trigger = this;
     }

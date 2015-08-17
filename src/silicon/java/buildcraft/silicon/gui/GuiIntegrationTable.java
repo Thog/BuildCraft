@@ -51,7 +51,7 @@ public class GuiIntegrationTable extends GuiLaserTable {
         super.drawGuiContainerBackgroundLayer(f, mouseX, mouseY);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(TEXTURE);
-        if (integrationTable.getEnergy() > 0) {
+        if (integrationTable.clientPower > 0) {
             int h = table.getProgressScaled(69);
             drawTexturedModalRect(guiLeft + 164, guiTop + 18 + 74 - h, 176, 18, 4, h);
         }

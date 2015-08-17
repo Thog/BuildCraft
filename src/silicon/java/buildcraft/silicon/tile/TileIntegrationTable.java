@@ -45,7 +45,7 @@ public class TileIntegrationTable extends TileLaserTableBase {
         }
 
         if (activeRecipe == null || !activeRecipeValid) {
-            setEnergy(0);
+            internalStorage.extractPower(getWorld(), 0, Integer.MAX_VALUE, false);
             return;
         }
 
@@ -58,12 +58,12 @@ public class TileIntegrationTable extends TileLaserTableBase {
 
         ItemStack output = getStackInSlot(10);
         if (!isRoomForOutput(output)) {
-            setEnergy(0);
+            internalStorage.extractPower(getWorld(), 0, Integer.MAX_VALUE, false);
             return;
         }
 
-        if (getEnergy() >= activeRecipe.getEnergyCost()) {
-            setEnergy(0);
+        if (internalStorage.currentPower() >= activeRecipe.getPowerCost()) {
+            internalStorage.extractPower(getWorld(), 0, activeRecipe.getPowerCost(), false);
 
             output = activeRecipe.craft(getStackInSlot(0), getExpansions(), false);
 
@@ -164,8 +164,8 @@ public class TileIntegrationTable extends TileLaserTableBase {
     }
 
     @Override
-    public int getRequiredEnergy() {
-        return hasWork() ? activeRecipe.getEnergyCost() : 0;
+    public double getRequiredPower() {
+        return hasWork() ? activeRecipe.getPowerCost() : 0;
     }
 
     @Override

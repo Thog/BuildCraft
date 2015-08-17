@@ -9,10 +9,10 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 
 public interface IIntegrationRecipe {
-    /** Get the energy cost (in RF) of the recipe.
+    /** Get the energy cost (in MJ) of the recipe.
      * 
      * @return The energy cost of the recipe. */
-    int getEnergyCost();
+    double getPowerCost();
 
     /** Get a list of example inputs. This is used for recipe preview.
      * 

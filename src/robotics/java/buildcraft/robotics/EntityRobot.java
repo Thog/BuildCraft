@@ -39,7 +39,7 @@ import buildcraft.api.boards.RedstoneBoardRobot;
 import buildcraft.api.boards.RedstoneBoardRobotNBT;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IZone;
-import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjDevice;
 import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
@@ -159,7 +159,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
         width = 0.25F;
         height = 0.25F;
 
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, 10);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, 10);
         internalStorage = new DefaultMjInternalStorage(10, 10, 10, 10);// TODO: set the power variables
         externalStorage.setInternalStorage(internalStorage);
     }

@@ -25,6 +25,7 @@ public class ItemPackage extends ItemBuildCraft {
 
     @Override
     @SideOnly(Side.CLIENT)
+    @SuppressWarnings("rawtypes")
     public void getSubItems(Item item, CreativeTabs tab, List list) {
 
     }
@@ -65,6 +66,7 @@ public class ItemPackage extends ItemBuildCraft {
 
     @Override
     @SideOnly(Side.CLIENT)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void addInformation(ItemStack stack, EntityPlayer player, List strings, boolean adv) {
         NBTTagCompound tag = NBTUtils.getItemData(stack);
         if (!tag.hasNoTags()) {

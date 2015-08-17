@@ -35,17 +35,17 @@ import io.netty.buffer.ByteBuf;
 /** For future maintainers: This class intentionally does not implement just every interface out there. For some of them
  * (such as IControllable), we expect the tiles supporting it to implement it - but TileBuildCraft provides all the
  * underlying functionality to stop code repetition. */
-public abstract class TileBuildCraft extends TileEntity implements /*IEnergyHandler,*/ ISerializable, IUpdatePlayerListBox, IAdditionalDataTile {
+public abstract class TileBuildCraft extends TileEntity implements ISerializable, IUpdatePlayerListBox, IAdditionalDataTile {
     protected TileBuffer[] cache;
     protected HashSet<EntityPlayer> guiWatchers = new HashSet<EntityPlayer>();
     protected IControllable.Mode mode;
 
     private int init = 0;
     private String owner = "[BuildCraft]";
-//    private RFBattery battery;
+    // private RFBattery battery;
 
-//    private int receivedTick, extractedTick;
-//    private long worldTimeEnergyReceive;
+    // private int receivedTick, extractedTick;
+    // private long worldTimeEnergyReceive;
     /** Used at the client for the power LED brightness */
     // TODO: Make LED POWER work... somehow
     public int ledPower = 0;
@@ -78,23 +78,9 @@ public abstract class TileBuildCraft extends TileEntity implements /*IEnergyHand
             init = 2;
         }
 
-        /*if (battery != null) {
-//            receivedTick = 0;
-//            extractedTick = 0;
-
-            if (!worldObj.isRemote) {
-                int prePower = ledPower;
-                int stored = battery.getEnergyStored();
-                int max = battery.getMaxEnergyStored();
-                ledPower = 0;
-                if (stored != 0) {
-                    ledPower = stored * 2 / max + 1;
-                }
-                if (prePower != ledPower) {
-                    sendNetworkUpdate();
-                }
-            }
-        }*/
+        /* if (battery != null) { // receivedTick = 0; // extractedTick = 0; if (!worldObj.isRemote) { int prePower =
+         * ledPower; int stored = battery.getEnergyStored(); int max = battery.getMaxEnergyStored(); ledPower = 0; if
+         * (stored != 0) { ledPower = stored * 2 / max + 1; } if (prePower != ledPower) { sendNetworkUpdate(); } } } */
     }
 
     public void initialize() {
@@ -157,11 +143,8 @@ public abstract class TileBuildCraft extends TileEntity implements /*IEnergyHand
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setString("owner", owner);
-        /*if (battery != null) {
-            NBTTagCompound batteryNBT = new NBTTagCompound();
-            battery.writeToNBT(batteryNBT);
-            nbt.setTag("battery", batteryNBT);
-        }*/
+        /* if (battery != null) { NBTTagCompound batteryNBT = new NBTTagCompound(); battery.writeToNBT(batteryNBT);
+         * nbt.setTag("battery", batteryNBT); } */
         if (mode != null) {
             nbt.setByte("lastMode", (byte) mode.ordinal());
         }
@@ -173,17 +156,15 @@ public abstract class TileBuildCraft extends TileEntity implements /*IEnergyHand
         if (nbt.hasKey("owner")) {
             owner = nbt.getString("owner");
         }
-        /*if (battery != null) {
-            battery.readFromNBT(nbt.getCompoundTag("battery"));
-        }*/
+        /* if (battery != null) { battery.readFromNBT(nbt.getCompoundTag("battery")); } */
         if (nbt.hasKey("lastMode")) {
             mode = IControllable.Mode.values()[nbt.getByte("lastMode")];
         }
     }
-//
-//    protected int getTicksSinceEnergyReceived() {
-//        return (int) (worldObj.getTotalWorldTime() - worldTimeEnergyReceive);
-//    }
+    //
+    // protected int getTicksSinceEnergyReceived() {
+    // return (int) (worldObj.getTotalWorldTime() - worldTimeEnergyReceive);
+    // }
 
     @Override
     public int hashCode() {
@@ -195,64 +176,19 @@ public abstract class TileBuildCraft extends TileEntity implements /*IEnergyHand
         return this == cmp;
     }
 
-    /*@Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return battery != null;
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        if (battery != null && this.canConnectEnergy(from)) {
-            int received = battery.receiveEnergy(maxReceive - receivedTick, simulate);
-            if (!simulate) {
-                receivedTick += received;
-                worldTimeEnergyReceive = worldObj.getTotalWorldTime();
-            }
-            return received;
-        } else {
-            return 0;
-        }
-    }
-
-    /** If you want to use this, implement IEnergyProvider. * /
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        if (battery != null && this.canConnectEnergy(from)) {
-            int extracted = battery.extractEnergy(maxExtract - extractedTick, simulate);
-            if (!simulate) {
-                extractedTick += extracted;
-            }
-            return extracted;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        if (battery != null && this.canConnectEnergy(from)) {
-            return battery.getEnergyStored();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        if (battery != null && this.canConnectEnergy(from)) {
-            return battery.getMaxEnergyStored();
-        } else {
-            return 0;
-        }
-    }
-
-    public RFBattery getBattery() {
-        return battery;
-    }
-
-    protected void setBattery(RFBattery battery) {
-        this.battery = battery;
-    }
-*/
+    /* @Override public boolean canConnectEnergy(EnumFacing from) { return battery != null; }
+     * @Override public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) { if (battery != null &&
+     * this.canConnectEnergy(from)) { int received = battery.receiveEnergy(maxReceive - receivedTick, simulate); if
+     * (!simulate) { receivedTick += received; worldTimeEnergyReceive = worldObj.getTotalWorldTime(); } return received;
+     * } else { return 0; } } /** If you want to use this, implement IEnergyProvider. * / public int
+     * extractEnergy(EnumFacing from, int maxExtract, boolean simulate) { if (battery != null &&
+     * this.canConnectEnergy(from)) { int extracted = battery.extractEnergy(maxExtract - extractedTick, simulate); if
+     * (!simulate) { extractedTick += extracted; } return extracted; } else { return 0; } }
+     * @Override public int getEnergyStored(EnumFacing from) { if (battery != null && this.canConnectEnergy(from)) {
+     * return battery.getEnergyStored(); } else { return 0; } }
+     * @Override public int getMaxEnergyStored(EnumFacing from) { if (battery != null && this.canConnectEnergy(from)) {
+     * return battery.getMaxEnergyStored(); } else { return 0; } } public RFBattery getBattery() { return battery; }
+     * protected void setBattery(RFBattery battery) { this.battery = battery; } */
     public IBlockState getBlockState(EnumFacing side) {
         if (cache == null) {
             cache = TileBuffer.makeBuffer(worldObj, pos, false);

@@ -8,12 +8,16 @@ import net.minecraft.world.World;
  * should check sides, and make sure that the caller is of the correct type- so that an engine is not trying to take
  * power from it. */
 public interface IMjExternalStorage {
-    /** @return The type of this storage device. Depending on what it is, different actions will be taken when accepting
+    /** @param side The side to query. A null value is acceptable, but may return the wrong result if you will use this
+     *            value for anything
+     * @return The type of this storage device. Depending on what it is, different actions will be taken when accepting
      *         power and receiving power. Should never return null. */
-    EnumMjDeviceType getDeviceType();
+    EnumMjDevice getDeviceType(EnumFacing side);
 
-    /** @return The type of power this storage deals with. */
-    EnumMjPowerType getPowerType();
+    /** @param side The side to query. A null value is acceptable, but may return the wrong result if you will use this
+     *            value for anything
+     * @return The type of power this storage deals with. */
+    EnumMjPower getPowerType(EnumFacing side);
 
     /** @param flowDirection The direction that the power should flow (If you are extracting from an engine below, this
      *            would be EnumFacing.UP). If you don't know which direction it is, it is safe to pass null.
@@ -28,9 +32,10 @@ public interface IMjExternalStorage {
 
     /** @param flowDirection The direction that the power should flow (If you are inserting to an engine below, this
      *            would be EnumFacing.DOWN). If you don't know which direction it is, it is safe to pass null.
-     * @param from
-     * @param mj
-     * @param simulate
+     * @param from The IMjExternalStorage that is providing the power. This should never be null!
+     * @param mj The power to insert
+     * @param simulate If true, nothing internally will be changed, but it will pretend that power was take from it (You
+     *            can use this to test if it has enough power)
      * @return The overflow power that could not be inserted into storage. Will equal <code>mj</code> if this storage is
      *         full, or cannot receive power from that direction. */
     double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate);
@@ -51,4 +56,14 @@ public interface IMjExternalStorage {
      * @param storage The storage to set. If a storage has already been set (usually by the tile entity that created
      *            this) it will throw an IllegalArgumentException. */
     void setInternalStorage(IMjInternalStorage storage);
+
+    /** @param side The side to query. A null value is acceptable, but may return the wrong result if you will use this
+     *            value for anything
+     * @return The current power level of the side. */
+    double currentPower(EnumFacing side);
+
+    /** @param side The side to query. A null value is acceptable, but may return the wrong result if you will use this
+     *            value for anything
+     * @return The maximum amount of power that the side can hold. */
+    double maxPower(EnumFacing side);
 }

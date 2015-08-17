@@ -6,10 +6,11 @@ package buildcraft.core;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 import buildcraft.api.enums.EnumEnergyStage;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
@@ -19,7 +20,14 @@ import buildcraft.core.lib.engines.TileEngineBase;
 public class TileEngineWood extends TileEngineBase {
     protected class SidedMjExternalStorage extends DefaultMjExternalStorage implements IMjConnection {
         public SidedMjExternalStorage(double maxPowerTransfered) {
-            super(EnumMjDeviceType.ENGINE, EnumMjPowerType.REDSTONE, maxPowerTransfered);
+            super(EnumMjDevice.ENGINE, EnumMjPower.REDSTONE, maxPowerTransfered);
+            addLimiter(new IConnectionLimiter() {
+                @Override
+                public boolean allowConnection(World world, EnumFacing flowDirection, IMjExternalStorage from, IMjExternalStorage to,
+                        boolean flowingIn) {
+                    return orientation == flowDirection;
+                }
+            });
         }
 
         @Override
@@ -37,6 +45,7 @@ public class TileEngineWood extends TileEngineBase {
     public TileEngineWood() {
         super(MAX_POWER, MAX_TRANSFERED, ACTIVATION_POWER, LOSS_DELAY, LOSS_RATE);
         externalStorage = new SidedMjExternalStorage(MAX_TRANSFERED);
+        externalStorage.setInternalStorage(internalStorage);
     }
 
     // private boolean hasSent = false;

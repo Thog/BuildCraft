@@ -10,16 +10,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BuildCraftTransport;
@@ -29,8 +32,8 @@ import buildcraft.transport.PipeTransportFluids;
 
 import io.netty.buffer.ByteBuf;
 
-public class PipeFluidsWood extends Pipe<PipeTransportFluids>implements IEnergyHandler, ISerializable, IDebuggable {
-    private static final int ENERGY_MULTIPLIER = 50;
+public class PipeFluidsWood extends Pipe<PipeTransportFluids>implements IMjExternalStorage, ISerializable, IDebuggable {
+    private static final int ENERGY_MULTIPLIER = 500;
 
     public int fluidToExtract;
 
@@ -154,41 +157,6 @@ public class PipeFluidsWood extends Pipe<PipeTransportFluids>implements IEnergyH
     }
 
     @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        TileEntity tile = getConnectingTile();
-        if (tile == null || !(tile instanceof IFluidHandler)) {
-            return 0;
-        }
-
-        int maxToReceive = (1000 - fluidToExtract) / ENERGY_MULTIPLIER;
-        int received = Math.min(maxReceive, maxToReceive);
-        if (!simulate) {
-            fluidToExtract += ENERGY_MULTIPLIER * received;
-        }
-        return received;
-    }
-
-    @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        return 0;
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        return 0;
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return 1000 / ENERGY_MULTIPLIER;
-    }
-
-    @Override
     public void writeData(ByteBuf data) {
         data.writeShort(fluidToExtract);
     }
@@ -203,5 +171,59 @@ public class PipeFluidsWood extends Pipe<PipeTransportFluids>implements IEnergyH
         left.add("");
         left.add("PipeFluidsWood");
         left.add(" Fluid Extraction Potential = " + fluidToExtract + "mB");
+    }
+
+    @Override
+    public EnumMjDevice getDeviceType(EnumFacing side) {
+        return EnumMjDevice.MACHINE;
+    }
+
+    @Override
+    public EnumMjPower getPowerType(EnumFacing side) {
+        return EnumMjPower.REDSTONE;
+    }
+
+    @Override
+    public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
+        return 0;// Nope
+    }
+
+    @Override
+    public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+        TileEntity tile = getConnectingTile();
+        if (tile == null || !(tile instanceof IFluidHandler)) {
+            return 0;
+        }
+
+        double maxToReceive = (1000 - fluidToExtract) / ENERGY_MULTIPLIER;
+        double received = Math.min(mj, maxToReceive);
+        double overflow = maxToReceive - mj;
+        if (overflow < 0) {
+            overflow = 0;
+        }
+        if (!simulate) {
+            fluidToExtract += ENERGY_MULTIPLIER * received;
+        }
+        return overflow;
+    }
+
+    @Override
+    public double getSuction(World world, EnumFacing flowDirection) {
+        return 0.75;
+    }
+
+    @Override
+    public void setInternalStorage(IMjInternalStorage storage) {
+        // Nope
+    }
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        return 0;
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        return 10;
     }
 }

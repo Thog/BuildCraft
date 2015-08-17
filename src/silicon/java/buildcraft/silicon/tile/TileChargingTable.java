@@ -3,8 +3,8 @@ package buildcraft.silicon.tile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
-import cofh.api.energy.IEnergyContainerItem;
-
+import buildcraft.api.enums.EnumInventoryDirection;
+import buildcraft.api.mj.IMjItemHandler;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.lib.utils.StringUtils;
 
@@ -17,32 +17,35 @@ public class TileChargingTable extends TileLaserTableBase implements IHasWork {
             return;
         }
 
-        if (getEnergy() > 0) {
-            if (getRequiredEnergy() > 0) {
+        if (internalStorage.currentPower() > 0) {
+            if (getRequiredPower() > 0) {
                 ItemStack stack = this.getStackInSlot(0);
-                IEnergyContainerItem containerItem = (IEnergyContainerItem) stack.getItem();
-                addEnergy(0 - containerItem.receiveEnergy(stack, getEnergy(), false));
+                IMjItemHandler itemHandler = (IMjItemHandler) stack.getItem();
+                double power = internalStorage.extractPower(getWorld(), 0, 10, false);
+                double excess = itemHandler.insertPower(stack, EnumInventoryDirection.UNKNOWN, power, false);
+                internalStorage.insertPower(getWorld(), excess, false);
                 this.setInventorySlotContents(0, stack);
             } else {
-                subtractEnergy(Math.min(getEnergy(), 10));
+                internalStorage.extractPower(getWorld(), 0, 10, false);
             }
         }
     }
 
     @Override
-    public int getRequiredEnergy() {
+    public double getRequiredPower() {
         ItemStack stack = this.getStackInSlot(0);
-        if (stack != null && stack.getItem() != null && stack.getItem() instanceof IEnergyContainerItem) {
-            IEnergyContainerItem containerItem = (IEnergyContainerItem) stack.getItem();
-            return containerItem.getMaxEnergyStored(stack) - containerItem.getEnergyStored(stack);
+        if (stack != null && stack.getItem() != null && stack.getItem() instanceof IMjItemHandler) {
+            IMjItemHandler item = (IMjItemHandler) stack.getItem();
+            double excess = item.insertPower(stack, EnumInventoryDirection.UNKNOWN, 1000, true);
+            return 1000 - excess;
+            // Returns anywhere between 1000 and 0 even if the item has more room than 100 MJ
         }
-
         return 0;
     }
 
     @Override
     public boolean hasWork() {
-        return getRequiredEnergy() > 0;
+        return getRequiredPower() > 0;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class TileChargingTable extends TileLaserTableBase implements IHasWork {
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == 0 && stack != null && stack.getItem() != null && stack.getItem() instanceof IEnergyContainerItem;
+        return slot == 0 && stack != null && stack.getItem() != null && stack.getItem() instanceof IMjItemHandler;
     }
 
     @Override

@@ -51,7 +51,7 @@ public class GuiStampingTable extends GuiLaserTable {
         super.drawGuiContainerBackgroundLayer(f, mouseX, mouseY);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(TEXTURE);
-        if (integrationTable.getEnergy() > 0) {
+        if (integrationTable.clientPower > 0) {
             int progress = integrationTable.getProgressScaled(98);
             drawTexturedModalRect(guiLeft + 36, guiTop + 14, 0, flash ? 197 : 221, progress, 24);
         }

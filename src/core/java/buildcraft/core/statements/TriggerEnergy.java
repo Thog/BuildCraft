@@ -7,11 +7,9 @@ package buildcraft.core.statements;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import cofh.api.energy.IEnergyConnection;
-import cofh.api.energy.IEnergyHandler;
-import cofh.api.energy.IEnergyProvider;
-import cofh.api.energy.IEnergyReceiver;
-
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.ITriggerInternal;
@@ -42,24 +40,20 @@ public class TriggerEnergy extends BCStatement implements ITriggerInternal {
         return StringUtils.localize("gate.trigger.machine.energyStored." + (high ? "high" : "low"));
     }
 
-    private boolean isTriggeredEnergyHandler(IEnergyConnection connection, EnumFacing side) {
-        int energyStored, energyMaxStored;
+    private boolean isTriggeredEnergyHandler(IMjHandler handler, EnumFacing side) {
+        double energyStored, energyMaxStored;
 
-        if (connection instanceof IEnergyHandler) {
-            energyStored = ((IEnergyHandler) connection).getEnergyStored(side);
-            energyMaxStored = ((IEnergyHandler) connection).getMaxEnergyStored(side);
-        } else if (connection instanceof IEnergyProvider) {
-            energyStored = ((IEnergyProvider) connection).getEnergyStored(side);
-            energyMaxStored = ((IEnergyProvider) connection).getMaxEnergyStored(side);
-        } else if (connection instanceof IEnergyReceiver) {
-            energyStored = ((IEnergyReceiver) connection).getEnergyStored(side);
-            energyMaxStored = ((IEnergyReceiver) connection).getMaxEnergyStored(side);
-        } else {
+        IMjExternalStorage storage = handler.getMjStorage();
+
+        if (storage.getDeviceType(side) == EnumMjDevice.TRANSPORT) {
             return false;
         }
 
+        energyStored = storage.currentPower(side);
+        energyMaxStored = storage.maxPower(side);
+
         if (energyMaxStored > 0) {
-            float level = energyStored / energyMaxStored;
+            double level = energyStored / energyMaxStored;
             if (high) {
                 return level > 0.95F;
             } else {
@@ -70,27 +64,35 @@ public class TriggerEnergy extends BCStatement implements ITriggerInternal {
     }
 
     protected static boolean isTriggered(Object tile, EnumFacing side) {
-        return (tile instanceof IEnergyHandler || tile instanceof IEnergyProvider || tile instanceof IEnergyReceiver) && (((IEnergyConnection) tile)
-                .canConnectEnergy(side.getOpposite()));
+        if (!(tile instanceof IMjHandler)) {
+            return false;
+        }
+        IMjHandler handler = (IMjHandler) tile;
+        return handler.getMjStorage().getDeviceType(null) != EnumMjDevice.TRANSPORT;
+        // if (handler.getMjStorage() instanceof IMjConnection) {
+        // return ((IMjConnection) handler.getMjStorage()).canConnectPower(side, null);
+        // }
+        // return tile instanceof IMjHandler && (((IMjHandler) tile).getMjStorage() instanceof IMjConnection) ?
+        // (((IEnergyConnection) tile).canConnectEnergy(side.getOpposite()));
     }
 
     protected boolean isActive(Object tile, EnumFacing side) {
         if (isTriggered(tile, side)) {
-            return isTriggeredEnergyHandler((IEnergyConnection) tile, side.getOpposite());
+            return isTriggeredEnergyHandler((IMjHandler) tile, side.getOpposite());
         }
 
         return false;
     }
 
-    public static boolean isTriggeringPipe(TileEntity tile) {
-        if (tile instanceof IPipeTile) {
-            IPipeTile pipeTile = (IPipeTile) tile;
-            if (pipeTile.getPipeType() == IPipeTile.PipeType.POWER && pipeTile.getPipe() instanceof IEnergyHandler) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // public static boolean isTriggeringPipe(TileEntity tile) {
+    // if (tile instanceof IPipeTile) {
+    // IPipeTile pipeTile = (IPipeTile) tile;
+    // if (pipeTile.getPipeType() == IPipeTile.PipeType.POWER && pipeTile.getPipe() instanceof IMjExternalStorage) {
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
 
     // @Override
     // @SideOnly(Side.CLIENT)
@@ -101,9 +103,9 @@ public class TriggerEnergy extends BCStatement implements ITriggerInternal {
     @Override
     public boolean isTriggerActive(IStatementContainer source, IStatementParameter[] parameters) {
         // Internal check
-        if (isTriggeringPipe(source.getTile())) {
-            return isActive(((IPipeTile) source.getTile()).getPipe(), null);
-        }
+        // if (isTriggeringPipe(source.getTile())) {
+        // return isActive(((IPipeTile) source.getTile()).getPipe(), null);
+        // }
 
         Neighbor triggeringNeighbor = getTriggeringNeighbor(source.getTile());
         if (triggeringNeighbor != null) {

@@ -61,11 +61,11 @@ public class TileProgrammingTable extends TileLaserTableBase implements IInvento
             return;
         }
 
-        if (optionId >= 0 && this.getStackInSlot(1) == null && getEnergy() >= currentRecipe.getEnergyCost(options.get(optionId))) {
+        if (optionId >= 0 && this.getStackInSlot(1) == null && internalStorage.currentPower() >= currentRecipe.getPowerCost(options.get(optionId))) {
             if (currentRecipe.canCraft(this.getStackInSlot(0))) {
                 ItemStack remaining = currentRecipe.craft(this.getStackInSlot(0), options.get(optionId));
                 if (remaining != null && remaining.stackSize > 0) {
-                    setEnergy(0);
+                    internalStorage.extractPower(getWorld(), 0, Integer.MAX_VALUE, false);
                     this.decrStackSize(0, remaining.stackSize);
 
                     if (remaining.stackSize > 0) {
@@ -146,9 +146,9 @@ public class TileProgrammingTable extends TileLaserTableBase implements IInvento
     }
 
     @Override
-    public int getRequiredEnergy() {
+    public double getRequiredPower() {
         if (hasWork()) {
-            return currentRecipe.getEnergyCost(options.get(optionId));
+            return currentRecipe.getPowerCost(options.get(optionId));
         } else {
             return 0;
         }

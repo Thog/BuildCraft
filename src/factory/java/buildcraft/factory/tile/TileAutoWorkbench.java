@@ -19,8 +19,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
 
 import buildcraft.api.core.IInvSlot;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
@@ -67,7 +67,7 @@ public class TileAutoWorkbench extends TileBuildCraft implements ISidedInventory
     private final DefaultMjInternalStorage internalStorage;
 
     public TileAutoWorkbench() {
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.REDSTONE, 1.6);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, EnumMjPower.REDSTONE, 1.6);
         internalStorage = new DefaultMjInternalStorage(3.2, 1.6, 400, 0.16);
         externalStorage.setInternalStorage(internalStorage);
     }

@@ -14,7 +14,6 @@ import com.google.common.collect.Maps;
 import buildcraft.transport.pipes.events.PipeEvent;
 import buildcraft.transport.pipes.events.PipeEventPriority;
 
-@Deprecated
 // TODO: Make this use something other than reflection
 public class PipeEventBus {
     private class EventHandler {
@@ -85,8 +84,9 @@ public class PipeEventBus {
 
         for (Method m : handler.getClass().getDeclaredMethods()) {
             if ("eventHandler".equals(m.getName())) {
-                Class[] parameters = m.getParameterTypes();
+                Class<?>[] parameters = m.getParameterTypes();
                 if (parameters.length == 1 && PipeEvent.class.isAssignableFrom(parameters[0])) {
+                    @SuppressWarnings("unchecked")
                     Class<? extends PipeEvent> eventType = (Class<? extends PipeEvent>) parameters[0];
                     List<EventHandler> eventHandlerList = getHandlerList(eventType);
                     eventHandlerList.add(new EventHandler(m, handler));

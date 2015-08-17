@@ -16,11 +16,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
-import cofh.api.energy.IEnergyHandler;
-
 import buildcraft.api.core.IIconProvider;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
 import buildcraft.api.transport.IStripesHandler;
@@ -41,7 +44,7 @@ import buildcraft.transport.pipes.events.PipeEventItem;
 import buildcraft.transport.statements.ActionPipeDirection;
 import buildcraft.transport.utils.TransportUtils;
 
-public class PipeItemsStripes extends Pipe<PipeTransportItems>implements IEnergyHandler, IStripesPipe {
+public class PipeItemsStripes extends Pipe<PipeTransportItems>implements IMjExternalStorage, IStripesPipe {
     private EnumFacing actionDir = null;
 
     public PipeItemsStripes(Item item) {
@@ -173,13 +176,7 @@ public class PipeItemsStripes extends Pipe<PipeTransportItems>implements IEnergy
         return super.canPipeConnect(tile, side);
     }
 
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+    public double receiveEnergy(EnumFacing from, double maxReceive, boolean simulate) {
         if (maxReceive == 0) {
             return 0;
         } else if (simulate) {
@@ -229,17 +226,40 @@ public class PipeItemsStripes extends Pipe<PipeTransportItems>implements IEnergy
     }
 
     @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+    public EnumMjDevice getDeviceType(EnumFacing side) {
+        return EnumMjDevice.MACHINE;
+    }
+
+    @Override
+    public EnumMjPower getPowerType(EnumFacing side) {
+        return EnumMjPower.REDSTONE;
+    }
+
+    @Override
+    public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
         return 0;
     }
 
     @Override
-    public int getEnergyStored(EnumFacing from) {
+    public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+        return receiveEnergy(flowDirection, mj, simulate);
+    }
+
+    @Override
+    public double getSuction(World world, EnumFacing flowDirection) {
+        return 0.5;
+    }
+
+    @Override
+    public void setInternalStorage(IMjInternalStorage storage) {}
+
+    @Override
+    public double currentPower(EnumFacing side) {
         return 0;
     }
 
     @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return 10;
+    public double maxPower(EnumFacing side) {
+        return 1;
     }
 }

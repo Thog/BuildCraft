@@ -14,11 +14,11 @@ public interface IProgrammingRecipe {
      * @return */
     List<ItemStack> getOptions(int width, int height);
 
-    /** Get the energy cost of a given option ItemStack.
+    /** Get the power cost (In MJ) of a given option ItemStack.
      * 
      * @param option
      * @return */
-    int getEnergyCost(ItemStack option);
+    double getPowerCost(ItemStack option);
 
     /** @param input The input stack.
      * @return Whether this recipe applies to the given input stack. */

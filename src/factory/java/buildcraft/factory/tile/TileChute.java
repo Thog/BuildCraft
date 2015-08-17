@@ -13,8 +13,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.world.World;
 
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
@@ -35,7 +35,7 @@ public class TileChute extends TileBuildCraft implements IInventory, IMjHandler 
     private final DefaultMjInternalStorage internalStorage;
 
     public TileChute() {
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, EnumMjPowerType.REDSTONE, 1.0);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, EnumMjPower.REDSTONE, 1.0);
         externalStorage.addLimiter(new IConnectionLimiter() {
             @Override
             public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage thisOne, IMjExternalStorage other, boolean in) {

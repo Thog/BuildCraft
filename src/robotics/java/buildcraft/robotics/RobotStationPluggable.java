@@ -10,7 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjDevice;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
@@ -140,7 +140,7 @@ public class RobotStationPluggable extends PipePluggable implements IPipePluggab
     private final DefaultMjInternalStorage internalStorage;
 
     public RobotStationPluggable() {
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.TRANSPORT, 10);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.TRANSPORT, 10);
         internalStorage = new DefaultMjInternalStorage(100, 1, 400, 1);
         externalStorage.setInternalStorage(internalStorage);
     }

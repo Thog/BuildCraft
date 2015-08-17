@@ -13,8 +13,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
@@ -52,13 +52,13 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     }
 
     @Override
-    public EnumMjDeviceType getDeviceType() {
-        return EnumMjDeviceType.TRANSPORT;
+    public EnumMjDevice getDeviceType(EnumFacing side) {
+        return EnumMjDevice.TRANSPORT;
     }
 
     @Override
-    public EnumMjPowerType getPowerType() {
-        return EnumMjPowerType.NORMAL;
+    public EnumMjPower getPowerType(EnumFacing side) {
+        return EnumMjPower.NORMAL;
     }
 
     @Override
@@ -94,6 +94,16 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     @Override
     public void setInternalStorage(IMjInternalStorage storage) {
         // NO-OP (Its handled seperately)
+    }
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        return 0;
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        return 0;
     }
 
     @Override
@@ -171,7 +181,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
                     }
                     double otherSuction = external.getSuction(getWorld(), face);
                     // If the other one has more pull than we do or its a machine (Always try to insert into machines)
-                    if (otherSuction > suction || external.getDeviceType() == EnumMjDeviceType.MACHINE) {
+                    if (otherSuction > suction || external.getDeviceType(null) == EnumMjDevice.MACHINE) {
                         totalSuction += otherSuction;
                         toVisit.add(def);
                     }
@@ -204,7 +214,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     }
 
     protected boolean isValidDestination(IMjExternalStorage storage) {
-        return storage.getDeviceType().acceptsPowerFrom(getDeviceType());
+        return storage.getDeviceType(null).acceptsPowerFrom(getDeviceType(null));
     }
 
     protected void processDestinations(Map<EnumFacing, IMjExternalStorage> faceOtherMap) {

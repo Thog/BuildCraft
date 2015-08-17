@@ -90,9 +90,6 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
         if (lastRecievedPower == -1) {
             // Essentially an initialisation step
             lastRecievedPower = currentTick;
-            // Not required??
-            System.out.println("This part was required!!!!");
-            // TODO (PASS 2): Remove this debug method
         } else if (lastRecievedPower + lossDelay < currentTick) {
             // Enough time has passed, start losing power
             power -= lossRate;

@@ -13,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.mj.EnumMjDeviceType;
+import buildcraft.api.mj.EnumMjDevice;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
@@ -24,7 +24,12 @@ import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.utils.Average;
 
 public abstract class TileLaserTableBase extends TileBuildCraft implements IInventory, IHasWork, IMjHandler {
-    private static final AxisAlignedBB TARGET = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+    private static final AxisAlignedBB TARGET = new AxisAlignedBB(7 / 16d, 9 / 16d, 7 / 16d, 9 / 16d, 9 / 16d, 9 / 16d);
+
+    private static final double MAX_POWER = 10000;
+    private static final double MAX_TRANSFERED = 100;
+    private static final long LOSS_DELAY = 4000;
+    private static final double LOSS_RATE = 1;
 
     public double clientRequiredPower = 0;
     public double clientPower = 0;
@@ -36,14 +41,14 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements IInve
     protected final DefaultMjLaserExternalStorage externalStorage;
     protected final DefaultMjInternalStorage internalStorage;
 
-    public TileLaserTableBase(double maxPower, double maxTransfered, long lossDelay, double lossRate) {
-        externalStorage = new DefaultMjLaserExternalStorage(EnumMjDeviceType.MACHINE, maxTransfered, EnumFacing.UP, TARGET) {
+    public TileLaserTableBase() {
+        externalStorage = new DefaultMjLaserExternalStorage(EnumMjDevice.MACHINE, MAX_TRANSFERED, EnumFacing.UP, TARGET) {
             @Override
             public boolean canCurrentlyRecievePower() {
                 return requiresLaserEnergy();
             }
         };
-        internalStorage = new DefaultMjInternalStorage(maxPower, 0, lossDelay, lossRate);
+        internalStorage = new DefaultMjInternalStorage(MAX_POWER, 0, LOSS_DELAY, LOSS_RATE);
         externalStorage.setInternalStorage(internalStorage);
     }
 

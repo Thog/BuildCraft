@@ -3,8 +3,8 @@ package buildcraft.api.mj.reference;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjInternalStorage;
 
@@ -14,13 +14,13 @@ public final class NonExistantStorage implements IMjExternalStorage {
     public static final NonExistantStorage INSTANCE = new NonExistantStorage();
 
     @Override
-    public EnumMjDeviceType getDeviceType() {// Doesn't really matter, as it cannot accept power anyway
-        return EnumMjDeviceType.ENGINE;
+    public EnumMjDevice getDeviceType(EnumFacing side) {// Doesn't really matter, as it cannot accept power anyway
+        return EnumMjDevice.ENGINE;
     }
 
     @Override
-    public EnumMjPowerType getPowerType() {// Again doesn't really matter, as it cannot be converted
-        return EnumMjPowerType.NORMAL;
+    public EnumMjPower getPowerType(EnumFacing side) {// Again doesn't really matter, as it cannot be converted
+        return EnumMjPower.NONE;
     }
 
     @Override
@@ -40,4 +40,14 @@ public final class NonExistantStorage implements IMjExternalStorage {
 
     @Override
     public void setInternalStorage(IMjInternalStorage storage) {}
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        return 0;
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        return 0;
+    }
 }

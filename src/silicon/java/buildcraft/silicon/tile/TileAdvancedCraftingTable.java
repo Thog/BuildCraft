@@ -27,7 +27,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.oredict.OreDictionary;
 
 import buildcraft.api.core.IInvSlot;
-import buildcraft.api.power.ILaserTarget;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.InventoryCopy;
 import buildcraft.core.lib.inventory.InventoryIterator;
@@ -45,7 +44,7 @@ import buildcraft.core.network.PacketIds;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.silicon.BuildCraftSilicon;
 
-public class TileAdvancedCraftingTable extends TileLaserTableBase implements IInventory, ILaserTarget, ISidedInventory {
+public class TileAdvancedCraftingTable extends TileLaserTableBase implements IInventory, ISidedInventory {
 
     private static final int[] SLOTS = Utils.createSlotArray(0, 24);
     private static final EnumSet<EnumFacing> SEARCH_SIDES = EnumSet.of(EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST,
@@ -204,13 +203,13 @@ public class TileAdvancedCraftingTable extends TileLaserTableBase implements IIn
     }
 
     @Override
-    public int getRequiredEnergy() {
+    public double getRequiredPower() {
         return craftResult.getStackInSlot(0) != null ? REQUIRED_POWER : 0;
     }
 
     @Override
     public int getProgressScaled(int i) {
-        return (getEnergy() * i) / REQUIRED_POWER;
+        return (int) ((clientPower * i) / REQUIRED_POWER);
     }
 
     @Override
@@ -235,7 +234,7 @@ public class TileAdvancedCraftingTable extends TileLaserTableBase implements IIn
         updateRecipeOutputDisplay();
         justCrafted = false;
         if (canCraftAndOutput()) {
-            if (getEnergy() >= getRequiredEnergy()) {
+            if (internalStorage.currentPower() >= getRequiredPower()) {
                 craftItem();
                 justCrafted = true;
             }
@@ -243,7 +242,7 @@ public class TileAdvancedCraftingTable extends TileLaserTableBase implements IIn
             craftable = false;
             internalInventoryCrafting.tempStacks = null;
             internalInventoryCrafting.hitCount = null;
-            setEnergy(0);
+            internalStorage.extractPower(getWorld(), 0, Integer.MAX_VALUE, false);
         }
     }
 
@@ -322,7 +321,7 @@ public class TileAdvancedCraftingTable extends TileLaserTableBase implements IIn
             inv.getItemStacks()[i] = tempStorage[i];
         }
 
-        subtractEnergy(getRequiredEnergy());
+        internalStorage.extractPower(getWorld(), getRequiredPower(), getRequiredPower(), false);
         List<ItemStack> outputs = Lists.newArrayList(recipeOutput.copy());
 
         for (int i = 0; i < internalPlayer.inventory.mainInventory.length; i++) {

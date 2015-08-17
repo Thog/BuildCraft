@@ -8,17 +8,18 @@ import net.minecraft.item.ItemStack;
 import buildcraft.api.recipes.IIntegrationRecipe;
 
 public abstract class IntegrationRecipeBC implements IIntegrationRecipe {
-    private final int energyCost, maxExpansionCount;
+    private final int maxExpansionCount;
+    private final double powerCost;
     private SoftReference<List<ItemStack>> exampleInputs;
     private SoftReference<List<ItemStack>> exampleOutputs;
     private SoftReference<List<List<ItemStack>>> exampleExpansions;
 
-    public IntegrationRecipeBC(int energyCost) {
-        this(energyCost, -1);
+    public IntegrationRecipeBC(double powerCost) {
+        this(powerCost, -1);
     }
 
-    public IntegrationRecipeBC(int energyCost, int maxExpansionCount) {
-        this.energyCost = energyCost;
+    public IntegrationRecipeBC(double powerCost, int maxExpansionCount) {
+        this.powerCost = powerCost;
         this.maxExpansionCount = maxExpansionCount;
     }
 
@@ -29,8 +30,8 @@ public abstract class IntegrationRecipeBC implements IIntegrationRecipe {
     public abstract List<List<ItemStack>> generateExampleExpansions();
 
     @Override
-    public int getEnergyCost() {
-        return energyCost;
+    public double getPowerCost() {
+        return powerCost;
     }
 
     @Override

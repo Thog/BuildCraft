@@ -11,7 +11,6 @@ import buildcraft.api.boards.RedstoneBoardNBT;
 import buildcraft.api.boards.RedstoneBoardRegistry;
 import buildcraft.api.recipes.IProgrammingRecipe;
 import buildcraft.core.lib.utils.NBTUtils;
-import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.item.ItemRedstoneBoard;
 
 public class BoardProgrammingRecipe implements IProgrammingRecipe {
@@ -24,7 +23,7 @@ public class BoardProgrammingRecipe implements IProgrammingRecipe {
 
         @Override
         public int compare(ItemStack o1, ItemStack o2) {
-            return recipe.getEnergyCost(o1) - recipe.getEnergyCost(o2);
+            return (int) (recipe.getPowerCost(o1) - recipe.getPowerCost(o2));
         }
     }
 
@@ -36,7 +35,7 @@ public class BoardProgrammingRecipe implements IProgrammingRecipe {
     @Override
     public List<ItemStack> getOptions(int width, int height) {
         List<ItemStack> options = new ArrayList<ItemStack>(width * height);
-        for (RedstoneBoardNBT nbt : RedstoneBoardRegistry.instance.getAllBoardNBTs()) {
+        for (RedstoneBoardNBT<?> nbt : RedstoneBoardRegistry.instance.getAllBoardNBTs()) {
             ItemStack stack = new ItemStack(BuildCraftRobotics.redstoneBoard);
             nbt.createBoard(NBTUtils.getItemData(stack));
             options.add(stack);
@@ -46,7 +45,7 @@ public class BoardProgrammingRecipe implements IProgrammingRecipe {
     }
 
     @Override
-    public int getEnergyCost(ItemStack option) {
+    public double getPowerCost(ItemStack option) {
         return RedstoneBoardRegistry.instance.getEnergyCost(RedstoneBoardRegistry.instance.getRedstoneBoard(option.getTagCompound().getString("id")));
     }
 

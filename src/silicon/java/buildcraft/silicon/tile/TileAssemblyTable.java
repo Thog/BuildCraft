@@ -45,7 +45,7 @@ public class TileAssemblyTable extends TileLaserTableBase implements IInventory,
     private boolean queuedNetworkUpdate = false;
 
     public TileAssemblyTable() {
-        super(maxPower, maxTransfered, lossDelay, lossRate);
+        super();
     }
 
     public List<CraftingResult<ItemStack>> getPotentialOutputs() {

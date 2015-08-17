@@ -18,8 +18,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.mj.EnumMjDeviceType;
-import buildcraft.api.mj.EnumMjPowerType;
+import buildcraft.api.mj.EnumMjDevice;
+import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjLaserStorage;
@@ -61,10 +61,10 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         super();
         internalStorage = new DefaultMjInternalStorage(1000, 25, 400, 2);
 
-        externalStorage = new DefaultMjExternalStorage(EnumMjDeviceType.MACHINE, 5);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, 5);
         externalStorage.setInternalStorage(internalStorage);
 
-        externalLaserStorage = new DefaultMjExternalStorage(EnumMjDeviceType.ENGINE, EnumMjPowerType.LASER, 0);
+        externalLaserStorage = new DefaultMjExternalStorage(EnumMjDevice.ENGINE, EnumMjPower.LASER, 0);
         externalLaserStorage.setInternalStorage(internalStorage);
     }
 
