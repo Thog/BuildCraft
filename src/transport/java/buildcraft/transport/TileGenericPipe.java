@@ -259,14 +259,20 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     public class SidedExternalStorage implements IMjExternalStorage {
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("SidedExternalStorage [" + getSidedStorage(null) + "]");
+            return builder.toString();
+        }
 
         private IMjExternalStorage getSidedStorage(EnumFacing side) {
-            if (hasPipePluggable(side)) {
+            if (side != null && hasPipePluggable(side)) {
                 PipePluggable pluggable = getPipePluggable(side);
                 if (pluggable instanceof IMjExternalStorage) {
                     return (IMjExternalStorage) pluggable;
                 } else if (pluggable.isBlocking(TileGenericPipe.this, side)) {
-                    return null;
+                    return NonExistantStorage.INSTANCE;
                 }
             }
             if (pipe instanceof IMjExternalStorage) {
@@ -292,12 +298,12 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
         @Override
         public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
-            return getSidedStorage(flowDirection.getOpposite()).insertPower(world, flowDirection, from, mj, simulate);
+            return getSidedStorage(flowDirection == null ? null : flowDirection.getOpposite()).insertPower(world, flowDirection, from, mj, simulate);
         }
 
         @Override
         public double getSuction(World world, EnumFacing flowDirection) {
-            return getSidedStorage(flowDirection.getOpposite()).getSuction(world, flowDirection);
+            return getSidedStorage(flowDirection == null ? null : flowDirection.getOpposite()).getSuction(world, flowDirection);
         }
 
         @Override
@@ -426,6 +432,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 initialize(pipe);
             }
         }
+
+        sendNetworkUpdate();
 
         if (attachPluggables) {
             attachPluggables = false;
@@ -866,7 +874,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         for (EnumFacing side : EnumFacing.VALUES) {
-//            TileBuffer t = cache[side.ordinal()];
+            // TileBuffer t = cache[side.ordinal()];
             // For blocks which are not loaded, keep the old connection value.
             // if (t.exists() || !initialized) {
             // t.refresh();

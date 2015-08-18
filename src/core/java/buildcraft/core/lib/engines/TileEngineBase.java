@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.engines;
 
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
@@ -23,6 +25,7 @@ import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage.IConnectionLimiter;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
+import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.tiles.IHeatable;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.api.transport.IPipeConnection;
@@ -35,7 +38,7 @@ import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
-public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection, IHeatable, IMjHandler {
+public abstract class TileEngineBase extends TileBuildCraft implements IPipeConnection, IHeatable, IMjHandler, IDebuggable {
     // TEMP
     public static final ResourceLocation TRUNK_BLUE_TEXTURE = new ResourceLocation("buildcraftcore:textures/blocks/engine/trunk_blue.png");
     public static final ResourceLocation TRUNK_GREEN_TEXTURE = new ResourceLocation("buildcraftcore:textures/blocks/engine/trunk_green.png");
@@ -60,6 +63,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     private boolean checkRedstonePower = true;
 
     private boolean isPumping = false; // Used for SMP synch
+    private double heldPower = 0;// Used for caching power while it is pulsing
 
     protected DefaultMjExternalStorage externalStorage;
     protected DefaultMjInternalStorage internalStorage;
@@ -251,29 +255,62 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
 
         internalStorage.tick(getWorld());
 
-        if (internalStorage.hasActivated()) {
-            double maxMj = internalStorage.currentPower() / 5d;
-            double minMj = maxMj / 3d;
-            double power = internalStorage.extractPower(getWorld(), minMj, maxMj, false);
-            if (power > 0) {
+        if (internalStorage.hasActivated() && heldPower == 0) {
+            heldPower += internalStorage.extractPower(getWorld(), 0, internalStorage.currentPower(), false);
+            internalStorage.stopOperating();
+        }
+
+        if (heldPower > 0) {
+            double mj = Math.min(heldPower, internalStorage.activationPower / 5d);
+            if (mj > 0) {
+                heldPower -= mj;
                 TileEntity tile = getWorld().getTileEntity(getPos().offset(orientation));
                 if (tile != null && tile instanceof IMjHandler) {
                     IMjHandler handler = (IMjHandler) tile;
                     IMjExternalStorage storage = handler.getMjStorage();
                     if (canSendPowerTo(tile, storage)) {
-                        double excess = storage.insertPower(getWorld(), orientation, getMjStorage(), power, false);
-                        internalStorage.insertPower(getWorld(), excess, false);
+                        double excess = storage.insertPower(getWorld(), orientation, getMjStorage(), mj, false);
+                        heldPower += excess;
                         setPumping(true);
                     } else {// We didn't want to send power to it
                         setPumping(false);
                     }
                 } else {// The tile did not handle MJ
+                    internalStorage.insertPower(getWorld(), mj, false);
                     setPumping(false);
                 }
             } else {// Power == 0
                 setPumping(false);
             }
         }
+
+        // if (internalStorage.hasActivated()) {
+        // double maxMj = internalStorage.currentPower();
+        // double minMj = maxMj;
+        // double power = heldPower > 0 ? heldPower : internalStorage.extractPower(getWorld(), minMj, maxMj, false);
+        // if (heldPower > 0) {
+        // heldPower = 0;
+        // }
+        // if (power > 0) {
+        // TileEntity tile = getWorld().getTileEntity(getPos().offset(orientation));
+        // if (tile != null && tile instanceof IMjHandler) {
+        // IMjHandler handler = (IMjHandler) tile;
+        // IMjExternalStorage storage = handler.getMjStorage();
+        // if (canSendPowerTo(tile, storage)) {
+        // double excess = storage.insertPower(getWorld(), orientation, getMjStorage(), power, false);
+        // heldPower += excess;
+        // setPumping(true);
+        // } else {// We didn't want to send power to it
+        // setPumping(false);
+        // }
+        // } else {// The tile did not handle MJ
+        // internalStorage.insertPower(getWorld(), power, false);
+        // setPumping(false);
+        // }
+        // } else {// Power == 0
+        // setPumping(false);
+        // }
+        // }
         /* Object tile = getEnergyProvider(orientation); if (progressPart != 0) { progress += getPistonSpeed(); if
          * (progress > 0.5 && progressPart == 1) { progressPart = 2; } else if (progress >= 1) { progress = 0;
          * progressPart = 0; } } else if (isRedstonePowered && isActive()) { if (isPoweredTile(tile, orientation)) {
@@ -282,6 +319,8 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         burn();
 
         /* if (!isRedstonePowered) { currentOutput = 0; } else if (isRedstonePowered && isActive()) { sendPower(); } */
+        // FIXME TEMP
+        sendNetworkUpdate();
     }
 
     protected boolean canSendPowerTo(TileEntity tile, IMjExternalStorage storage) {
@@ -407,6 +446,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         internalStorage.readFromNBT(data.getCompoundTag("internalStorage"));
         // }
         heat = data.getFloat("heat");
+        heldPower = data.getDouble("heldPower");
     }
 
     @Override
@@ -417,6 +457,7 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
         data.setFloat("progress", progress);
         data.setTag("internalStorage", internalStorage.writeToNBT());
         data.setFloat("heat", heat);
+        data.setDouble("heldPower", heldPower);
     }
 
     @Override
@@ -542,5 +583,15 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
     public double setHeatValue(double value) {
         heat = (float) MathUtils.clamp(value, MIN_HEAT, MAX_HEAT);
         return heat;
+    }
+
+    @Override
+    public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
+        left.add("");
+        left.add("Internal Storage:");
+        left.add("  - power = " + internalStorage.currentPower() + "Mj");
+        left.add("  - activation = " + internalStorage.activationPower);
+        left.add("  - active = " + internalStorage.hasActivated());
+        left.add("  - operating = " + internalStorage.isOperating());
     }
 }

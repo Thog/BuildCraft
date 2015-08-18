@@ -3,6 +3,7 @@ package buildcraft.transport.pipes;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -13,17 +14,23 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+import buildcraft.api.core.BCLog;
+import buildcraft.api.core.ISerializable;
 import buildcraft.api.mj.EnumMjDevice;
 import buildcraft.api.mj.EnumMjPower;
+import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
+import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportPower;
 
-public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements IMjExternalStorage {
+import io.netty.buffer.ByteBuf;
+
+public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements IMjExternalStorage, IDebuggable, ISerializable {
     // TYPES:
     // WOOD --extract from engines
     // COBBLE --doesn't connect to STONE or QUARTZ
@@ -33,12 +40,10 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     // IRON --power only flows out one way
     // GOLD --not sure
     // CLAY --prioritises machines over pipes
-    public static final double MAX_POWER = 128;
+    public static final double MAX_POWER = 1024;
     public static final double ACTIVATION = 0.1;
-    public static final long LOSS_DELAY = 80;
-    public static final double LOSS_RATE = 0.1;
-
-    public static final double TRANSFER_POWER = 40;
+    public static final long LOSS_DELAY = 10;
+    public static final double LOSS_RATE = 8;
 
     protected EnumMap<EnumFacing, DefaultMjInternalStorage> pipePartMap = Maps.newEnumMap(EnumFacing.class);
 
@@ -69,6 +74,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     @Override
     public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
         if (!(from instanceof Pipe<?>)) {
+            BCLog.logger.info(from.getClass());
             return mj;// You cannot insert power (directly) to pipes -wooden pipes implement this separately for
                       // redstone engines
         }
@@ -88,7 +94,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             return suction / 6d;
         }
         IMjInternalStorage storage = pipePartMap.get(flowDirection.getOpposite());
-        return 1 - (storage.currentPower() / storage.maxPower());
+        return storage.getSuction();
     }
 
     @Override
@@ -98,18 +104,114 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
 
     @Override
     public double currentPower(EnumFacing side) {
-        return 0;
+        if (side == null) {
+            return 0;
+        }
+        return pipePartMap.get(side).currentPower();
     }
 
     @Override
     public double maxPower(EnumFacing side) {
-        return 0;
+        if (side == null) {
+            return MAX_POWER;
+        }
+        return pipePartMap.get(side).maxPower();
     }
 
     @Override
     public void update() {
         super.update();
-        transferPower();
+        if (container.getWorld().isRemote) {
+            return;
+        }
+        for (DefaultMjInternalStorage store : pipePartMap.values()) {
+            store.tick(getWorld());
+        }
+        // transferPower();
+        transferPower2nd();
+    }
+
+    protected void transferPower2nd() {
+        // First, try and transfer power from the pipe face to the tile it is connected to
+        for (EnumFacing face : EnumFacing.values()) {
+            if (container.isPipeConnected(face)) {
+                TileEntity tile = container.getWorld().getTileEntity(container.getPos().offset(face));
+                if (tile == null || !(tile instanceof IMjHandler)) {
+                    // Most of the time it SHOULD be a valid handler, but just check anyway
+                    continue;
+                }
+                IMjExternalStorage external = ((IMjHandler) tile).getMjStorage();
+
+                if (external instanceof IMjConnection) {
+                    IMjConnection connection = (IMjConnection) external;
+                    if (!connection.canConnectPower(face, this)) {
+                        continue;
+                    }
+                }
+
+                DefaultMjInternalStorage storage = pipePartMap.get(face);
+                double suctionOut = external.getSuction(getWorld(), face);
+                double suctionDifference = suctionOut - storage.getSuction() / EnumMjDevice.TRANSPORT.getSuctionDivisor();
+
+                if (suctionDifference <= 0) {
+                    if (external.getDeviceType(face.getOpposite()) != EnumMjDevice.MACHINE) {
+                        continue;
+                    } else {
+                        suctionDifference = suctionOut;
+                    }
+                }
+                suctionDifference += 0.3;
+
+                double mj = storage.extractPower(getWorld(), 0, storage.currentPower() * suctionDifference / 2, false);
+                double excess = external.insertPower(getWorld(), face, this, mj, false);
+                storage.insertPower(getWorld(), excess, false);
+            } else if (container.hasPipePluggable(face)) {
+                // TODO
+            }
+        }
+
+        // Second transfer half the total power to the center
+        double heldPower = 0;
+        double totalSuction = 0;
+
+        for (EnumFacing face : EnumFacing.values()) {
+
+            DefaultMjInternalStorage storage = pipePartMap.get(face);
+            double mj = (storage.currentPower());
+            heldPower += storage.extractPower(getWorld(), mj, mj, false);
+            if (!container.isPipeConnected(face)) {
+                continue;
+            }
+            totalSuction += storage.getSuction();
+        }
+
+        double totalPower = heldPower;
+
+        // Then transfer all the center power to the faces that need it
+        for (EnumFacing face : EnumFacing.values()) {
+            if (!container.isPipeConnected(face)) {
+                continue;
+            }
+            DefaultMjInternalStorage storage = pipePartMap.get(face);
+            double mj = totalPower * storage.getSuction() / totalSuction;
+            heldPower -= mj;
+            heldPower += storage.insertPower(getWorld(), mj, false);
+        }
+
+        // if (heldPower > 0) {
+        // // If the above failed then just add power to each part
+        // for (EnumFacing face : EnumFacing.values()) {
+        // if (!container.isPipeConnected(face)) {
+        // continue;
+        // }
+        // DefaultMjInternalStorage storage = pipePartMap.get(face);
+        // heldPower = storage.insertPower(getWorld(), heldPower, false);
+        // }
+        // }
+
+        if (heldPower > 0.00001) {// Normal losses due to double being slightly inaccurate.
+            BCLog.logger.warn("Too much power! (heldPower = " + heldPower + ")");
+        }
     }
 
     protected void transferPower() {
@@ -119,8 +221,6 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         Map<EnumFacing, IMjExternalStorage> faceOtherMap = Maps.newHashMap();
         // Map of pipe part -> suction
         Map<DefaultMjInternalStorage, Double> partSuctionMap = Maps.newHashMap();
-        // Map of pipe part -> stored in that section
-        Map<DefaultMjInternalStorage, Double> partStoredMap = Maps.newHashMap();
         // A list of all the internal storages that have not been visited yet
         List<DefaultMjInternalStorage> toDo = Lists.newArrayList();
         for (EnumFacing face : EnumFacing.values()) {
@@ -133,7 +233,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
                 PipePluggable pluggable = container.getPipePluggable(face);
                 if (pluggable instanceof IMjHandler) {
                     IMjExternalStorage external = ((IMjHandler) pluggable).getMjStorage();
-                    if (isValidDestination(external)) {
+                    if (isValidDestination(external, face)) {
                         // If its not a valid destination, then don't add it to the totalSuction calculation below.
                         faceOtherMap.put(face, external);
                     }
@@ -143,19 +243,17 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             }
             DefaultMjInternalStorage storage = pipePartMap.get(face);
             storage.tick(getWorld());
-            if (storage.hasActivated()) {// If it has at least ACTIVATION power
-                double thisSuction = 1 - (storage.currentPower() / storage.maxPower());
-                partFaceMap.put(storage, face);
-                partSuctionMap.put(storage, thisSuction);
-                toDo.add(storage);
-            }
+            double thisSuction = storage.getSuction();
+            partFaceMap.put(storage, face);
+            partSuctionMap.put(storage, thisSuction);
+            toDo.add(storage);
             TileEntity tile = container.getWorld().getTileEntity(container.getPos().offset(face));
             if (tile == null || !(tile instanceof IMjHandler)) {
                 // Most of the time it SHOULD be a valid handler, but just check anyway
                 continue;
             }
             IMjExternalStorage external = ((IMjHandler) tile).getMjStorage();
-            if (isValidDestination(external)) {
+            if (isValidDestination(external, face)) {
                 // If its not a valid destination, then don't add it to the totalSuction calculation below.
                 faceOtherMap.put(face, external);
             }
@@ -164,10 +262,13 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         processDestinations(faceOtherMap);
 
         for (DefaultMjInternalStorage store : toDo) {
+            if (!store.hasActivated()) {
+                continue;
+            }
             // We need to cache the suction value otherwise the pipes start to pretend that they had different amounts
             // than they did
             double suction = partSuctionMap.get(store);
-            double stored = partStoredMap.get(store);
+            // double stored = partStoredMap.get(store);
             EnumFacing face = partFaceMap.get(store);
 
             List<DefaultMjInternalStorage> toVisit = Lists.newArrayList();
@@ -181,45 +282,52 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
                     }
                     double otherSuction = external.getSuction(getWorld(), face);
                     // If the other one has more pull than we do or its a machine (Always try to insert into machines)
-                    if (otherSuction > suction || external.getDeviceType(null) == EnumMjDevice.MACHINE) {
+                    if (otherSuction > suction || external.getDeviceType(face.getOpposite()) == EnumMjDevice.MACHINE) {
                         totalSuction += otherSuction;
                         toVisit.add(def);
                     }
                 } else {
                     double otherSuction = partSuctionMap.get(def);
                     if (otherSuction > suction) {
-                        totalSuction += def.currentPower() / def.maxPower();
+                        totalSuction += def.getSuction();
                         toVisit.add(def);
                     }
                 }
             }
 
-            double totalMj = store.extractPower(getWorld(), 0, TRANSFER_POWER, false);
-            double totalExcess = 0;
+            double totalMj = store.extractPower(getWorld(), 0, 27946, false);
+            double usedMj = 0;
 
-            for (DefaultMjInternalStorage def : toVisit) {
-                if (def == store) {// The outside machine
-                    double mj = faceOtherMap.get(def).getSuction(getWorld(), face) * totalMj / totalSuction;
-                    double excess = faceOtherMap.get(def).insertPower(getWorld(), face, container.getMjStorage(), mj, false);
-                    totalExcess += excess;
-                } else {// Anotehr pipe
-                    double mj = partSuctionMap.get(def) * totalMj / totalSuction;
-                    double excess = def.insertPower(getWorld(), mj, false);
-                    totalExcess += excess;
+            if (totalSuction > 0) {
+                for (DefaultMjInternalStorage def : toVisit) {
+                    if (def == store) {// The outside machine
+                        IMjExternalStorage outside = faceOtherMap.get(def);
+                        if (outside != null) {
+                            double mj = outside.getSuction(getWorld(), face) * totalMj / totalSuction;
+                            double excess = outside.insertPower(getWorld(), face, container.getMjStorage(), mj, false);
+                            usedMj += mj - excess;
+                        }
+                    } else {// Another pipe part
+                        double mj = partSuctionMap.get(def) * totalMj / totalSuction;
+                        double excess = def.insertPower(getWorld(), mj, false);
+                        usedMj += mj - excess;
+                    }
                 }
             }
             // Re-insert the excess power
-            store.insertPower(getWorld(), totalExcess, false);
+            store.insertPower(getWorld(), totalMj - usedMj, false);
         }
     }
 
-    protected boolean isValidDestination(IMjExternalStorage storage) {
-        return storage.getDeviceType(null).acceptsPowerFrom(getDeviceType(null));
+    protected boolean isValidDestination(IMjExternalStorage storage, EnumFacing flowDir) {
+        return storage.getDeviceType(flowDir.getOpposite()).acceptsPowerFrom(getDeviceType(null));
     }
 
     protected void processDestinations(Map<EnumFacing, IMjExternalStorage> faceOtherMap) {
         // This is overridden by PipePowerClay to remove any pipes if any machines are present in this map that can
-        // accept power (and a few otehr things)
+        // accept power (and a few other things)
+        for (Entry<EnumFacing, IMjExternalStorage> store : faceOtherMap.entrySet())
+            BCLog.logger.info("  " + store.getKey() + " = " + store.getValue());
     }
 
     @Override
@@ -241,5 +349,31 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             storageTag.setTag(face.name(), storage.writeToNBT());
         }
         data.setTag("storage", storageTag);
+    }
+
+    @Override
+    public void getDebugInfo(List<String> left, List<String> right, EnumFacing face) {
+        left.add("");
+        left.add("Internal Storage:");
+        for (EnumFacing side : EnumFacing.values()) {
+            DefaultMjInternalStorage store = pipePartMap.get(side);
+            if (store == null) {
+                left.add("  - " + side + " = not connected");
+            } else {
+                left.add("  - " + side + " = " + store.currentPower() + " Mj");
+            }
+        }
+    }
+
+    public void writeData(ByteBuf data) {
+        for (EnumFacing face : EnumFacing.values()) {
+            pipePartMap.get(face).writeData(data);
+        }
+    }
+
+    public void readData(ByteBuf data) {
+        for (EnumFacing face : EnumFacing.values()) {
+            pipePartMap.get(face).readData(data);
+        }
     }
 }

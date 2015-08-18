@@ -61,7 +61,7 @@ public class TileLaser extends TileBuildCraft implements IHasWork, IControllable
         super();
         internalStorage = new DefaultMjInternalStorage(1000, 25, 400, 2);
 
-        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, 5);
+        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, EnumMjPower.NORMAL, 5);
         externalStorage.setInternalStorage(internalStorage);
 
         externalLaserStorage = new DefaultMjExternalStorage(EnumMjDevice.ENGINE, EnumMjPower.LASER, 0);

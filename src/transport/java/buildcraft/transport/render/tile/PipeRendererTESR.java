@@ -29,9 +29,9 @@ import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeRenderState;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.PipeTransportItems;
-import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.GatePluggable;
+import buildcraft.transport.pipes.PipePowerBase;
 
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
     public PipeRendererTESR() {}
@@ -58,7 +58,7 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
         } else if (pipeType == IPipeTile.PipeType.FLUID) {
             PipeRendererFluids.renderFluidPipe((Pipe<PipeTransportFluids>) pipe.pipe, x, y, z);
         } else if (pipeType == IPipeTile.PipeType.POWER) {
-            PipeRendererPower.renderPowerPipe((Pipe<PipeTransportPower>) pipe.pipe, x, y, z);
+            PipeRendererPower.renderPowerPipe((PipePowerBase) pipe.pipe, x, y, z);
         } /* else if (pipeType == PipeType.STRUCTURE) { // no object to render in a structure pipe; } */
     }
 

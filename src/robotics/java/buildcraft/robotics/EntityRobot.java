@@ -130,7 +130,6 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
     private float energyFX = 0;
     private Vec3 steamDirection = new Vec3(0, -1, 0);
 
-    private final DefaultMjExternalStorage externalStorage;
     private final DefaultMjInternalStorage internalStorage;
 
     public EntityRobot(World world, RedstoneBoardRobotNBT boardNBT) {
@@ -159,9 +158,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
         width = 0.25F;
         height = 0.25F;
 
-        externalStorage = new DefaultMjExternalStorage(EnumMjDevice.MACHINE, 10);
         internalStorage = new DefaultMjInternalStorage(10, 10, 10, 10);// TODO: set the power variables
-        externalStorage.setInternalStorage(internalStorage);
     }
 
     @Override

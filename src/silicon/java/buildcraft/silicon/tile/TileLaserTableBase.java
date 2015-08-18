@@ -42,7 +42,7 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements IInve
     protected final DefaultMjInternalStorage internalStorage;
 
     public TileLaserTableBase() {
-        externalStorage = new DefaultMjLaserExternalStorage(EnumMjDevice.MACHINE, MAX_TRANSFERED, EnumFacing.UP, TARGET) {
+        externalStorage = new DefaultMjLaserExternalStorage(this, EnumMjDevice.MACHINE, MAX_TRANSFERED, EnumFacing.UP, TARGET) {
             @Override
             public boolean canCurrentlyRecievePower() {
                 return requiresLaserEnergy();

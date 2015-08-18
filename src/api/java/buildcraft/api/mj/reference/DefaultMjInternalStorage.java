@@ -19,9 +19,8 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     public static final long ENGINE_LOSS_DELAY = 300;
     public static final double ENGINE_LOSS_RATE = 0.2;
 
-    private final double maxPower, activationPower, lossRate;
+    public double maxPower, lossRate, power, activationPower;
     private final long lossDelay;
-    private double power;
     private boolean on = false;
     private long lastRecievedPower = -1, lastTicked = -1;
 
@@ -34,11 +33,6 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
         this.activationPower = activationPower;
         this.lossDelay = lossDelay;
         this.lossRate = lossRate;
-    }
-
-    @Override
-    public double currentPower() {
-        return power;
     }
 
     @Override
@@ -118,6 +112,8 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     public NBTTagCompound writeToNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setDouble("mj", power);
+        nbt.setDouble("activationPower", activationPower);
+        nbt.setDouble("maxPower", maxPower);
         nbt.setLong("lastRecievedPower", lastRecievedPower);
         nbt.setLong("lastTicked", lastTicked);
         nbt.setBoolean("on", on);
@@ -127,6 +123,8 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         power = nbt.getDouble("mj");
+        activationPower = nbt.getDouble("activationPower");
+        maxPower = nbt.getDouble("maxPower");
         lastRecievedPower = nbt.getLong("lastRecievedPower");
         lastTicked = nbt.getLong("lastTicked");
         on = nbt.getBoolean("on");
@@ -137,10 +135,48 @@ public class DefaultMjInternalStorage implements IMjInternalStorage, ISerializab
     @Override
     public void writeData(ByteBuf data) {
         data.writeDouble(power);
+        data.writeBoolean(on);
+        data.writeDouble(activationPower);
+        data.writeDouble(maxPower);
     }
 
     @Override
     public void readData(ByteBuf data) {
         power = data.readDouble();
+        on = data.readBoolean();
+        activationPower = data.readDouble();
+        maxPower = data.readDouble();
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString() */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("DefaultMjInternalStorage [power=");
+        builder.append(power);
+        builder.append(", on=");
+        builder.append(on);
+        builder.append(", lastRecievedPower=");
+        builder.append(lastRecievedPower);
+        builder.append(", lastTicked=");
+        builder.append(lastTicked);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    @Override
+    public double currentPower() {
+        return power;
+    }
+
+    @Override
+    public double getSuction() {
+        if (maxPower() <= 0) {
+            return 0;
+        } else {
+            return 1 - (currentPower() / maxPower());
+        }
+    }
+
 }

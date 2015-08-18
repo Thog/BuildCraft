@@ -6,16 +6,16 @@ import com.google.common.collect.Lists;
 
 public enum EnumMjDevice {
     /** Something that gives out power to anything, but only accepts power from other engines. */
-    ENGINE(1),
+    ENGINE(3),
     /** Something that gives out power to transport, and only accepts power from transport. */
     STORAGE(2),
     /** Something that gives out power to anything, and accepts power from anything. */
-    TRANSPORT(1),
+    TRANSPORT(2),
     /** Something that gives out no power, but accepts power from transport and engines. */
-    MACHINE(4);
+    MACHINE(1);
 
     private final List<EnumMjDevice> to;
-    private final double flowDivisor;
+    private final double suctionDivisor;
 
     static {
         ENGINE.to.add(ENGINE);
@@ -31,7 +31,7 @@ public enum EnumMjDevice {
 
     EnumMjDevice(double flowDivisor) {
         this.to = Lists.newArrayList();
-        this.flowDivisor = flowDivisor;
+        this.suctionDivisor = flowDivisor;
     }
 
     public boolean givesPowerTo(EnumMjDevice type) {
@@ -42,7 +42,7 @@ public enum EnumMjDevice {
         return type.givesPowerTo(this);
     }
 
-    public double getFlowDivisor() {
-        return flowDivisor;
+    public double getSuctionDivisor() {
+        return suctionDivisor;
     }
 }

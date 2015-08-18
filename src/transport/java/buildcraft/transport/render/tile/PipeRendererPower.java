@@ -15,9 +15,9 @@ import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportPower;
+import buildcraft.transport.pipes.PipePowerBase;
 
 public class PipeRendererPower {
     public static final float DISPLAY_MULTIPLIER = 0.1f;
@@ -34,7 +34,7 @@ public class PipeRendererPower {
 
     private static boolean initialized = false;
 
-    static void renderPowerPipe(Pipe<PipeTransportPower> pipe, double x, double y, double z) {
+    static void renderPowerPipe(PipePowerBase pipe, double x, double y, double z) {
         initializeDisplayPowerList();
 
         PipeTransportPower pow = pipe.transport;
@@ -55,6 +55,12 @@ public class PipeRendererPower {
             GL11.glPushMatrix();
 
             short stage = pow.displayPower[side];
+            double value = pipe.currentPower(EnumFacing.VALUES[side]) / pipe.maxPower(EnumFacing.VALUES[side]);
+            value = Math.sqrt(value);
+            stage = (short) ((displayList.length - 1) * value);
+            if (value != 0 && stage == 0) {
+                stage = 1;
+            }
             if (stage >= 1) {
                 if (stage < displayList.length) {
                     GL11.glCallList(displayList[stage][side]);

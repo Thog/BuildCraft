@@ -101,10 +101,11 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
 
         if (tile instanceof IMjHandler) {
             if (container.pipe instanceof PipePowerWood) {
-
+                IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
+                return storage.getDeviceType(side.getOpposite()).givesPowerTo(EnumMjDevice.TRANSPORT);
             }
             IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
-            return storage.getDeviceType(null).acceptsPowerFrom(EnumMjDevice.TRANSPORT);
+            return storage.getDeviceType(side.getOpposite()).acceptsPowerFrom(EnumMjDevice.TRANSPORT);
         }
         /* if (tile instanceof IEngine) { // Disregard engines for this. return false; } if (tile instanceof
          * IEnergyHandler || tile instanceof IEnergyReceiver) { IEnergyConnection handler = (IEnergyConnection) tile; if

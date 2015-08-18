@@ -436,6 +436,12 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
         left.add("Result");
         left.add(" " + result.getFluidAmount() + "/" + result.getCapacity() + "mB");
         left.add(" " + (result.getFluid() == null ? "empty" : result.getFluidType().getLocalizedName(result.getFluid())));
+        left.add("");
+        left.add("Internal Storage:");
+        left.add("  - power = " + internalStorage.currentPower() + "Mj");
+        left.add("  - max = " + internalStorage.maxPower() + "Mj");
+        left.add("  - active = " + internalStorage.hasActivated());
+        left.add("  - operating = " + internalStorage.isOperating());
     }
 
     @Override

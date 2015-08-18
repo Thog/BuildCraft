@@ -59,7 +59,7 @@ public abstract class GuiEngine extends GuiBuildCraft {
 
         @Override
         public String getTooltip() {
-            return String.format("%d RF/t", engine.currentOutput);
+            return engine.currentOutput + " Mj/t";
         }
     }
 

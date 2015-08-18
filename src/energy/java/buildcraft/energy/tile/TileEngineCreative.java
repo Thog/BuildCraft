@@ -44,6 +44,8 @@ public class TileEngineCreative extends TileEngineBase {
 
             if (equipped instanceof IToolWrench && ((IToolWrench) equipped).canWrench(player, pos)) {
                 powerMode = powerMode.getNext();
+                internalStorage.activationPower = powerMode.maxPower * 40;
+                internalStorage.maxPower = powerMode.maxPower * 200;
 
                 if (!(player instanceof FakePlayer)) {
                     if (BuildCraftCore.hidePowerNumbers) {

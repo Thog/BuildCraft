@@ -7,6 +7,7 @@ package buildcraft.core.builders;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -14,6 +15,7 @@ import com.google.common.collect.Sets;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -24,6 +26,7 @@ import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
+import buildcraft.api.tiles.IDebuggable;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.LaserData;
 import buildcraft.core.internal.IBoxProvider;
@@ -36,7 +39,7 @@ import buildcraft.core.lib.network.command.PacketCommand;
 import io.netty.buffer.ByteBuf;
 
 public abstract class TileAbstractBuilder extends TileBuildCraft implements ITileBuilder, IInventory, IBoxProvider, IBuildingItemsProvider,
-        ICommandReceiver, IMjHandler {
+        ICommandReceiver, IMjHandler, IDebuggable {
 
     public LinkedList<LaserData> pathLasers = new LinkedList<LaserData>();
 
@@ -84,7 +87,9 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
     @Override
     public void update() {
         super.update();
-        internalStorage.tick(getWorld());
+        if (!getWorld().isRemote) {
+            internalStorage.tick(getWorld());
+        }
 
         Iterator<BuildingItem> itemIterator = buildersInAction.iterator();
         BuildingItem i;
@@ -169,5 +174,15 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
     @Override
     public IMjExternalStorage getMjStorage() {
         return externalStorage;
+    }
+
+    @Override
+    public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
+        left.add("");
+        left.add("Internal Storage:");
+        left.add("  - power = " + internalStorage.currentPower() + "Mj");
+        left.add("  - max = " + internalStorage.maxPower() + "Mj");
+        left.add("  - active = " + internalStorage.hasActivated());
+        left.add("  - operating = " + internalStorage.isOperating());
     }
 }

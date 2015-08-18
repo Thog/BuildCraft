@@ -1,5 +1,6 @@
 package buildcraft.api.mj.reference;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
@@ -11,7 +12,7 @@ public abstract class DefaultMjLaserExternalStorage extends DefaultMjExternalSto
     private final EnumFacing face;
     private final AxisAlignedBB target;
 
-    public DefaultMjLaserExternalStorage(EnumMjDevice type, double maxPowerTransfered, EnumFacing face, AxisAlignedBB target) {
+    public DefaultMjLaserExternalStorage(TileEntity tile, EnumMjDevice type, double maxPowerTransfered, EnumFacing face, AxisAlignedBB target) {
         super(type, EnumMjPower.LASER, maxPowerTransfered);
         this.face = face;
         this.target = target;

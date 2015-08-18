@@ -46,13 +46,8 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     private final EnumMjPower powerType;
     private List<IConnectionLimiter> connectionLimits = Lists.newArrayList();
 
-    // DEBUG!!!!
-
+    /** Used for debugging incorrectly set up storages */
     private final Throwable initPos;
-
-    public DefaultMjExternalStorage(EnumMjDevice type, double maxPowerTransfered) {
-        this(type, EnumMjPower.NORMAL, maxPowerTransfered);
-    }
 
     public DefaultMjExternalStorage(EnumMjDevice deviceType, EnumMjPower powerType, double maxPowerTransfered) {
         this.deviceType = deviceType;
@@ -78,6 +73,17 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
      *            UnsupportedOperationException. */
     public void addLimiter(IConnectionLimiter limiter) {
         connectionLimits.add(limiter);
+    }
+
+    /** This must be called after {@link #addLimiter(IConnectionLimiter)} to finalise the limiters */
+    @Override
+    public void setInternalStorage(IMjInternalStorage storage) {
+        if (this.storage == null) {
+            this.storage = storage;
+            this.connectionLimits = ImmutableList.copyOf(connectionLimits);
+        } else {
+            throw new IllegalStateException("You cannot set an internal storage when one has already been set!");
+        }
     }
 
     private IMjInternalStorage storage() {
@@ -137,21 +143,8 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     }
 
     @Override
-    public double getSuction(World world, EnumFacing florDirection) {
-        double filled = storage().currentPower() / storage().maxPower();
-        filled = 1 - filled;
-        return filled / getDeviceType(null).getFlowDivisor();
-    }
-
-    /** This must be called after {@link #addLimiter(IConnectionLimiter)} to finalise the limiters */
-    @Override
-    public void setInternalStorage(IMjInternalStorage storage) {
-        if (this.storage == null) {
-            this.storage = storage;
-            this.connectionLimits = ImmutableList.copyOf(connectionLimits);
-        } else {
-            throw new IllegalStateException("You cannot set an internal storage when one has already been set!");
-        }
+    public double getSuction(World world, EnumFacing flowDirection) {
+        return storage().getSuction() / getDeviceType(flowDirection.getOpposite()).getSuctionDivisor();
     }
 
     @Override

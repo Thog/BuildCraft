@@ -4,8 +4,6 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.pipes;
 
-import java.util.List;
-
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -17,11 +15,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
-import buildcraft.api.tiles.IDebuggable;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
 
-public class PipePowerWood extends PipePowerBase implements IDebuggable {
+public class PipePowerWood extends PipePowerBase {
     public final boolean[] powerSources = new boolean[6];
 
     protected int standardIconIndex = PipeIconProvider.TYPE.PipePowerWood_Standard.ordinal();
@@ -123,24 +121,18 @@ public class PipePowerWood extends PipePowerBase implements IDebuggable {
 
     @Override
     public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
-        if (from.getPowerType(null) == EnumMjPower.REDSTONE) {
+        if (from.getPowerType(flowDirection.getOpposite()) == EnumMjPower.REDSTONE) {
             // If the from is a redstone engine than redirect the power to allow it to extract this tick
             allowExtraction = true;
             return 0;
         } else {
-            return super.insertPower(world, flowDirection, from, mj, simulate);
+            EnumFacing pipePart = flowDirection.getOpposite();
+            DefaultMjInternalStorage storage = pipePartMap.get(pipePart);
+            return storage.insertPower(world, mj, simulate);
         }
     }
 
     /* @Override public int receiveEnergy(EnumFacing from, int val) { return -1; }
      * @Override public int requestEnergy(EnumFacing from, int amount) { if (container.getTile(from) instanceof
      * IPipeTile) { requestedEnergy += amount; return amount; } else { return 0; } } */
-
-    @Override
-    public void getDebugInfo(List<String> left, List<String> right, EnumFacing face) {
-        left.add("");
-        left.add("Power Acceptor");
-        left.add("- requestedEnergy: " + requestedEnergy);
-        left.add("- lastRequestedEnergy: " + lastRequestedEnergy);
-    }
 }

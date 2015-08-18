@@ -97,7 +97,7 @@ public final class GateExpansionPulsar extends GateExpansionBuildcraft implement
             if (pipeTile instanceof IMjHandler && (!singlePulse || !hasPulsed)) {
                 gate.setPulsing(true);
                 IMjExternalStorage storage = ((IMjHandler) pipeTile).getMjStorage();
-                storage.insertPower(pipeTile.getWorld(), gate.getFace().getOpposite(), null, Math.min(1 << (count - 1), 64), false);
+                storage.insertPower(pipeTile.getWorld(), null, null, Math.min(1 << (count - 1), 64), false);
                 hasPulsed = true;
             } else {
                 gate.setPulsing(true);

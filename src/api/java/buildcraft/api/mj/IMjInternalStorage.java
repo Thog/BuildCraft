@@ -13,6 +13,9 @@ public interface IMjInternalStorage {
     /** @return The maximum power this storage can hold. */
     double maxPower();
 
+    /** @return A double between 0 and 1 that represents how much this storage is pulling power in. */
+    double getSuction();
+
     /** If this has enough power then this will activate the machine, so that the machine can continue running until it
      * has no power left
      * 
