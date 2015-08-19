@@ -42,6 +42,10 @@ minecraft {
     replace "@MC_VERSION@", version
 }
 
+dependencies {
+    testCompile "junit:junit:4.12"
+}
+
 sourceSets {
     core {
         resources {
@@ -105,6 +109,11 @@ modules.each { module ->
         }
     }
     sourceSets[module].compileClasspath += sourceSets["api"].compileClasspath
+
+    dependencies {
+        testCompile sourceSets[module].output
+    }
+
     moduleDependencies[module].each { dependant ->
         sourceSets[module].compileClasspath += sourceSets[dependant].output
         println "    depends on " + dependant
