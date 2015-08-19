@@ -4,6 +4,11 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.utils;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagDouble;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants.NBT;
+
 public class Average {
     private double[] data;
     private int pos, precise;
@@ -46,4 +51,35 @@ public class Average {
     public void push(double value) {
         tickValue += value;
     }
+
+    public void readFromNBT(NBTTagCompound nbt) {
+        if (nbt.hasNoTags()) {
+            // We're upgrading from something that didn't have this tag- leave settings as they are
+            return;
+        }
+        NBTTagList list = nbt.getTagList("data", NBT.TAG_DOUBLE);
+        data = new double[list.tagCount()];
+        for (int i = 0; i < list.tagCount(); i++) {
+            data[i] = list.getDoubleAt(i);
+        }
+        pos = nbt.getInteger("pos");
+        precise = nbt.getInteger("precise");
+        averageRaw = nbt.getDouble("averageRaw");
+        tickValue = nbt.getDouble("tickValue");
+    }
+
+    public NBTTagCompound writeToNBT() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        NBTTagList list = new NBTTagList();
+        for (double value : data) {
+            list.appendTag(new NBTTagDouble(value));
+        }
+        nbt.setTag("data", list);
+        nbt.setInteger("pos", pos);
+        nbt.setInteger("precise", precise);
+        nbt.setDouble("averageRaw", averageRaw);
+        nbt.setDouble("tickValue", tickValue);
+        return nbt;
+    }
+
 }

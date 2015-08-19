@@ -128,7 +128,10 @@ public class PipePowerWood extends PipePowerBase {
         } else {
             EnumFacing pipePart = flowDirection.getOpposite();
             DefaultMjInternalStorage storage = pipePartMap.get(pipePart);
-            return storage.insertPower(world, mj, simulate);
+            double excess = storage.insertPower(world, mj, simulate);
+            double actual = mj - excess;
+            pipePartDirections.get(pipePart).push(actual);
+            return excess;
         }
     }
 

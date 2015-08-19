@@ -314,7 +314,7 @@ public class TileTank extends TileBuildCraft implements IFluidHandler, IDebuggab
     @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
         left.add("");
-        left.add(tank.getFluidAmount() + "/" + tank.getCapacity() + "mB");
+        left.add(tank.getAmountString());// tank.getFluidAmount() + "/" + tank.getCapacity() + "mB");
         left.add(tank.getFluid() == null ? "empty" : tank.getFluidType().getLocalizedName(tank.getFluid()));
     }
 }

@@ -85,4 +85,12 @@ public class Tank extends FluidTank {
         }
         toolTip.add(new ToolTipLine(String.format(Locale.ENGLISH, "%,d / %,d", amount, getCapacity())));
     }
+
+    public String getAmountString() {
+        return (getFluidAmount() / 1000d) + "/" + (getCapacity() / 1000d) + " Buckets";
+    }
+
+    public String getTypeString() {
+        return getFluid() == null ? "empty" : getFluid().getLocalizedName();
+    }
 }
