@@ -11,10 +11,10 @@ public interface ISerializable {
     /** Serializes the state to the stream
      *
      * @param data */
-    void writeData(ByteBuf data);
+    void writeData(ByteBuf stream);
 
     /** Deserializes the state from the stream
      *
      * @param data */
-    void readData(ByteBuf data);
+    void readData(ByteBuf stream);
 }

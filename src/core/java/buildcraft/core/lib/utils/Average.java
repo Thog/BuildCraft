@@ -9,7 +9,11 @@ import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class Average {
+import buildcraft.api.core.ISerializable;
+
+import io.netty.buffer.ByteBuf;
+
+public class Average implements ISerializable {
     private double[] data;
     private int pos, precise;
     private double averageRaw, tickValue;
@@ -82,4 +86,22 @@ public class Average {
         return nbt;
     }
 
+    @Override
+    public void writeData(ByteBuf stream) {
+        stream.writeInt(data.length);
+//        for (double d : data) {
+//            stream.writeDouble(d);
+//        }
+        stream.writeDouble(averageRaw);
+    }
+
+    @Override
+    public void readData(ByteBuf stream) {
+        precise = stream.readInt();
+//        data = new double[precise];
+//        for (int i = 0; i < data.length; i++) {
+//            data[i] = stream.readDouble();
+//        }
+        averageRaw = stream.readDouble();
+    }
 }

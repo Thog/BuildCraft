@@ -21,16 +21,10 @@ import buildcraft.transport.pipes.PipePowerBase;
 
 public class PipeRendererPower {
     public static final float DISPLAY_MULTIPLIER = 0.1f;
-    public static final int POWER_STAGES = 100;
+    public static final int POWER_STAGES = 32;
 
-    // static int[] displayPowerList = new int[POWER_STAGES];
-    // static int[] displayPowerListOverload = new int[POWER_STAGES];
-
-    private static int[][] normalPower = new int[POWER_STAGES][6];
-    private static int[][] overloadPower = new int[POWER_STAGES][6];
-
-    // private static final int[] angleY = { 0, 0, 270, 90, 0, 180 };
-    // private static final int[] angleZ = { 90, 270, 0, 0, 0, 0 };
+    private static int[][][] power = new int[POWER_STAGES][POWER_STAGES][6];
+    private static int[] centerPower = new int[POWER_STAGES];
 
     private static boolean initialized = false;
 
@@ -49,23 +43,42 @@ public class PipeRendererPower {
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
-        int[][] displayList = pow.overload > 0 ? overloadPower : normalPower;
+        // Used for the centre rendering
+        double maxPower = 0;
+        for (EnumFacing face : EnumFacing.values()) {
+            double power = pipe.currentPower(face) / pipe.maxPower(face);
+            power = Math.sqrt(power);// This will actually increase the value
+            if (maxPower < power) {
+                maxPower = power;
+            }
+        }
+        short centerStage = (short) ((POWER_STAGES - 1) * maxPower);
+        if (centerStage == 0 && maxPower != 0) {
+            centerStage = 1;
+        }
+        if (centerStage >= POWER_STAGES) {
+            centerStage = POWER_STAGES - 1;
+        }
+
+        GL11.glPushMatrix();
+        GL11.glCallList(centerPower[centerStage]);
+        GL11.glPopMatrix();
 
         for (int side = 0; side < 6; ++side) {
             GL11.glPushMatrix();
 
             short stage = pow.displayPower[side];
             double value = pipe.currentPower(EnumFacing.VALUES[side]) / pipe.maxPower(EnumFacing.VALUES[side]);
-            value = Math.sqrt(value);
-            stage = (short) ((displayList.length - 1) * value);
+            value = Math.sqrt(value);// Make the amount of MJ directly proportional to the AREA not the RADIUS
+            stage = (short) ((power.length - 1) * value);
             if (value != 0 && stage == 0) {
                 stage = 1;
             }
             if (stage >= 1) {
-                if (stage < displayList.length) {
-                    GL11.glCallList(displayList[stage][side]);
+                if (stage < power.length) {
+                    GL11.glCallList(power[stage][centerStage][side]);
                 } else {
-                    GL11.glCallList(displayList[displayList.length - 1][side]);
+                    GL11.glCallList(power[power.length - 1][centerStage][side]);
                 }
             }
 
@@ -106,37 +119,52 @@ public class PipeRendererPower {
         initialized = true;
 
         TextureAtlasSprite normal = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
-        TextureAtlasSprite overloaded = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Overload.ordinal());
 
         for (int stage = 0; stage < POWER_STAGES; stage++) {
-            for (int side = 0; side < 6; side++) {
-                int[] addresses = new int[2];
+            int address = GLAllocation.generateDisplayLists(1);
+            centerPower[stage] = address;
 
-                addresses[0] = GLAllocation.generateDisplayLists(1);
-                normalPower[stage][side] = addresses[0];
+            GL11.glNewList(address, GL11.GL_COMPILE);
 
-                addresses[1] = GLAllocation.generateDisplayLists(1);
-                overloadPower[stage][side] = addresses[1];
+            double width = 0.5 * stage / (double) POWER_STAGES;
 
-                boolean overload = false;
+            Vec3 size = new Vec3(width, width, width);
+            Vec3 pos = new Vec3(0.5, 0.5, 0.5);
 
-                for (int address : addresses) {
+            EntityResizableCuboid erc = new EntityResizableCuboid(null);
+            erc.setSize(size);
+            erc.texture = normal;
+
+            GL11.glPushMatrix();
+            RenderUtils.translate(pos);
+            RenderResizableCuboid.INSTANCE.renderCubeFromCentre(erc);
+            GL11.glPopMatrix();
+
+            GL11.glEndList();
+        }
+        for (int stage = 0; stage < POWER_STAGES; stage++) {
+            for (int centerStage = stage; centerStage < POWER_STAGES; centerStage++) {
+                for (int side = 0; side < 6; side++) {
+                    int address = GLAllocation.generateDisplayLists(1);
+                    power[stage][centerStage][side] = address;
+
                     GL11.glNewList(address, GL11.GL_COMPILE);
 
                     double width = 0.5 * stage / (double) POWER_STAGES;
+                    double centerOffset = 0.25 * centerStage / (double) POWER_STAGES;
 
                     EnumFacing face = EnumFacing.values()[side];
 
-                    Vec3 pos = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 0.25));
+                    Vec3 pos = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 0.25 + centerOffset / 2d));
 
                     face = Utils.convertPositive(face);
                     Vec3 size = new Vec3(1, 1, 1).subtract(Utils.convert(face));
                     size = Utils.multiply(size, width);
-                    size = size.add(Utils.convert(face, 0.5));
+                    size = size.add(Utils.convert(face, 0.25));
 
                     EntityResizableCuboid erc = new EntityResizableCuboid(null);
                     erc.setSize(size);
-                    erc.texture = overload ? overloaded : normal;
+                    erc.texture = normal;
 
                     GL11.glPushMatrix();
                     RenderUtils.translate(pos);
@@ -144,11 +172,10 @@ public class PipeRendererPower {
                     GL11.glPopMatrix();
 
                     GL11.glEndList();
-
-                    overload = true;
                 }
             }
         }
+
     }
 
     /** Called whenever a texture remap is done, to refresh the existing textures to new ones. */
@@ -159,16 +186,16 @@ public class PipeRendererPower {
         }
         initialized = false;
 
-        for (int[] arr : normalPower) {
-            for (int i : arr) {
-                GLAllocation.deleteDisplayLists(i);
+        for (int[][] arr2 : power) {
+            for (int[] arr : arr2) {
+                for (int i : arr) {
+                    GLAllocation.deleteDisplayLists(i);
+                }
             }
         }
 
-        for (int[] arr : overloadPower) {
-            for (int i : arr) {
-                GLAllocation.deleteDisplayLists(i);
-            }
+        for (int i : centerPower) {
+            GLAllocation.deleteDisplayLists(i);
         }
     }
 }
