@@ -35,7 +35,7 @@ public enum EnumMjDevice {
     }
 
     public boolean givesPowerTo(EnumMjDevice type) {
-        return type == this || to.contains(type);
+        return to.contains(type);
     }
 
     public boolean acceptsPowerFrom(EnumMjDevice type) {

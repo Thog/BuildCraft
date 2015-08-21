@@ -160,7 +160,7 @@ public class PipeRendererPower {
                     face = Utils.convertPositive(face);
                     Vec3 size = new Vec3(1, 1, 1).subtract(Utils.convert(face));
                     size = Utils.multiply(size, width);
-                    size = size.add(Utils.convert(face, 0.25));
+                    size = size.add(Utils.convert(face, 0.5 - centerOffset));
 
                     EntityResizableCuboid erc = new EntityResizableCuboid(null);
                     erc.setSize(size);

@@ -26,7 +26,7 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
             EnumFacing side = flowingIn ? flow : flow.getOpposite();
             EnumMjDevice fromDevice = from.getDeviceType(side.getOpposite());
             EnumMjDevice toDevice = to.getDeviceType(side);
-            return flowingIn ? fromDevice.acceptsPowerFrom(toDevice) : fromDevice.givesPowerTo(toDevice);
+            return toDevice.acceptsPowerFrom(fromDevice);
         }
     };
 
@@ -36,7 +36,7 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
             EnumFacing side = flowingIn ? flow : flow.getOpposite();
             EnumMjPower fromPower = from.getPowerType(side.getOpposite());
             EnumMjPower toPower = to.getPowerType(side);
-            return flowingIn ? fromPower.canConvertFrom(toPower) : fromPower.canConvertTo(toPower);
+            return toPower.canConvertFrom(fromPower);
         }
     };
 

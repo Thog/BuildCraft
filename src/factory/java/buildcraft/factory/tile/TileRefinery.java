@@ -344,6 +344,7 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
         stream.writeFloat(animationSpeed);
         NetworkUtils.writeUTF(stream, currentRecipeId);
         tankManager.writeData(stream);
+        internalStorage.writeData(stream);
     }
 
     @Override
@@ -357,6 +358,7 @@ public class TileRefinery extends TileBuildCraft implements IFluidHandler, IInve
         if (currentRecipe != null) {
             craftingResult = currentRecipe.craft(this, true);
         }
+        internalStorage.readData(stream);
     }
 
     @Override
