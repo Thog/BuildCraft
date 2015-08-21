@@ -71,7 +71,7 @@ public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeVie
         }
     }
 
-    public int energyCost = 0;
+    public double powerCost = 0;
     public long craftingTime = 0;
     public String id;
 
@@ -86,11 +86,11 @@ public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeVie
 
     }
 
-    public FlexibleRecipe(String id, T output, int iEnergyCost, long craftingTime, Object... input) {
-        setContents(id, output, iEnergyCost, craftingTime, input);
+    public FlexibleRecipe(String id, T output, double iPowerCost, long craftingTime, Object... input) {
+        setContents(id, output, iPowerCost, craftingTime, input);
     }
 
-    public void setContents(String iid, Object ioutput, int iEnergyCost, long iCraftingTime, Object... input) {
+    public void setContents(String iid, Object ioutput, double iPowerCost, long iCraftingTime, Object... input) {
         id = iid;
 
         if (ioutput == null) {
@@ -107,7 +107,7 @@ public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeVie
             throw new IllegalArgumentException("An unknown object passed to recipe " + iid + " as output! (" + ioutput.getClass() + ")");
         }
 
-        energyCost = iEnergyCost;
+        powerCost = iPowerCost;
         craftingTime = iCraftingTime;
 
         for (Object i : input) {
@@ -150,7 +150,7 @@ public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeVie
         CraftingResult<T> result = new CraftingResult<T>();
 
         result.recipe = this;
-        result.powerCost = energyCost;
+        result.powerCost = powerCost;
         result.craftingTime = craftingTime;
 
         for (ItemStack requirement : inputItems) {
@@ -288,8 +288,8 @@ public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeVie
     }
 
     @Override
-    public int getEnergyCost() {
-        return energyCost;
+    public double getPowerCost() {
+        return powerCost;
     }
 
     @Override

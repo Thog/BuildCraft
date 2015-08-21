@@ -587,7 +587,8 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
 
     @Override
     public FluidTankInfo[] getTankInfo(EnumFacing from) {
-        return new FluidTankInfo[] { new FluidTankInfo(fluidType, sections[from.ordinal()].amount) };
+        int sectionOrdinal = from == null ? 6 : from.ordinal();
+        return new FluidTankInfo[] { new FluidTankInfo(fluidType, sections[sectionOrdinal].amount) };
     }
 
     @Override

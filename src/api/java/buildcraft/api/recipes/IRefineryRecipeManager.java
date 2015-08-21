@@ -10,9 +10,9 @@ import net.minecraftforge.fluids.FluidStack;
 
 public interface IRefineryRecipeManager {
 
-    void addRecipe(String id, FluidStack ingredient, FluidStack result, int energy, int delay);
+    void addRecipe(String id, FluidStack ingredient, FluidStack result, double power, int delay);
 
-    void addRecipe(String id, FluidStack ingredient1, FluidStack ingredient2, FluidStack result, int energy, int delay);
+    void addRecipe(String id, FluidStack ingredient1, FluidStack ingredient2, FluidStack result, double power, int delay);
 
     void removeRecipe(String id);
 

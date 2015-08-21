@@ -21,5 +21,5 @@ public interface IFlexibleRecipeViewable {
 
     long getCraftingTime();
 
-    int getEnergyCost();
+    double getPowerCost();
 }

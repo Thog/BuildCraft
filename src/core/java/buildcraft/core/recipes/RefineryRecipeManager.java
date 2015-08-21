@@ -27,7 +27,7 @@ public final class RefineryRecipeManager implements IRefineryRecipeManager {
     private RefineryRecipeManager() {}
 
     @Override
-    public void addRecipe(String id, FluidStack ingredient, FluidStack result, int energy, int delay) {
+    public void addRecipe(String id, FluidStack ingredient, FluidStack result, double energy, int delay) {
         // String name = result.getFluid().getName();
 
         FlexibleRecipe<FluidStack> recipe = new FlexibleRecipe<FluidStack>(id, result, energy, delay, ingredient);
@@ -37,7 +37,7 @@ public final class RefineryRecipeManager implements IRefineryRecipeManager {
     }
 
     @Override
-    public void addRecipe(String id, FluidStack ingredient1, FluidStack ingredient2, FluidStack result, int energy, int delay) {
+    public void addRecipe(String id, FluidStack ingredient1, FluidStack ingredient2, FluidStack result, double energy, int delay) {
         // String name = result.getFluid().getName();
 
         if (ingredient1 == null || ingredient2 == null || result == null) {
