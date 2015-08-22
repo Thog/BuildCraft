@@ -19,7 +19,6 @@ public class PipePowerGold extends Pipe<PipeTransportPower> {
 
     public PipePowerGold(Item item) {
         super(new PipeTransportPower(), item);
-        transport.initFromPipe(getClass());
     }
 
     @Override

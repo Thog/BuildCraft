@@ -433,8 +433,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             }
         }
 
-        sendNetworkUpdate();
-
         if (attachPluggables) {
             attachPluggables = false;
             // Attach callback

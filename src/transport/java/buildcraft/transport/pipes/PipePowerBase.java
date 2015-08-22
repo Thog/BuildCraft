@@ -21,14 +21,13 @@ import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
-import buildcraft.api.tiles.IDebuggable;
 import buildcraft.core.lib.utils.Average;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportPower;
 
 import io.netty.buffer.ByteBuf;
 
-public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements IMjExternalStorage, IDebuggable, ISerializable {
+public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements IMjExternalStorage, ISerializable {
     // TYPES:
     // WOOD --extract from engines
     // COBBLE --doesn't connect to STONE or QUARTZ
@@ -49,8 +48,6 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
 
     public PipePowerBase(Item item) {
         super(new PipeTransportPower(), item);
-
-        transport.initFromPipe(getClass());
         for (EnumFacing face : EnumFacing.values()) {
             pipePartMap.put(face, new DefaultMjInternalStorage(MAX_POWER, ACTIVATION, LOSS_DELAY, LOSS_RATE));
             pipePartDirections.put(face, new Average(40));
@@ -133,6 +130,29 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             pipePartDirections.get(face).tick();
         }
         transferPower();
+        // Update client info
+        for (EnumFacing face : EnumFacing.values()) {
+            int ord = face.ordinal();
+
+            DefaultMjInternalStorage storage = pipePartMap.get(face);
+            double filled = storage.currentPower() / storage.maxPower();
+            double display = Math.sqrt(filled);
+            display *= PipeTransportPower.POWER_STAGES;
+            transport.displayPower[ord] = (byte) display;
+
+            Average average = pipePartDirections.get(face);
+            if (storage.currentPower() > 1e-2) {
+                double flow = average.getAverage() / storage.currentPower() / 2;
+                if (flow > 1) {
+                    flow = 1;
+                }
+                // flow = Math.sqrt(flow);
+                System.out.println(average.getAverage() + ", " + filled + " -> " + flow);
+                transport.displayFlow[ord] = (byte) flow;
+            } else {
+                transport.displayFlow[ord] = 0;
+            }
+        }
     }
 
     protected void transferPower() {
@@ -287,20 +307,6 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         }
         data.setTag("storage", storageTag);
         data.setTag("average", averageTag);
-    }
-
-    @Override
-    public void getDebugInfo(List<String> left, List<String> right, EnumFacing face) {
-        left.add("");
-        left.add("Internal Storage:");
-        for (EnumFacing side : EnumFacing.values()) {
-            DefaultMjInternalStorage store = pipePartMap.get(side);
-            if (store == null) {
-                left.add("  - " + side + " = not connected");
-            } else {
-                left.add("  - " + side + " = " + store.currentPower() + " Mj, avg = " + pipePartDirections.get(side).getAverage());
-            }
-        }
     }
 
     public void writeData(ByteBuf data) {

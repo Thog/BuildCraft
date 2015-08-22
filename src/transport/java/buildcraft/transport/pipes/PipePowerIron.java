@@ -30,11 +30,10 @@ import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.statements.ActionPowerLimiter;
 
-public class PipePowerIron extends Pipe<PipeTransportPower> {
+public class PipePowerIron extends PipePowerBase {
 
     public PipePowerIron(Item item) {
-        super(new PipeTransportPower(), item);
-        transport.initFromPipe(getClass());
+        super(item);
     }
 
     @Override
@@ -74,7 +73,6 @@ public class PipePowerIron extends Pipe<PipeTransportPower> {
     @Override
     public void update() {
         super.update();
-        transport.maxPower = getMode().maxPower;
     }
 
     public PowerMode getMode() {

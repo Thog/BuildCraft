@@ -16,7 +16,6 @@ import buildcraft.transport.PipeIconProvider;
 public class PipePowerQuartz extends PipePowerBase {
     public PipePowerQuartz(Item item) {
         super(item);
-        transport.initFromPipe(getClass());
     }
 
     @Override

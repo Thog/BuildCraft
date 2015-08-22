@@ -6,6 +6,7 @@ package buildcraft.transport.statements;
 
 import java.util.Locale;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -22,8 +23,8 @@ import buildcraft.core.statements.BCStatement;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.PipeTransportItems;
-import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.pipes.PipePowerBase;
 
 public class TriggerPipeContents extends BCStatement implements ITriggerInternal {
 
@@ -32,7 +33,6 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
         containsItems,
         containsFluids,
         containsEnergy,
-        requestsEnergy,
         tooMuchEnergy;
         public ITriggerInternal trigger;
     }
@@ -114,31 +114,34 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
 
                 return false;
             }
-        } else if (pipe.transport instanceof PipeTransportPower) {
-            PipeTransportPower transportPower = (PipeTransportPower) pipe.transport;
+        } else if (pipe instanceof PipePowerBase) {
+            PipePowerBase pipePower = (PipePowerBase) pipe;
 
             switch (kind) {
                 case empty:
-                    for (double s : transportPower.displayPower) {
-                        if (s > 1e-4) {
+                    for (EnumFacing face : EnumFacing.values()) {
+                        if (pipePower.currentPower(face) > 1e-4) {
                             return false;
                         }
                     }
 
                     return true;
                 case containsEnergy:
-                    for (double s : transportPower.displayPower) {
-                        if (s > 1e-4) {
+                    for (EnumFacing face : EnumFacing.values()) {
+                        if (pipePower.currentPower(face) > 1e-4) {
                             return true;
                         }
                     }
-
                     return false;
-                case requestsEnergy:
-                    return transportPower.isQueryingPower();
                 default:
-                case tooMuchEnergy:
-                    return transportPower.isOverloaded();
+                case tooMuchEnergy: {
+                    for (EnumFacing face : EnumFacing.values()) {
+                        if (pipePower.maxPower(face) - pipePower.currentPower(face) > 1e-4) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
             }
         }
 

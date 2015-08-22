@@ -8,14 +8,13 @@ import net.minecraft.util.BlockPos;
 
 import buildcraft.core.lib.network.PacketCoordinates;
 import buildcraft.core.network.PacketIds;
-import buildcraft.transport.render.tile.PipeRendererPower;
 
 import io.netty.buffer.ByteBuf;
 
 public class PacketPowerUpdate extends PacketCoordinates {
 
-    public boolean overload;
-    public short[] displayPower;
+    public byte[] power;
+    public byte[] flow;
 
     public PacketPowerUpdate() {}
 
@@ -24,21 +23,22 @@ public class PacketPowerUpdate extends PacketCoordinates {
     }
 
     @Override
-    public void readData(ByteBuf data) {
-        super.readData(data);
-        displayPower = new short[] { 0, 0, 0, 0, 0, 0 };
-        overload = data.readBoolean();
-        for (int i = 0; i < displayPower.length; i++) {
-            displayPower[i] = data.readUnsignedByte();
+    public void readData(ByteBuf stream) {
+        super.readData(stream);
+        power = new byte[6];
+        flow = new byte[6];
+        for (int i = 0; i < 6; i++) {
+            power[i] = stream.readByte();
+            flow[i] = stream.readByte();
         }
     }
 
     @Override
-    public void writeData(ByteBuf data) {
-        super.writeData(data);
-        data.writeBoolean(overload);
-        for (short element : displayPower) {
-            data.writeByte(Math.min(PipeRendererPower.POWER_STAGES, (int) Math.ceil(element * PipeRendererPower.DISPLAY_MULTIPLIER)));
+    public void writeData(ByteBuf stream) {
+        super.writeData(stream);
+        for (int i = 0; i < 6; i++) {
+            stream.writeByte(power[i]);
+            stream.writeByte(flow[i]);
         }
     }
 }

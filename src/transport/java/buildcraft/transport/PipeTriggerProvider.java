@@ -50,7 +50,6 @@ public class PipeTriggerProvider implements ITriggerProvider {
                 result.add(TriggerPipeContents.PipeContents.empty.trigger);
                 result.add(TriggerPipeContents.PipeContents.containsEnergy.trigger);
                 result.add(TriggerPipeContents.PipeContents.tooMuchEnergy.trigger);
-                result.add(TriggerPipeContents.PipeContents.requestsEnergy.trigger);
                 break;
             case STRUCTURE:
                 break;
