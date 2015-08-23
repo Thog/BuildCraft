@@ -245,15 +245,17 @@ public class RenderResizableCuboid extends Render {
 
                 // If there is an offset then make sure the texture positions are changed properly
                 if (firstU && textureOffsetU != 0) {
-                    uvt[U_MIN] = uvt[U_MIN] + (uvt[U_MAX] - uvt[U_MIN]) * (float) textureOffsetU;
-                    addU -= 1 - textureOffsetU;
+                    uvt[U_MIN] = uv[U_MIN] + (uv[U_MAX] - uv[U_MIN]) * (float) textureOffsetU;
+                    addU -= textureOffsetU;
+                    // addU = 1 - textureOffsetU;
                     lowerU = true;
                 }
                 firstU = false;
 
                 if (firstV && textureOffsetV != 0) {
-                    uvt[V_MIN] = uvt[V_MIN] + (uvt[V_MAX] - uvt[V_MIN]) * (float) textureOffsetV;
-                    addV -= 1 - textureOffsetV;
+                    uvt[V_MIN] = uv[V_MIN] + (uv[V_MAX] - uv[V_MIN]) * (float) textureOffsetV;
+                    addV -= textureOffsetV;
+                    // addV = 1 - textureOffsetV;
                     lowerV = true;
                 }
                 firstV = false;
@@ -261,15 +263,27 @@ public class RenderResizableCuboid extends Render {
                 // If the size of the texture is greater than the cuboid goes on for then make sure the texture
                 // positions are lowered
                 if (u + addU > sizeU) {
-                    addU = sizeU - u;
-                    float uDiff = uvt[U_MAX] - uvt[U_MIN];
-                    uvt[U_MAX] = uvt[U_MIN] + uDiff * (float) (addU / textureSizeU);
+                    if (addU != textureSizeU) {// So if this is the first and textureOffsetU isn't 0
+                        addU = sizeU - u;
+                        float uDiff = uv[U_MAX] - uvt[U_MIN];
+                        uvt[U_MAX] = uvt[U_MIN] + uDiff * (float) (addU / (textureSizeU - textureOffsetU));
+                    } else {
+                        addU = sizeU - u;
+                        float uDiff = uv[U_MAX] - uv[U_MIN];
+                        uvt[U_MAX] = uv[U_MIN] + uDiff * (float) (addU / textureSizeU);
+                    }
                 }
 
                 if (v + addV > sizeV) {
-                    addV = sizeV - v;
-                    float vDiff = uvt[V_MAX] - uvt[V_MIN];
-                    uvt[V_MAX] = uvt[V_MIN] + vDiff * (float) (addV / textureSizeV);
+                    if (addV != textureSizeV) {// So if this is the first and textureOffsetV isn't 0
+                        addV = sizeV - v;
+                        float vDiff = uv[V_MAX] - uvt[V_MIN];
+                        uvt[V_MAX] = uvt[V_MIN] + vDiff * (float) (addV / (textureSizeV - textureOffsetV));
+                    } else {
+                        addV = sizeV - v;
+                        float vDiff = uv[V_MAX] - uv[V_MIN];
+                        uvt[V_MAX] = uv[V_MIN] + vDiff * (float) (addV / textureSizeV);
+                    }
                 }
 
                 double[] xyz = new double[4];
@@ -288,7 +302,7 @@ public class RenderResizableCuboid extends Render {
 
                 if (lowerV) {
                     v -= textureSizeV;
-                    v += addU;
+                    v += addV;
                 }
             }
         }

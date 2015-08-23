@@ -28,6 +28,8 @@ import buildcraft.transport.PipeTransportPower;
 import io.netty.buffer.ByteBuf;
 
 public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements IMjExternalStorage, ISerializable {
+    // TODO (PASS 0): refactor this into PipeTransportPower
+
     // TYPES:
     // WOOD --extract from engines
     // COBBLE --doesn't connect to STONE or QUARTZ
@@ -147,7 +149,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
                     flow = 1;
                 }
                 // flow = Math.sqrt(flow);
-                System.out.println(average.getAverage() + ", " + filled + " -> " + flow);
+                // System.out.println(average.getAverage() + ", " + filled + " -> " + flow);
                 transport.displayFlow[ord] = (byte) flow;
             } else {
                 transport.displayFlow[ord] = 0;
@@ -171,9 +173,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             double powerFlow = pipePartDirections.get(face).getAverage();
             DefaultMjInternalStorage pipe = pipePartMap.get(face);
             double power = pipe.currentPower() >= MIN_TRANSFER ? pipe.currentPower() / 2d : pipe.currentPower();
-            if (powerFlow == 0) {
-                numMid++;
-            } else if (powerFlow <= 0) {
+            /* if (powerFlow == 0) { numMid++; } else */ if (powerFlow <= 0) {
                 numNeg++;
                 totalNegPower += power;
             } else {

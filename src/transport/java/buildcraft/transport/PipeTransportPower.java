@@ -30,6 +30,9 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
     /** Used by the client for displaying power flow */
     public byte[] displayFlow = new byte[6], preDisplayFlow = new byte[6];
 
+    /** Used at the client to show flow properly. index 6 is for the centre */
+    public double[] clientDisplayFlow = new double[7];
+
     public long lastRecievedTime = 0, preRecievedTime = -1;
 
     private SafeTimeTracker tracker = new SafeTimeTracker(2);
@@ -89,26 +92,6 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
         lastRecievedTime = System.currentTimeMillis();
     }
 
-    public double[] interpolatePower() {
-        return interpolate(preDisplayPower, displayPower);
-    }
-
-    public double[] interpolateFlow() {
-        return interpolate(preDisplayFlow, displayFlow);
-    }
-
-    private double[] interpolate(byte[] lastArray, byte[] nowArray) {
-        long now = System.currentTimeMillis();
-        long diffLast = lastRecievedTime - preRecievedTime;
-        long diffNow = now - lastRecievedTime;
-        double interpDiff = (double) diffNow / (double) diffLast;
-        double[] array = new double[6];
-        for (int i = 0; i < 6; i++) {
-            array[i] = (1 - interpDiff) * lastArray[i] + interpDiff * nowArray[i];
-        }
-        return array;
-    }
-
     @Override
     public void updateEntity() {
         if (tracker.markTimeIfDelay(getWorld())) {
@@ -130,7 +113,8 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
             int ord = face.ordinal();
             left.add(" - " + face.getName2() + " " + displayPower[ord] + " MJ");
             byte flow = displayFlow[ord];
-            left.add(" -   flowing " + (flow < 0 ? "in by " + -flow : (flow > 0 ? "out by " + flow : "nowhere")));
+            left.add("   - flowing " + (flow < 0 ? "in by " + -flow : (flow > 0 ? "out by " + flow : "nowhere")));
+            left.add("   - shown flow = " + clientDisplayFlow[ord]);
         }
     }
 }

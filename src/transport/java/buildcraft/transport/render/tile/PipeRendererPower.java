@@ -44,13 +44,13 @@ public class PipeRendererPower {
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
         // Used for the centre rendering
-        double centerPower = 0;
+        byte centerPower = 0;
         EnumFacing centerFlowDir = null;
-        double centerFlow = 0;
-        double[] power = pow.interpolatePower();
-        double[] flow = pow.interpolateFlow();
+        byte centerFlow = 0;
+        byte[] power = pow.displayPower;
+        byte[] flow = pow.displayFlow;
         for (int i = 0; i < 6; i++) {
-            double d = power[i];
+            byte d = power[i];
             if (d > centerPower) {
                 centerPower = d;
                 centerFlowDir = EnumFacing.values()[i];
@@ -58,13 +58,25 @@ public class PipeRendererPower {
             }
         }
 
+        long ms = System.currentTimeMillis();
+
         GL11.glPushMatrix();
         renderCenterPower(centerPower, centerFlowDir, centerFlow);
         GL11.glPopMatrix();
 
         for (int i = 0; i < 6; i++) {
             EnumFacing face = EnumFacing.values()[i];
-            renderSidePower(face, power[i], flow[i], centerPower);
+            if (!pipe.container.isPipeConnected(face)) {
+                continue;
+            }
+            pow.clientDisplayFlow[i] += flow[i] / 60d;
+            if (pow.clientDisplayFlow[i] < 0) {
+                pow.clientDisplayFlow[i] = 16;
+            }
+            if (pow.clientDisplayFlow[i] > 16) {
+                pow.clientDisplayFlow[i] = 0;
+            }
+            renderSidePower(face, power[i], pow.clientDisplayFlow[i], centerPower);
         }
 
         GlStateManager.enableLighting();
@@ -73,12 +85,10 @@ public class PipeRendererPower {
         GL11.glPopMatrix();
     }
 
-    private static void renderSidePower(EnumFacing face, double stage, double flow, double centerStage) {
+    private static void renderSidePower(EnumFacing face, byte stage, double flow, byte centerStage) {
         if (stage <= 0) {
             return;
         }
-
-        long ms = System.currentTimeMillis();
 
         double width = 0.5 * stage / (double) POWER_STAGES;
         double centerRadius = 0.25 * centerStage / (double) POWER_STAGES;
@@ -99,8 +109,8 @@ public class PipeRendererPower {
         cuboid.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
         cuboid.makeClient();
 
-        double offsetNonFlow = 8 - textureWidth;
-        double offsetFlow = 1 + (ms % 1000) / 1000;
+        double offsetNonFlow = 8 - textureWidth / 2;
+        double offsetFlow = flow;
 
         Vec3 textureOffset = new Vec3(offsetNonFlow, offsetNonFlow, offsetNonFlow);
         textureOffset = textureOffset.add(Utils.convert(face, -offsetNonFlow));
@@ -110,13 +120,20 @@ public class PipeRendererPower {
         cuboid.textureOffsetY = textureOffset.yCoord;
         cuboid.textureOffsetZ = textureOffset.zCoord;
 
+        // offset += 0.0001;
+        // if (offset >= 8) {
+        // offset = 0;
+        // }
+        // System.out.println(offset);
+        // cuboid.textureOffsetX = 2;//offset;
+
         GL11.glPushMatrix();
         RenderUtils.translate(center);
         RenderResizableCuboid.INSTANCE.renderCubeFromCentre(cuboid);
         GL11.glPopMatrix();
     }
 
-    private static void renderCenterPower(double stage, EnumFacing flow, double flowSpeed) {
+    private static void renderCenterPower(byte stage, EnumFacing flow, byte flowSpeed) {
         if (stage <= 0) {
             return;
         }
