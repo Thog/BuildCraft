@@ -130,7 +130,7 @@ public class PipePowerWood extends PipePowerBase {
             DefaultMjInternalStorage storage = pipePartMap.get(pipePart);
             double excess = storage.insertPower(world, mj, simulate);
             double actual = mj - excess;
-            pipePartDirections.get(pipePart).push(actual);
+            averageFlow.get(pipePart).push(actual);
             return excess;
         }
     }

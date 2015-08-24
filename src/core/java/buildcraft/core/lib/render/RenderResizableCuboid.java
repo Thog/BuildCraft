@@ -230,59 +230,52 @@ public class RenderResizableCuboid extends Render {
     /** A way to automatically generate the different positions given the same arguments. */
     private List<RenderInfo> getRenderInfos(float[] uv, double sizeU, double sizeV, double textureSizeU, double textureSizeV, double textureOffsetU,
             double textureOffsetV) {
+
         List<RenderInfo> infos = Lists.newArrayList();
         boolean firstU = true;
         for (double u = 0; u < sizeU; u += textureSizeU) {
+            float[] uvtu = Arrays.copyOf(uv, 4);
+            double addU = textureSizeU;
+            boolean lowerU = false;
+
+            // If there is an offset then make sure the texture positions are changed properly
+            if (firstU && textureOffsetU != 0) {
+                uvtu[U_MIN] = uvtu[U_MIN] + (uvtu[U_MAX] - uvtu[U_MIN]) * (float) textureOffsetU;
+                addU -= textureOffsetU;
+                // addU = 1 - textureOffsetU;
+                lowerU = true;
+            }
+
+            // If the size of the texture is greater than the cuboid goes on for then make sure the texture
+            // positions are lowered
+            if (u + addU > sizeU) {
+                addU = sizeU - u;
+                if (firstU && textureOffsetU != 0) {
+                    uvtu[U_MAX] = uvtu[U_MIN] + (uvtu[U_MAX] - uvtu[U_MIN]) * (float) (addU / (textureSizeU - textureOffsetU));
+                } else {
+                    uvtu[U_MAX] = uvtu[U_MIN] + (uvtu[U_MAX] - uvtu[U_MIN]) * (float) (addU / textureSizeU);
+                }
+            }
+            firstU = false;
             boolean firstV = true;
             for (double v = 0; v < sizeV; v += textureSizeV) {
-                float[] uvt = Arrays.copyOf(uv, 4);
+                float[] uvtv = Arrays.copyOf(uvtu, 4);
 
-                double addU = textureSizeU;
                 double addV = textureSizeV;
 
-                boolean lowerU = false;
                 boolean lowerV = false;
 
-                // If there is an offset then make sure the texture positions are changed properly
-                if (firstU && textureOffsetU != 0) {
-                    uvt[U_MIN] = uv[U_MIN] + (uv[U_MAX] - uv[U_MIN]) * (float) textureOffsetU;
-                    addU -= textureOffsetU;
-                    // addU = 1 - textureOffsetU;
-                    lowerU = true;
-                }
-                firstU = false;
-
                 if (firstV && textureOffsetV != 0) {
-                    uvt[V_MIN] = uv[V_MIN] + (uv[V_MAX] - uv[V_MIN]) * (float) textureOffsetV;
+                    uvtv[V_MIN] = uvtv[V_MIN] + (uvtv[V_MAX] - uvtv[V_MIN]) * (float) textureOffsetV;
                     addV -= textureOffsetV;
-                    // addV = 1 - textureOffsetV;
                     lowerV = true;
                 }
-                firstV = false;
-
-                // If the size of the texture is greater than the cuboid goes on for then make sure the texture
-                // positions are lowered
-                if (u + addU > sizeU) {
-                    if (addU != textureSizeU) {// So if this is the first and textureOffsetU isn't 0
-                        addU = sizeU - u;
-                        float uDiff = uv[U_MAX] - uvt[U_MIN];
-                        uvt[U_MAX] = uvt[U_MIN] + uDiff * (float) (addU / (textureSizeU - textureOffsetU));
-                    } else {
-                        addU = sizeU - u;
-                        float uDiff = uv[U_MAX] - uv[U_MIN];
-                        uvt[U_MAX] = uv[U_MIN] + uDiff * (float) (addU / textureSizeU);
-                    }
-                }
-
                 if (v + addV > sizeV) {
-                    if (addV != textureSizeV) {// So if this is the first and textureOffsetV isn't 0
-                        addV = sizeV - v;
-                        float vDiff = uv[V_MAX] - uvt[V_MIN];
-                        uvt[V_MAX] = uvt[V_MIN] + vDiff * (float) (addV / (textureSizeV - textureOffsetV));
+                    addV = sizeV - v;
+                    if (firstV && textureOffsetV != 0) {
+                        uvtv[V_MAX] = uvtv[V_MIN] + (uvtv[V_MAX] - uvtv[V_MIN]) * (float) (addV / (textureSizeV - textureOffsetV));
                     } else {
-                        addV = sizeV - v;
-                        float vDiff = uv[V_MAX] - uv[V_MIN];
-                        uvt[V_MAX] = uv[V_MIN] + vDiff * (float) (addV / textureSizeV);
+                        uvtv[V_MAX] = uvtv[V_MIN] + (uvtv[V_MAX] - uvtv[V_MIN]) * (float) (addV / textureSizeV);
                     }
                 }
 
@@ -291,19 +284,17 @@ public class RenderResizableCuboid extends Render {
                 xyz[U_MAX] = u + addU;
                 xyz[V_MIN] = v;
                 xyz[V_MAX] = v + addV;
-                infos.add(new RenderInfo(uvt, xyz));
-
-                // If we lowered the U or V because the cuboid started on an offset, reset it back to what was actually
-                // rendered, not what the for loop assumes
-                if (lowerU) {
-                    u -= textureSizeU;
-                    u += addU;
-                }
+                infos.add(new RenderInfo(uvtv, xyz));
 
                 if (lowerV) {
-                    v -= textureSizeV;
-                    v += addV;
+                    v -= textureOffsetV;
                 }
+                firstV = false;
+            }
+            // If we lowered the U because the cuboid started on an offset, reset it back to what was actually
+            // rendered, not what the for loop assumes
+            if (lowerU) {
+                u -= textureOffsetU;
             }
         }
         return infos;

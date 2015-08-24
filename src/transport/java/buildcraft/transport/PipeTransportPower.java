@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.mj.EnumMjDevice;
@@ -26,14 +27,14 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
     public static final byte POWER_STAGES = 32;
 
     /** Used by the client for displaying power */
-    public byte[] displayPower = new byte[6], preDisplayPower = new byte[6];
+    public byte[] displayPower = new byte[6];
     /** Used by the client for displaying power flow */
-    public byte[] displayFlow = new byte[6], preDisplayFlow = new byte[6];
+    public byte[] displayFlow = new byte[6];
 
-    /** Used at the client to show flow properly. index 6 is for the centre */
-    public double[] clientDisplayFlow = new double[7];
+    /** Used at the client to show flow properly */
+    public double[] clientDisplayFlow = new double[6];
 
-    public long lastRecievedTime = 0, preRecievedTime = -1;
+    public Vec3 clientDisplayFlowCentre = new Vec3(0, 0, 0);
 
     private SafeTimeTracker tracker = new SafeTimeTracker(2);
 
@@ -83,13 +84,8 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
      *
      * @param packetPower */
     public void handlePowerPacket(PacketPowerUpdate packetPower) {
-        preDisplayPower = displayPower;
-        preDisplayFlow = displayFlow;
-        preRecievedTime = lastRecievedTime;
-
         displayPower = packetPower.power;
         displayFlow = packetPower.flow;
-        lastRecievedTime = System.currentTimeMillis();
     }
 
     @Override

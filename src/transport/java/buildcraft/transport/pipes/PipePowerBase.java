@@ -46,13 +46,15 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     public static final double MIN_TRANSFER = 1;
 
     protected EnumMap<EnumFacing, DefaultMjInternalStorage> pipePartMap = Maps.newEnumMap(EnumFacing.class);
-    protected EnumMap<EnumFacing, Average> pipePartDirections = Maps.newEnumMap(EnumFacing.class);
+    protected EnumMap<EnumFacing, Average> averageFlow = Maps.newEnumMap(EnumFacing.class);
+    protected EnumMap<EnumFacing, Average> averagePower = Maps.newEnumMap(EnumFacing.class);
 
     public PipePowerBase(Item item) {
         super(new PipeTransportPower(), item);
         for (EnumFacing face : EnumFacing.values()) {
             pipePartMap.put(face, new DefaultMjInternalStorage(MAX_POWER, ACTIVATION, LOSS_DELAY, LOSS_RATE));
-            pipePartDirections.put(face, new Average(40));
+            averageFlow.put(face, new Average(40));
+            averagePower.put(face, new Average(40));// These two numbers need to be the same!
         }
     }
 
@@ -82,7 +84,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         DefaultMjInternalStorage storage = pipePartMap.get(pipePart);
         double excess = storage.insertPower(world, mj, simulate);
         double actual = mj - excess;
-        pipePartDirections.get(pipePart).push(actual);
+        averageFlow.get(pipePart).push(actual);
         return excess;
     }
 
@@ -129,7 +131,9 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         }
         for (EnumFacing face : EnumFacing.values()) {
             pipePartMap.get(face).tick(getWorld());
-            pipePartDirections.get(face).tick();
+            averageFlow.get(face).tick();
+            averagePower.get(face).tick();
+            averagePower.get(face).push(pipePartMap.get(face).currentPower());
         }
         transferPower();
         // Update client info
@@ -142,14 +146,17 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             display *= PipeTransportPower.POWER_STAGES;
             transport.displayPower[ord] = (byte) display;
 
-            Average average = pipePartDirections.get(face);
-            if (storage.currentPower() > 1e-2) {
-                double flow = average.getAverage() / storage.currentPower() / 2;
+            Average avgFlow = averageFlow.get(face);
+            Average avgPower = averagePower.get(face);
+            if (avgPower.getAverage() > 1e-2) {
+                double flow = avgFlow.getAverage() / avgPower.getAverage();
                 if (flow > 1) {
                     flow = 1;
                 }
-                // flow = Math.sqrt(flow);
-                // System.out.println(average.getAverage() + ", " + filled + " -> " + flow);
+                if (flow < -1) {
+                    flow = -1;
+                }
+                flow *= 64;// We want to be able to see the difference
                 transport.displayFlow[ord] = (byte) flow;
             } else {
                 transport.displayFlow[ord] = 0;
@@ -164,23 +171,21 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
         int numNeg = 0;
         int numMid = 0;
         int numPos = 0;
-        double totalNegPower = 0;
         for (EnumFacing face : EnumFacing.values()) {
             int pos = 0;
             if (!container.isPipeConnected(face)) {
                 continue;
             }
-            double powerFlow = pipePartDirections.get(face).getAverage();
+            double powerFlow = averageFlow.get(face).getAverage();
             DefaultMjInternalStorage pipe = pipePartMap.get(face);
-            double power = pipe.currentPower() >= MIN_TRANSFER ? pipe.currentPower() / 2d : pipe.currentPower();
+            // double power = pipe.currentPower() >= MIN_TRANSFER ? pipe.currentPower() / 2d : pipe.currentPower();
             /* if (powerFlow == 0) { numMid++; } else */ if (powerFlow <= 0) {
                 numNeg++;
-                totalNegPower += power;
             } else {
                 numPos++;
             }
             for (EnumFacing inList : directions) {
-                if (powerFlow > pipePartDirections.get(inList).getAverage()) {
+                if (powerFlow > averageFlow.get(inList).getAverage()) {
                     pos++;
                 } else {
                     break;
@@ -263,7 +268,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
 
                 double mj = storage.extractPower(getWorld(), 0, storage.currentPower() * suctionDifference / 2, false);
                 double excess = external.insertPower(getWorld(), face, this, mj, false);
-                pipePartDirections.get(face).push(excess - mj);
+                averageFlow.get(face).push(excess - mj);
                 storage.insertPower(getWorld(), excess, false);
             } else if (container.hasPipePluggable(face)) {
                 // TODO
@@ -286,7 +291,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             DefaultMjInternalStorage storage = pipePartMap.get(face);
             storage.readFromNBT(storageTag.getCompoundTag(face.name()));
 
-            Average average = pipePartDirections.get(face);
+            Average average = averageFlow.get(face);
             average.readFromNBT(averageTag.getCompoundTag(face.name()));
         }
     }
@@ -302,7 +307,7 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
             DefaultMjInternalStorage storage = pipePartMap.get(face);
             storageTag.setTag(face.name(), storage.writeToNBT());
 
-            Average average = pipePartDirections.get(face);
+            Average average = averageFlow.get(face);
             averageTag.setTag(face.name(), average.writeToNBT());
         }
         data.setTag("storage", storageTag);
@@ -312,14 +317,14 @@ public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements I
     public void writeData(ByteBuf data) {
         for (EnumFacing face : EnumFacing.values()) {
             pipePartMap.get(face).writeData(data);
-            pipePartDirections.get(face).writeData(data);
+            averageFlow.get(face).writeData(data);
         }
     }
 
     public void readData(ByteBuf data) {
         for (EnumFacing face : EnumFacing.values()) {
             pipePartMap.get(face).readData(data);
-            pipePartDirections.get(face).readData(data);
+            averageFlow.get(face).readData(data);
         }
     }
 }

@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.Vec3;
 
 import buildcraft.core.lib.EntityResizableCuboid;
@@ -20,7 +22,7 @@ import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportPower;
 
 public class PipeRendererPower {
-    public static final float DISPLAY_MULTIPLIER = 0.1f;
+    public static final double FLOW_MULTIPLIER = 1 / 64d;
     public static final byte POWER_STAGES = PipeTransportPower.POWER_STAGES;
 
     private static int[][][] power = new int[POWER_STAGES][POWER_STAGES][6];
@@ -60,24 +62,39 @@ public class PipeRendererPower {
 
         long ms = System.currentTimeMillis();
 
-        GL11.glPushMatrix();
-        renderCenterPower(centerPower, centerFlowDir, centerFlow);
-        GL11.glPopMatrix();
-
         for (int i = 0; i < 6; i++) {
             EnumFacing face = EnumFacing.values()[i];
             if (!pipe.container.isPipeConnected(face)) {
                 continue;
             }
-            pow.clientDisplayFlow[i] += flow[i] / 60d;
-            if (pow.clientDisplayFlow[i] < 0) {
-                pow.clientDisplayFlow[i] = 16;
+            double clientDiff = flow[i] * FLOW_MULTIPLIER;
+            clientDiff *= face.getAxisDirection() == AxisDirection.POSITIVE ? 1 : -1;
+            pow.clientDisplayFlow[i] += clientDiff;
+            while (pow.clientDisplayFlow[i] < 0) {
+                pow.clientDisplayFlow[i] += 16;
             }
-            if (pow.clientDisplayFlow[i] > 16) {
-                pow.clientDisplayFlow[i] = 0;
+            while (pow.clientDisplayFlow[i] > 16) {
+                pow.clientDisplayFlow[i] -= 16;
             }
+
+            pow.clientDisplayFlowCentre = pow.clientDisplayFlowCentre.add(Utils.convert(face, flow[i] * FLOW_MULTIPLIER / 2));
             renderSidePower(face, power[i], pow.clientDisplayFlow[i], centerPower);
         }
+
+        for (Axis axis : Axis.values()) {
+            double value = Utils.getValue(pow.clientDisplayFlowCentre, axis);
+            while (value < 0) {
+                value += 16;
+            }
+            while (value > 16) {
+                value -= 16;
+            }
+            pow.clientDisplayFlowCentre = Utils.withValue(pow.clientDisplayFlowCentre, axis, value);
+        }
+
+        GL11.glPushMatrix();
+        renderCenterPower(centerPower, pow.clientDisplayFlowCentre);
+        GL11.glPopMatrix();
 
         GlStateManager.enableLighting();
 
@@ -92,10 +109,6 @@ public class PipeRendererPower {
 
         double width = 0.5 * stage / (double) POWER_STAGES;
         double centerRadius = 0.25 * centerStage / (double) POWER_STAGES;
-        double textureWidth = width * 16;
-
-        double flowTextureStartOffset = 0;
-        double textureStartOffsetWidth = 16 - width;
 
         Vec3 center = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 0.25 + centerRadius / 2d));
 
@@ -109,7 +122,7 @@ public class PipeRendererPower {
         cuboid.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
         cuboid.makeClient();
 
-        double offsetNonFlow = 8 - textureWidth / 2;
+        double offsetNonFlow = 0;// 8 - textureWidth / 2;
         double offsetFlow = flow;
 
         Vec3 textureOffset = new Vec3(offsetNonFlow, offsetNonFlow, offsetNonFlow);
@@ -120,25 +133,36 @@ public class PipeRendererPower {
         cuboid.textureOffsetY = textureOffset.yCoord;
         cuboid.textureOffsetZ = textureOffset.zCoord;
 
-        // offset += 0.0001;
-        // if (offset >= 8) {
-        // offset = 0;
-        // }
-        // System.out.println(offset);
-        // cuboid.textureOffsetX = 2;//offset;
-
         GL11.glPushMatrix();
         RenderUtils.translate(center);
         RenderResizableCuboid.INSTANCE.renderCubeFromCentre(cuboid);
         GL11.glPopMatrix();
     }
 
-    private static void renderCenterPower(byte stage, EnumFacing flow, byte flowSpeed) {
+    private static void renderCenterPower(byte stage, Vec3 centerFlow) {
         if (stage <= 0) {
             return;
         }
+        double width = 0.5 * stage / (double) POWER_STAGES;
+
+        Vec3 size = new Vec3(width, width, width);
+        Vec3 pos = new Vec3(0.5, 0.5, 0.5);
+
+        EntityResizableCuboid erc = new EntityResizableCuboid(null);
+        erc.setSize(size);
+        erc.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
+
+        erc.textureOffsetX = centerFlow.xCoord;
+        erc.textureOffsetY = centerFlow.yCoord;
+        erc.textureOffsetZ = centerFlow.zCoord;
+
+        GL11.glPushMatrix();
+        RenderUtils.translate(pos);
+        RenderResizableCuboid.INSTANCE.renderCubeFromCentre(erc);
+        GL11.glPopMatrix();
     }
 
+    @Deprecated
     private static void initializeDisplayPowerList() {
         if (initialized) {
             return;
@@ -204,26 +228,5 @@ public class PipeRendererPower {
             }
         }
 
-    }
-
-    /** Called whenever a texture remap is done, to refresh the existing textures to new ones. */
-    // TODO (PASS 1): Call this from a post texture remap event!
-    public static void resetTextures() {
-        if (!initialized) {
-            return;
-        }
-        initialized = false;
-
-        for (int[][] arr2 : power) {
-            for (int[] arr : arr2) {
-                for (int i : arr) {
-                    GLAllocation.deleteDisplayLists(i);
-                }
-            }
-        }
-
-        for (int i : centerPower) {
-            GLAllocation.deleteDisplayLists(i);
-        }
     }
 }
