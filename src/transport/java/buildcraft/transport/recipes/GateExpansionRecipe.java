@@ -18,7 +18,7 @@ import buildcraft.api.gates.IGateExpansion;
 import buildcraft.core.lib.inventory.StackHelper;
 import buildcraft.core.recipes.IntegrationRecipeBC;
 import buildcraft.transport.gates.GateDefinition;
-import buildcraft.transport.gates.ItemGate;
+import buildcraft.transport.item.ItemGate;
 
 public class GateExpansionRecipe extends IntegrationRecipeBC {
     private static final BiMap<IGateExpansion, ItemStack> recipes = (BiMap<IGateExpansion, ItemStack>) GateExpansions.getRecipesForPostInit();

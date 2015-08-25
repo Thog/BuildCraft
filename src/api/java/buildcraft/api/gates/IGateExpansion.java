@@ -22,5 +22,5 @@ public interface IGateExpansion {
 
     TextureAtlasSprite getOverlayBlock();
 
-    TextureAtlasSprite getOverlayItem();
+    String getOverlayItem();
 }

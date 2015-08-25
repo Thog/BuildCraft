@@ -18,7 +18,7 @@ import buildcraft.transport.gates.GateDefinition;
 import buildcraft.transport.gates.GateExpansionPulsar;
 import buildcraft.transport.gates.GateExpansionRedstoneFader;
 import buildcraft.transport.gates.GateExpansionTimer;
-import buildcraft.transport.gates.ItemGate;
+import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.recipes.AdvancedFacadeRecipe;
 import buildcraft.transport.recipes.GateExpansionRecipe;
 

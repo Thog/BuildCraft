@@ -2,11 +2,12 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.transport.gates;
+package buildcraft.transport.item;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -30,23 +31,27 @@ import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.items.ItemBuildCraft;
+import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
 import buildcraft.transport.Pipe;
+import buildcraft.transport.gates.GateDefinition;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
+import buildcraft.transport.gates.GateFactory;
+import buildcraft.transport.gates.GatePluggable;
 
 public class ItemGate extends ItemBuildCraft implements IPipePluggableItem {
 
-    protected static final String NBT_TAG_MAT = "mat";
-    protected static final String NBT_TAG_LOGIC = "logic";
-    protected static final String NBT_TAG_EX = "ex";
+    public static final String NBT_TAG_MAT = "mat";
+    public static final String NBT_TAG_LOGIC = "logic";
+    public static final String NBT_TAG_EX = "ex";
     private static ArrayList<ItemStack> allGates;
 
     public ItemGate() {
         super();
-        setHasSubtypes(false);
+        setHasSubtypes(true);
         setMaxDamage(0);
         setPassSneakClick(true);
         setCreativeTab(BCCreativeTab.get("gates"));

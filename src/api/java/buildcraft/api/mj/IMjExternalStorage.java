@@ -40,13 +40,13 @@ public interface IMjExternalStorage {
      *         full, or cannot receive power from that direction. */
     double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate);
 
-    /** @param flowDirection The direction that power would flow INTO this device (If you are querying an engine below,
+    /** @param flowDirection The direction that power would flow INTO this device (If you are querying a machine below,
      *            this would be EnumFacing.DOWN). It is safe to pass null, but some devices may return 0 if they depend
      *            on the direction.
      * 
      * @return The amount of power that is "pulling in" to this device, or that is sucking power into this device. The
      *         default implementation returns values between 0 and 1. This should never return values less than 0.
-     *         Higher values mean more suction, lower values mean less suction */
+     *         Higher values mean more suction, lower values mean less suction. */
     double getSuction(World world, EnumFacing flowDirection);
 
     /** This should be called before any other methods are called, as they all usually rely on this object. This is only

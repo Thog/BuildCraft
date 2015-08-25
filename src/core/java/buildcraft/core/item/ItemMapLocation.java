@@ -270,10 +270,11 @@ public class ItemMapLocation extends ItemBuildCraft implements IMapLocation {
 
     @Override
     public void registerModels() {
-        ModelHelper.registerItemModel(this, MapLocationType.CLEAN.meta, "");
-        ModelHelper.registerItemModel(this, MapLocationType.SPOT.meta, "Spot");
-        ModelHelper.registerItemModel(this, MapLocationType.AREA.meta, "Area");
-        ModelHelper.registerItemModel(this, MapLocationType.PATH.meta, "Path");
-        ModelHelper.registerItemModel(this, MapLocationType.ZONE.meta, "Zone");
+        String location = "buildcraftcore:map/";
+        ModelHelper.registerItemModel(this, MapLocationType.CLEAN.meta, location, "clean");
+        ModelHelper.registerItemModel(this, MapLocationType.SPOT.meta, location, "spot");
+        ModelHelper.registerItemModel(this, MapLocationType.AREA.meta, location, "area");
+        ModelHelper.registerItemModel(this, MapLocationType.PATH.meta, location, "path");
+        ModelHelper.registerItemModel(this, MapLocationType.ZONE.meta, location, "zone");
     }
 }

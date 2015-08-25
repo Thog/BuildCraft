@@ -5,6 +5,7 @@
 package buildcraft.transport.item;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.lib.items.ItemBuildCraft;
+import buildcraft.core.lib.utils.ModelHelper;
 
 public class ItemPipeWire extends ItemBuildCraft {
 
@@ -60,6 +62,14 @@ public class ItemPipeWire extends ItemBuildCraft {
         for (PipeWire pipeWire : PipeWire.VALUES) {
             // TODO: Find out whether custom item stacks are needed, and if they even exist anymore
             // GameRegistry.registerCustomItemStack(pipeWire.getTag(), pipeWire.getStack());
+        }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerModels() {
+        for (PipeWire pipeWire : PipeWire.VALUES) {
+            ModelHelper.registerItemModel(this, pipeWire.ordinal(), "/" + pipeWire.name().toLowerCase(Locale.ROOT));
         }
     }
 }

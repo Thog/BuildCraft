@@ -67,6 +67,7 @@ import buildcraft.core.lib.utils.ColorUtils;
 import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
+import buildcraft.robotics.render.RobotItemModel;
 import buildcraft.transport.block.BlockFilteredBuffer;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.gates.GateDefinition;
@@ -77,8 +78,8 @@ import buildcraft.transport.gates.GateExpansionPulsar;
 import buildcraft.transport.gates.GateExpansionRedstoneFader;
 import buildcraft.transport.gates.GateExpansionTimer;
 import buildcraft.transport.gates.GatePluggable;
-import buildcraft.transport.gates.ItemGate;
 import buildcraft.transport.item.ItemFacade;
+import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.item.ItemGateCopier;
 import buildcraft.transport.item.ItemPipe;
 import buildcraft.transport.item.ItemPipeWire;
@@ -93,6 +94,7 @@ import buildcraft.transport.pluggable.ItemLens;
 import buildcraft.transport.pluggable.ItemPlug;
 import buildcraft.transport.pluggable.LensPluggable;
 import buildcraft.transport.pluggable.PlugPluggable;
+import buildcraft.transport.render.GateItemModel;
 import buildcraft.transport.render.PipeBlockModel;
 import buildcraft.transport.render.PipeItemModel;
 import buildcraft.transport.schematics.BptItemPipeFilters;
@@ -120,7 +122,7 @@ public class BuildCraftTransport extends BuildCraftMod {
     public static BlockFilteredBuffer filteredBufferBlock;
 
     public static Item pipeWaterproof;
-    public static Item pipeGate;
+    public static ItemGate pipeGate;
     public static Item pipeWire;
     public static Item plugItem;
     public static Item lensItem;
@@ -526,7 +528,7 @@ public class BuildCraftTransport extends BuildCraftMod {
         TriggerParameterSignal.registerIcons(event);
         ActionParameterSignal.registerIcons(event);
     }
-
+    
     @Mod.EventHandler
     public void serverLoading(FMLServerStartingEvent event) {
         pipeExtensionListener = new PipeExtensionListener();
@@ -678,5 +680,8 @@ public class BuildCraftTransport extends BuildCraftMod {
             mrl = ModelHelper.getItemResourceLocation(itemPipe, "");
             event.modelRegistry.putObject(mrl, PipeItemModel.create(itemPipe));
         }
+        
+        mrl = new ModelResourceLocation("buildcrafttransport:gate", "inventory");
+        event.modelRegistry.putObject(mrl, GateItemModel.create());
     }
 }

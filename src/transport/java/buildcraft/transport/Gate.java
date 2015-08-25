@@ -31,8 +31,8 @@ import buildcraft.api.transport.PipeWire;
 import buildcraft.core.GuiIds;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
-import buildcraft.transport.gates.ItemGate;
 import buildcraft.transport.gui.ContainerGateInterface;
+import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.statements.ActionValve;
 
 public final class Gate implements IGate, ISidedStatementContainer, IRedstoneStatementContainer {

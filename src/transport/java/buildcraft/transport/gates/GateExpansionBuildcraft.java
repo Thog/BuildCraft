@@ -15,7 +15,7 @@ public abstract class GateExpansionBuildcraft implements IGateExpansion {
 
     private final String tag;
     private TextureAtlasSprite iconBlock;
-    private TextureAtlasSprite iconItem;
+    private String iconItem;
 
     public GateExpansionBuildcraft(String tag) {
         this.tag = tag;
@@ -38,7 +38,7 @@ public abstract class GateExpansionBuildcraft implements IGateExpansion {
 
     @Override
     public void registerItemOverlay(TextureMap iconRegister) {
-        iconItem = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_expansion_" + tag));
+        iconItem = "buildcrafttransport:gates/gate_expansion_" + tag;
     }
 
     @Override
@@ -47,7 +47,7 @@ public abstract class GateExpansionBuildcraft implements IGateExpansion {
     }
 
     @Override
-    public TextureAtlasSprite getOverlayItem() {
+    public String getOverlayItem() {
         return iconItem;
     }
 }
