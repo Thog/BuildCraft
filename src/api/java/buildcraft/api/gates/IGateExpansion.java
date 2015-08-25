@@ -16,11 +16,9 @@ public interface IGateExpansion {
 
     GateExpansionController makeController(TileEntity pipeTile);
 
-    void registerBlockOverlay(TextureMap iconRegister);
-
-    void registerItemOverlay(TextureMap iconRegister);
+    void registerSprites(TextureMap iconRegister);
 
     TextureAtlasSprite getOverlayBlock();
 
-    String getOverlayItem();
+    TextureAtlasSprite getOverlayItem();
 }

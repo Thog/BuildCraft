@@ -51,7 +51,7 @@ public class ItemGate extends ItemBuildCraft implements IPipePluggableItem {
 
     public ItemGate() {
         super();
-        setHasSubtypes(true);
+        setHasSubtypes(false);
         setMaxDamage(0);
         setPassSneakClick(true);
         setCreativeTab(BCCreativeTab.get("gates"));

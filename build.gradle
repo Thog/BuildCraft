@@ -1,29 +1,14 @@
-// DON'T TOUCH THE BUILDSCRIPT[] BLOCK
-// its special, and it is only there to make ForgeGradle work correctly.
-
 import net.minecraftforge.gradle.user.UserConstants
-import net.minecraftforge.gradle.delayed.DelayedFile
-import net.minecraftforge.gradle.delayed.DelayedString
-import net.minecraftforge.gradle.tasks.user.reobf.ReobfTask
+import net.minecraftforge.gradle.common.Constants
+import net.minecraftforge.gradle.patcher.TaskReobfuscate
+import net.minecraftforge.gradle.util.delayed.DelayedFile
+import net.minecraftforge.gradle.util.delayed.DelayedString
 
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-    }
-    dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT"
-    }
+plugins {// Depend on forge gradle
+    id "net.minecraftforge.gradle.forge" version "2.0.0"
 }
 
-apply plugin: "forge" // adds the forge dependency
+
 apply plugin: "maven" // for uploading to a maven repo
 //apply plugin: "checkstyle"
 
@@ -33,7 +18,7 @@ archivesBaseName = "buildcraft" // the name that all artifacts will use as a bas
 
 minecraft {
     mappings = "stable_16"
-    version = "1.8-11.14.3.1502" // McVersion-ForgeVersion     this variable is later changed to contain only the MC version, while the apiVersion variable is used for the forge version.  Yeah its stupid, and will be changed eventually.
+    version = "1.8-11.14.3.1504" // McVersion-ForgeVersion     this variable is later changed to contain only the MC version, while the apiVersion variable is used for the forge version.  Yeah its stupid, and will be changed eventually.
 
     runDir = "run" // the directory for ForgeGradle to run Minecraft in
 
@@ -62,15 +47,15 @@ sourceSets {
 // --------------------
 
 // add a source jar
-task sourceJar(type: Jar) {
-    classifier = "sources"
-}
+//task sourceJar(type: Jar) {
+//    classifier = "sources"
+//}
 
 // because the normal output has been made to be obfuscated
 task deobfJar(type: Jar) {
     classifier = "developer"
 
-    // This makes the dev output work
+// This makes the dev output work
     doLast {
         println "hi"
         com.google.common.io.Files.copy(
@@ -118,63 +103,47 @@ modules.each { module ->
         sourceSets[module].compileClasspath += sourceSets[dependant].output
         println "    depends on " + dependant
     }
-    task (module + "DeobfJar", type: Jar) {
-        from sourceSets[module].output
-        appendix = module
-        classifier = "developer"
-        doLast {
-            com.google.common.io.Files.copy(
-                    new File("./build/libs/buildcraft-" + module + "-" + version + "-developer.jar"), 
-                    new File("./build/libs/buildcraft-" + module + "-" + version + ".jar"))
-        }
-    }
     task (module + "SourceJar", type: Jar) {
         from sourceSets[module].allSource
         appendix = module
         classifier = "source"
     }
-    task (module + "Jar", type: ReobfTask, dependsOn: module + "DeobfJar") {
-        reobf tasks[module + "DeobfJar"]
 
-        File reobfInput = new File("./build/libs/buildcraft-" + module + "-" + version + "-developer.jar")
-        deobfFile = new DelayedFile(reobfInput)
-        
-        File reobfOutput = new File("./build/libs/buildcraft-" + module + "-" + version + ".jar")
-
-        recompFile = new DelayedFile(reobfOutput)
-
-        setSrgSrg()
-        setMcVersion(new DelayedString(getProject(), minecraft.version))
-        setExceptorCfg(new DelayedFile(getProject(), UserConstants.EXC_SRG, getProject().getPlugins().getPlugin("forge")));
-        setFieldCsv(new DelayedFile(getProject(), UserConstants.FIELD_CSV, getProject().getPlugins().getPlugin("forge")));
-        setMethodCsv(new DelayedFile(getProject(), UserConstants.METHOD_CSV, getProject().getPlugins().getPlugin("forge")));
+    task (module + "DeobfJar", type: Jar) {
+        from sourceSets[module].output
+        appendix = module
+        classifier = "developer"
     }
+  
 
     tasks.sourceJar.from sourceSets[module].allSource
-    tasks.deobfJar.from sourceSets[module].output // TODO: Find out what to use instead of "output" for the full jar
-    build.dependsOn tasks[module + "Jar"]
+  //  tasks.deobfJar.from sourceSets[module].output // TODO: Find out what to use instead of "output" for the full jar
+    //build.dependsOn tasks[module + "Jar"]
     build.dependsOn tasks[module + "DeobfJar"]
     build.dependsOn tasks[module + "SourceJar"]
 }
 
-task ("reobfJar", type: ReobfTask, dependsOn: deobfJar) {
-        reobf tasks["deobfJar"]   
+task ("reobfFullJar", type: TaskReobfuscate, dependsOn: deobfJar) {
+       // reobf tasks["deobfJar"]   
 
-        File reobfInput = new File("./build/libs/buildcraft-" + version + "-developer.jar")
-        deobfFile = new DelayedFile(reobfInput)
+        inJar = new File("./build/libs/buildcraft-" + version + "-developer.jar")
         
-        File reobfOutput = new File("./build/libs/buildcraft-" + version + ".jar")
+        outJar = new File("./build/libs/buildcraft-" + version + ".jar")
+        preFFJar = inJar
+        addLibs(sourceSets["api"].compileClasspath)
 
-        recompFile = new DelayedFile(reobfOutput)
-
-        setSrgSrg()
-        setMcVersion(new DelayedString(getProject(), minecraft.version))
-        setExceptorCfg(new DelayedFile(getProject(), UserConstants.EXC_SRG, getProject().getPlugins().getPlugin("forge")));
-        setFieldCsv(new DelayedFile(getProject(), UserConstants.FIELD_CSV, getProject().getPlugins().getPlugin("forge")));
-        setMethodCsv(new DelayedFile(getProject(), UserConstants.METHOD_CSV, getProject().getPlugins().getPlugin("forge")));
+       // setSrgSrg()
+       // setMcVersion(minecraft.version)
+       // setExceptorCfg( UserConstants.EXC_SRG, getProject().getPlugins().getPlugin("forge"));
+       // setFieldCsv( UserConstants.FIELD_CSV, getProject().getPlugins().getPlugin("forge"));
+        setSrg(new DelayedString(Constants.SRG_SRG_TO_MCP))
+       // setMcVersion(new DelayedString( minecraft.version))
+        setExc(new DelayedFile(getProject(), Constants.EXC_SRG));
+        setFieldsCsv(new DelayedFile(getProject(), Constants.CSV_FIELD))
+        setMethodsCsv(new DelayedFile(getProject(), Constants.CSV_METHOD))
 }
 
-build.dependsOn tasks["reobfJar"]
+build.dependsOn tasks["reobfFullJar"]
 
 processResources {
     // replace stuff in mcmod.info, nothing else
@@ -196,10 +165,8 @@ processResources {
 //    configFile = file('guidelines/buildcraft.checkstyle')
 //}
 
-//checkstyleApi.exclude "cofh/**"
-
 // make sure all of these happen when we run build
-build.dependsOn sourceJar, deobfJar
+//build.dependsOn sourceJar, deobfJar
 
 // --------------------
 // maven section
@@ -218,9 +185,9 @@ dependencies {
 // specify artifacts to be uploaded
 artifacts {
     // the default jar is already here by default
-    archives sourceJar
+//    archives sourceJar
     // archives javadocJar
-    archives deobfJar
+//    archives deobfJar
     // archives apiJar
 }
 

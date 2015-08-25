@@ -67,7 +67,6 @@ import buildcraft.core.lib.utils.ColorUtils;
 import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
-import buildcraft.robotics.render.RobotItemModel;
 import buildcraft.transport.block.BlockFilteredBuffer;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.gates.GateDefinition;
@@ -302,6 +301,7 @@ public class BuildCraftTransport extends BuildCraftMod {
             PipeWire.item = pipeWire;
 
             pipeGate = new ItemGate();
+            pipeGate.setTextureLocation("buildcrafttransport:gate");
             pipeGate.setUnlocalizedName("pipeGate");
             CoreProxy.proxy.registerItem(pipeGate);
 
@@ -514,21 +514,21 @@ public class BuildCraftTransport extends BuildCraftMod {
         WireIconProvider.registerIcons(event.map);
 
         for (GateDefinition.GateMaterial material : GateDefinition.GateMaterial.VALUES) {
-            material.registerBlockIcon(event.map);
+            material.registerSprites(event.map);
         }
 
         for (GateDefinition.GateLogic logic : GateDefinition.GateLogic.VALUES) {
-            logic.registerBlockIcon(event.map);
+            logic.registerSprites(event.map);
         }
 
         for (IGateExpansion expansion : GateExpansions.getExpansions()) {
-            expansion.registerBlockOverlay(event.map);
+            expansion.registerSprites(event.map);
         }
 
         TriggerParameterSignal.registerIcons(event);
         ActionParameterSignal.registerIcons(event);
     }
-    
+
     @Mod.EventHandler
     public void serverLoading(FMLServerStartingEvent event) {
         pipeExtensionListener = new PipeExtensionListener();
@@ -680,7 +680,7 @@ public class BuildCraftTransport extends BuildCraftMod {
             mrl = ModelHelper.getItemResourceLocation(itemPipe, "");
             event.modelRegistry.putObject(mrl, PipeItemModel.create(itemPipe));
         }
-        
+
         mrl = new ModelResourceLocation("buildcrafttransport:gate", "inventory");
         event.modelRegistry.putObject(mrl, GateItemModel.create());
     }

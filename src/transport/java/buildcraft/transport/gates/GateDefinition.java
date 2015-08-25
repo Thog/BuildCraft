@@ -72,14 +72,10 @@ public final class GateDefinition {
         }
 
         @SideOnly(Side.CLIENT)
-        public void registerBlockIcon(TextureMap iconRegister) {
+        public void registerSprites(TextureMap iconRegister) {
             if (this != REDSTONE) {
                 iconBlock = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_material_" + getTag()));
             }
-        }
-
-        @SideOnly(Side.CLIENT)
-        public void registerItemIcon(TextureMap iconRegister) {
             if (this != REDSTONE) {
                 iconItem = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_material_" + getTag()));
             }
@@ -132,20 +128,16 @@ public final class GateDefinition {
         }
 
         public String getTag() {
-            return name().toLowerCase(Locale.ENGLISH);
+            return name().toLowerCase(Locale.ROOT);
         }
 
         @SideOnly(Side.CLIENT)
-        public void registerBlockIcon(TextureMap iconRegister) {
+        public void registerSprites(TextureMap iconRegister) {
             iconLit = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_" + getTag() + "_lit"));
             iconDark = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_" + getTag() + "_dark"));
 
             iconGate = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_" + getTag()));
-        }
-
-        @SideOnly(Side.CLIENT)
-        public void registerItemIcon(TextureMap iconRegister) {
-            iconItem = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:gates/gate_logic_" + getTag()));
+            iconItem = iconRegister.registerSprite(new ResourceLocation("buildcrafttransport:items/gates/gate_logic_" + getTag()));
         }
 
         public static GateLogic fromOrdinal(int ordinal) {

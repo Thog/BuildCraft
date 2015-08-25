@@ -44,7 +44,7 @@ public abstract class BuildCraftBakedModel extends BakedModel {
     }
 
     public BuildCraftBakedModel(ImmutableList<BakedQuad> quads, TextureAtlasSprite particle, VertexFormat format) {
-        super(quads, particle, format);
+        this(quads, particle, format, getTransforms());
     }
 
     @SuppressWarnings("deprecation")
@@ -52,13 +52,14 @@ public abstract class BuildCraftBakedModel extends BakedModel {
     protected static ImmutableMap<TransformType, TRSRTransformation> getTransforms() {
         ImmutableMap.Builder<TransformType, TRSRTransformation> builder = ImmutableMap.builder();
 
-        // builder.put(TransformType.GUI, TRSRTransformation.identity());
-//        builder.put(TransformType.GUI, new TRSRTransformation(ict.gui));
-
-        float scale = 0.0375f;
+        float scale = 0.375f;
         Vector3f translation = new Vector3f(0, 1.5F * scale, -2.75F * scale);
         TRSRTransformation trsr = new TRSRTransformation(translation, new Quat4f(10, -45, 170, 1), new Vector3f(0.375F, 0.375F, 0.375F), null);
         builder.put(TransformType.THIRD_PERSON, trsr);
+
+        translation = new Vector3f(1, 1, 0);
+        trsr = new TRSRTransformation(translation, new Quat4f(0, 0, 0, 1), new Vector3f(1, 1, 1), new Quat4f(0, -90, 90, 1));
+        builder.put(TransformType.GUI, trsr);
 
         return builder.build();
     }
@@ -90,6 +91,15 @@ public abstract class BuildCraftBakedModel extends BakedModel {
         int[] i3 = new int[] { asInt(p3.x), asInt(p3.y), asInt(p3.z), -1, asInt(uvs[U_MAX]), asInt(uvs[V_MAX]), 0 };
         int[] i4 = new int[] { asInt(p4.x), asInt(p4.y), asInt(p4.z), -1, asInt(uvs[U_MAX]), asInt(uvs[V_MIN]), 0 };
         return concat(i1, i2, i3, i4);
+    }
+
+    public static float[] getUVArray(TextureAtlasSprite sprite) {
+        float[] uvs = new float[4];
+        uvs[U_MIN] = sprite.getMinU();
+        uvs[U_MAX] = sprite.getMaxU();
+        uvs[V_MIN] = sprite.getMinV();
+        uvs[V_MAX] = sprite.getMaxV();
+        return uvs;
     }
 
     public static int[] getFrom(Vector3f[] array, float[] uvs) {
