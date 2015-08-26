@@ -4,9 +4,34 @@ import net.minecraftforge.gradle.patcher.TaskReobfuscate
 import net.minecraftforge.gradle.util.delayed.DelayedFile
 import net.minecraftforge.gradle.util.delayed.DelayedString
 
-plugins {// Depend on forge gradle
-    id "net.minecraftforge.gradle.forge" version "2.0.0"
+
+// THIS buildscript is needed to depend on the snapshot versions (from here...
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT"
+    }
 }
+
+apply plugin: "net.minecraftforge.gradle.forge"
+// ...to here)
+
+// This buildscript is needed to depend on the full release versions (from here...
+//plugins {// Depend on forge gradle
+//    id "net.minecraftforge.gradle.forge" version "2.0.0"
+//}
+
+// ...to here)
 
 apply plugin: "maven" // for uploading to a maven repo
 //apply plugin: "checkstyle"
