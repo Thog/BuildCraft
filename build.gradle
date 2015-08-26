@@ -8,7 +8,6 @@ plugins {// Depend on forge gradle
     id "net.minecraftforge.gradle.forge" version "2.0.0"
 }
 
-
 apply plugin: "maven" // for uploading to a maven repo
 //apply plugin: "checkstyle"
 
