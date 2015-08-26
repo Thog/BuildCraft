@@ -9,9 +9,12 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.items.ItemBuildCraft;
+import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.NBTUtils;
 import buildcraft.transport.Gate;
 import buildcraft.transport.TileGenericPipe;
@@ -22,19 +25,16 @@ import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.gates.GatePluggable;
 
 public class ItemGateCopier extends ItemBuildCraft {
+    // Item damages for what the gate copier holds
+    private static final int META_EMPTY = 0;
+    private static final int META_FULL = 1;
+
     public ItemGateCopier() {
         super();
         setMaxStackSize(1);
+        setMaxDamage(META_FULL);
         setUnlocalizedName("gateCopier");
     }
-
-    // @Override
-    // @SideOnly(Side.CLIENT)
-    // public TextureAtlasSprite getIconIndex(ItemStack i) {
-    // NBTTagCompound cpt = NBTUtils.getItemData(i);
-    // this.itemIcon = cpt.hasKey("logic") ? icons[1] : icons[0];
-    // return this.itemIcon;
-    // }
 
     @Override
     public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -64,14 +64,21 @@ public class ItemGateCopier extends ItemBuildCraft {
         if (isCopying) {
             if (gate == null) {
                 stack.setTagCompound(new NBTTagCompound());
+                stack.setItemDamage(META_EMPTY);
                 player.addChatMessage(new ChatComponentTranslation("chat.gateCopier.clear"));
-                return true;
+            } else {
+                gate.writeStatementsToNBT(data);
+                data.setByte("material", (byte) gate.material.ordinal());
+                data.setByte("logic", (byte) gate.logic.ordinal());
+                stack.setItemDamage(META_FULL);
+                player.addChatMessage(new ChatComponentTranslation("chat.gateCopier.gateCopied"));
             }
 
-            gate.writeStatementsToNBT(data);
-            data.setByte("material", (byte) gate.material.ordinal());
-            data.setByte("logic", (byte) gate.logic.ordinal());
-            player.addChatMessage(new ChatComponentTranslation("chat.gateCopier.gateCopied"));
+            // Tell ItemModelMesher that this is NOT damageable, so it will use the meta for the icon
+            data.setBoolean("Unbreakable", true);
+
+            // Tell ItemStack.getToolTip() that we want to hide the resulting "Unbreakable" line that we just added
+            data.setInteger("HideFlags", 4);
         } else {
             if (!data.hasKey("logic")) {
                 player.addChatMessage(new ChatComponentTranslation("chat.gateCopier.noInformation"));
@@ -110,7 +117,10 @@ public class ItemGateCopier extends ItemBuildCraft {
         return true;
     }
 
-    // public String[] getIconNames() {
-    // return new String[] { "gateCopier/empty", "gateCopier/full" };
-    // }
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerModels() {
+        ModelHelper.registerItemModel(this, META_EMPTY, "_empty");
+        ModelHelper.registerItemModel(this, META_FULL, "_full");
+    }
 }

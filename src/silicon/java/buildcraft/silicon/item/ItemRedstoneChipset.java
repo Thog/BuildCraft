@@ -7,7 +7,6 @@ package buildcraft.silicon.item;
 import java.util.List;
 import java.util.Locale;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,6 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.core.lib.items.ItemBuildCraft;
+import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.silicon.BuildCraftSilicon;
 
 public class ItemRedstoneChipset extends ItemBuildCraft {
@@ -30,7 +30,6 @@ public class ItemRedstoneChipset extends ItemBuildCraft {
         COMP,
         EMERALD;
         public static final Chipset[] VALUES = values();
-        private TextureAtlasSprite icon;
 
         public String getChipsetName() {
             return "redstone_" + name().toLowerCase(Locale.ENGLISH) + "_chipset";
@@ -58,11 +57,6 @@ public class ItemRedstoneChipset extends ItemBuildCraft {
         setMaxDamage(0);
     }
 
-    // @Override
-    // public TextureAtlasSprite getIconFromDamage(int damage) {
-    // return Chipset.fromOrdinal(damage).icon;
-    // }
-
     @Override
     public String getUnlocalizedName(ItemStack stack) {
         return "item." + Chipset.fromOrdinal(stack.getItemDamage()).getChipsetName();
@@ -77,17 +71,11 @@ public class ItemRedstoneChipset extends ItemBuildCraft {
         }
     }
 
-    // @Override
-    // @SideOnly(Side.CLIENT)
-    // public void registerIcons(TextureAtlasSpriteRegister par1IconRegister) {
-    // for (Chipset chipset : Chipset.VALUES) {
-    // chipset.icon = par1IconRegister.registerIcon("buildcraftsilicon:chipset/" + chipset.getChipsetName());
-    // }
-    // }
-
-    // public void registerItemStacks() {
-    // for (Chipset chipset : Chipset.VALUES) {
-    // GameRegistry.registerCustomItemStack(chipset.getChipsetName(), chipset.getStack());
-    // }
-    // }
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerModels() {
+        for (Chipset chipset : Chipset.values()) {
+            ModelHelper.registerItemModel(this, chipset.ordinal(), "/" + chipset.name().toLowerCase(Locale.ROOT));
+        }
+    }
 }

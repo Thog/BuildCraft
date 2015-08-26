@@ -130,7 +130,7 @@ import buildcraft.core.tablet.manager.TabletManagerClient;
 import buildcraft.core.tablet.manager.TabletManagerServer;
 
 @Mod(name = "BuildCraft", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Core", acceptedMinecraftVersions = "[1.8]",
-        dependencies = "required-after:Forge@[11.14.3.1504]", guiFactory = "buildcraft.core.config.ConfigManager")
+        dependencies = "required-after:Forge@[11.14.3.1505]", guiFactory = "buildcraft.core.config.ConfigManager")
 public class BuildCraftCore extends BuildCraftMod {
     @Mod.Instance("BuildCraft|Core")
     public static BuildCraftCore instance;

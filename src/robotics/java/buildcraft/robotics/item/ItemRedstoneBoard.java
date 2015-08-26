@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.robotics.item;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
@@ -84,7 +85,9 @@ public class ItemRedstoneBoard extends ItemBuildCraft {
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels() {
-        for (RedstoneBoardNBT<?> boardNBT : RedstoneBoardRegistry.instance.getAllBoardNBTs()) {
+        Collection<RedstoneBoardNBT<?>> boardNBTs = RedstoneBoardRegistry.instance.getAllBoardNBTs();
+        boardNBTs.add(RedstoneBoardRegistry.instance.getEmptyRobotBoard());
+        for (RedstoneBoardNBT<?> boardNBT : boardNBTs) {
             String type = boardNBT.getItemModelLocation();
             /* Neat little trick: we have to register the models, but NEVER for meta 0 (because of the way minecraft
              * gets its item models). So, provided this number is never 0 it will work */
