@@ -1,5 +1,5 @@
 {
-	"parent":"buildcraftcore:item/engineBlock",
+	"parent":"buildcraftcore:item/engineblock",
 	"textures":{
 		"particle":"buildcraftcore:blocks/engine/inv/wood/back",
 		"base":"buildcraftcore:blocks/engine/inv/wood/back",

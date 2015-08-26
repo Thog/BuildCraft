@@ -7,6 +7,7 @@ package buildcraft.core.proxy;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -133,7 +134,7 @@ public class CoreProxyClient extends CoreProxy {
 
     private void registerBlockItemModel(IBlockState state, int meta, String type) {
         Block block = state.getBlock();
-        ModelResourceLocation location = new ModelResourceLocation(Utils.getNameForBlock(block).replace("|", ""), type.toLowerCase());
+        ModelResourceLocation location = new ModelResourceLocation(Utils.getNameForBlock(block).replace("|", ""), type.toLowerCase(Locale.ROOT));
         Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), meta, location);
     }
 

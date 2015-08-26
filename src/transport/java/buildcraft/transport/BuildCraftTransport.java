@@ -247,7 +247,6 @@ public class BuildCraftTransport extends BuildCraftMod {
             CoreProxy.proxy.registerBlock(filteredBufferBlock.setUnlocalizedName("filteredBufferBlock"));
 
             pipeWaterproof = new ItemBuildCraft();
-
             pipeWaterproof.setUnlocalizedName("pipeWaterproof");
             CoreProxy.proxy.registerItem(pipeWaterproof);
 
@@ -679,8 +678,6 @@ public class BuildCraftTransport extends BuildCraftMod {
         event.modelRegistry.putObject(mrl, new PipeBlockModel());
         for (ItemPipe itemPipe : BlockGenericPipe.pipes.keySet()) {
             mrl = ModelHelper.getItemResourceLocation(itemPipe, "");
-
-            System.out.println(mrl.toString());
             event.modelRegistry.putObject(mrl, PipeItemModel.create(itemPipe));
         }
 
