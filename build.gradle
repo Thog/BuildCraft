@@ -114,30 +114,37 @@ modules.each { module ->
         appendix = module
         classifier = "developer"
     }
+
+    task (module + "ReobfJar", type: TaskReobfuscate, dependsOn: module + "DeobfJar") {
+        inJar = new File("./build/libs/buildcraft-" + module + "-" + version + "-developer.jar")
+        
+        outJar = new File("./build/libs/buildcraft-" + module + "-" + version + ".jar")
+        preFFJar = inJar
+        //addLibs(sourceSets["api"].compileClasspath)
+        addLibs(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS))
+
+        setSrg(new DelayedString(Constants.SRG_MCP_TO_SRG))
+        setExc(new DelayedFile(getProject(), Constants.EXC_SRG));
+        setFieldsCsv(new DelayedFile(getProject(), Constants.CSV_FIELD))
+        setMethodsCsv(new DelayedFile(getProject(), Constants.CSV_METHOD))
+    }
   
 
     tasks.sourceJar.from sourceSets[module].allSource
-  //  tasks.deobfJar.from sourceSets[module].output // TODO: Find out what to use instead of "output" for the full jar
+    tasks.deobfJar.from sourceSets[module].output // TODO: Find out what to use instead of "output" for the full jar
     //build.dependsOn tasks[module + "Jar"]
-    build.dependsOn tasks[module + "DeobfJar"]
+    build.dependsOn tasks[module + "ReobfJar"]
     build.dependsOn tasks[module + "SourceJar"]
 }
 
 task ("reobfFullJar", type: TaskReobfuscate, dependsOn: deobfJar) {
-       // reobf tasks["deobfJar"]   
-
         inJar = new File("./build/libs/buildcraft-" + version + "-developer.jar")
         
         outJar = new File("./build/libs/buildcraft-" + version + ".jar")
         preFFJar = inJar
-        addLibs(sourceSets["api"].compileClasspath)
+        addLibs(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS))
 
-       // setSrgSrg()
-       // setMcVersion(minecraft.version)
-       // setExceptorCfg( UserConstants.EXC_SRG, getProject().getPlugins().getPlugin("forge"));
-       // setFieldCsv( UserConstants.FIELD_CSV, getProject().getPlugins().getPlugin("forge"));
-        setSrg(new DelayedString(Constants.SRG_SRG_TO_MCP))
-       // setMcVersion(new DelayedString( minecraft.version))
+        setSrg(new DelayedString(Constants.SRG_MCP_TO_SRG))
         setExc(new DelayedFile(getProject(), Constants.EXC_SRG));
         setFieldsCsv(new DelayedFile(getProject(), Constants.CSV_FIELD))
         setMethodsCsv(new DelayedFile(getProject(), Constants.CSV_METHOD))
@@ -193,7 +200,7 @@ artifacts {
 
 uploadArchives {
     // make sure this happens after reobfuscation
-    dependsOn 'reobf'
+    dependsOn "reobfFullJar"
 
     repositories {
         if (project.hasProperty("filesmaven")) { // if this is the Forge server, and this stuff is defined...
