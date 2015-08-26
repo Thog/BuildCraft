@@ -44,12 +44,29 @@ public abstract class BuildCraftBakedModel extends BakedModel {
     }
 
     public BuildCraftBakedModel(ImmutableList<BakedQuad> quads, TextureAtlasSprite particle, VertexFormat format) {
-        this(quads, particle, format, getTransforms());
+        this(quads, particle, format, getBlockTransforms());
     }
 
     @SuppressWarnings("deprecation")
     /** Get the default transformations for inside inventories and third person */
-    protected static ImmutableMap<TransformType, TRSRTransformation> getTransforms() {
+    protected static ImmutableMap<TransformType, TRSRTransformation> getBlockTransforms() {
+        ImmutableMap.Builder<TransformType, TRSRTransformation> builder = ImmutableMap.builder();
+
+        float scale = 0.375f;
+        Vector3f translation = new Vector3f(0, 1.5F * scale, -2.75F * scale);
+        TRSRTransformation trsr = new TRSRTransformation(translation, new Quat4f(10, -45, 170, 1), new Vector3f(0.375F, 0.375F, 0.375F), null);
+        builder.put(TransformType.THIRD_PERSON, trsr);
+
+//        translation = new Vector3f(1, 1, 0);
+//        trsr = new TRSRTransformation(translation, new Quat4f(0, 0, 0, 1), new Vector3f(1, 1, 1), new Quat4f(0, -90, 90, 1));
+//        builder.put(TransformType.GUI, trsr);
+
+        return builder.build();
+    }
+    
+    @SuppressWarnings("deprecation")
+    /** Get the default transformations for inside inventories and third person */
+    protected static ImmutableMap<TransformType, TRSRTransformation> getItemTransforms() {
         ImmutableMap.Builder<TransformType, TRSRTransformation> builder = ImmutableMap.builder();
 
         float scale = 0.375f;

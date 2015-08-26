@@ -82,7 +82,7 @@ public class GateItemModel extends BuildCraftBakedModel implements ISmartItemMod
     private static Map<GateInfo, BakedModel> modelCache = Maps.newHashMap();
 
     protected GateItemModel(ImmutableList<BakedQuad> quads, TextureAtlasSprite particle, VertexFormat format) {
-        super(quads, particle, format);
+        super(quads, particle, format, getItemTransforms());
     }
 
     @Override

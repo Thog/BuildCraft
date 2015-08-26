@@ -421,6 +421,7 @@ public class BuildCraftTransport extends BuildCraftMod {
         PipeManager.registerStripesHandler(new StripesHandlerEntityInteract(), 0);
         PipeManager.registerStripesHandler(new StripesHandlerPlaceBlock(), -65536);
         PipeManager.registerStripesHandler(new StripesHandlerUse(), -131072);
+        // er... what? why the large negative numbers? :(
         PipeManager.registerStripesHandler(new StripesHandlerHoe(), 0);
 
         StripesHandlerDispenser.items.add(ItemMinecart.class);
@@ -678,6 +679,8 @@ public class BuildCraftTransport extends BuildCraftMod {
         event.modelRegistry.putObject(mrl, new PipeBlockModel());
         for (ItemPipe itemPipe : BlockGenericPipe.pipes.keySet()) {
             mrl = ModelHelper.getItemResourceLocation(itemPipe, "");
+
+            System.out.println(mrl.toString());
             event.modelRegistry.putObject(mrl, PipeItemModel.create(itemPipe));
         }
 
