@@ -57,13 +57,14 @@ public abstract class BuildCraftBakedModel extends BakedModel {
         TRSRTransformation trsr = new TRSRTransformation(translation, new Quat4f(10, -45, 170, 1), new Vector3f(0.375F, 0.375F, 0.375F), null);
         builder.put(TransformType.THIRD_PERSON, trsr);
 
-//        translation = new Vector3f(1, 1, 0);
-//        trsr = new TRSRTransformation(translation, new Quat4f(0, 0, 0, 1), new Vector3f(1, 1, 1), new Quat4f(0, -90, 90, 1));
-//        builder.put(TransformType.GUI, trsr);
+        // translation = new Vector3f(1, 1, 0);
+        // trsr = new TRSRTransformation(translation, new Quat4f(0, 0, 0, 1), new Vector3f(1, 1, 1), new Quat4f(0, -90,
+        // 90, 1));
+        // builder.put(TransformType.GUI, trsr);
 
         return builder.build();
     }
-    
+
     @SuppressWarnings("deprecation")
     /** Get the default transformations for inside inventories and third person */
     protected static ImmutableMap<TransformType, TRSRTransformation> getItemTransforms() {
@@ -123,11 +124,11 @@ public abstract class BuildCraftBakedModel extends BakedModel {
         return getFrom(array[0], array[1], array[2], array[3], uvs);
     }
 
-    private static int asInt(float f) {
+    public static int asInt(float f) {
         return Float.floatToRawIntBits(f);
     }
 
-    private static int[] concat(int[]... ints) {
+    public static int[] concat(int[]... ints) {
         int[] holder = ints[0];
         for (int i = 1; i < ints.length; i++) {
             holder = ArrayUtils.addAll(holder, ints[i]);

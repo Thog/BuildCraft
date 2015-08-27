@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport;
 
+import net.minecraft.util.EnumFacing;
+
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.transport.pluggable.IConnectionMatrix;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
@@ -16,10 +18,12 @@ import io.netty.buffer.ByteBuf;
 public class PipeRenderState implements ISerializable, IPipeRenderState {
 
     public final ConnectionMatrix pipeConnectionMatrix = new ConnectionMatrix();
+    public final ConnectionMatrix pipeConnectionExtensions = new ConnectionMatrix();
     public final TextureMatrix textureMatrix = new TextureMatrix();
     public final WireMatrix wireMatrix = new WireMatrix();
     protected boolean glassColorDirty = false;
     private byte glassColor = -127;
+    public final float[] customConnections = new float[6];
 
     private boolean dirty = true;
 
@@ -29,6 +33,7 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
         pipeConnectionMatrix.clean();
         textureMatrix.clean();
         wireMatrix.clean();
+        pipeConnectionExtensions.clean();
     }
 
     public byte getGlassColor() {
@@ -47,12 +52,24 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
         return glassColorDirty || pipeConnectionMatrix.isDirty() || textureMatrix.isDirty() || wireMatrix.isDirty();
     }
 
+    public void setExtension(EnumFacing direction, float extension) {
+        pipeConnectionExtensions.setConnected(direction, extension != 0);
+        customConnections[direction.ordinal()] = extension;
+    }
+
     @Override
     public void writeData(ByteBuf data) {
         data.writeByte(glassColor < -1 ? -1 : glassColor);
         pipeConnectionMatrix.writeData(data);
+        pipeConnectionExtensions.writeData(data);
         textureMatrix.writeData(data);
         wireMatrix.writeData(data);
+        for (int i = 0; i < customConnections.length; i++) {
+            float f = customConnections[i];
+            if (pipeConnectionExtensions.isConnected(EnumFacing.VALUES[i])) {
+                data.writeFloat(f);
+            }
+        }
     }
 
     @Override
@@ -63,8 +80,16 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
             this.glassColorDirty = true;
         }
         pipeConnectionMatrix.readData(data);
+        pipeConnectionExtensions.readData(data);
         textureMatrix.readData(data);
         wireMatrix.readData(data);
+        for (int i = 0; i < customConnections.length; i++) {
+            if (pipeConnectionExtensions.isConnected(EnumFacing.VALUES[i])) {
+                customConnections[i] = data.readFloat();
+            } else {
+                customConnections[i] = 0;
+            }
+        }
     }
 
     @Override
