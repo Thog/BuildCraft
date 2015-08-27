@@ -201,7 +201,7 @@ public class FacadePluggable extends PipePluggable implements IFacadePluggable {
     }
 
     @Override
-    public IPipePluggableStaticRenderer getRenderer() {
+    public IPipePluggableStaticRenderer getStaticRenderer() {
         return FacadePluggableRenderer.INSTANCE;
     }
 

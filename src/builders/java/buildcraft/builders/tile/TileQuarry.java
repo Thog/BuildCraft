@@ -219,6 +219,8 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
                 }
 
                 moveHead(speed);
+            } else {
+                speed = 0;
             }
         }
 

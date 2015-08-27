@@ -11,6 +11,8 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.gates.GateExpansions;
 import buildcraft.api.gates.IGateExpansion;
@@ -26,13 +28,15 @@ import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.Gate;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.item.ItemGate;
+import buildcraft.transport.render.tile.PipeRendererGates;
 import buildcraft.transport.render.tile.PipeRendererTESR;
 
 import io.netty.buffer.ByteBuf;
 
 public class GatePluggable extends PipePluggable {
-    private static final class GatePluggableRenderer implements IPipePluggableStaticRenderer, IPipePluggableDynamicRenderer {
-        public static final GatePluggableRenderer INSTANCE = new GatePluggableRenderer();
+
+    @SideOnly(Side.CLIENT)
+    private class GatePluggableRenderer implements IPipePluggableStaticRenderer, IPipePluggableDynamicRenderer {
 
         private GatePluggableRenderer() {
 
@@ -46,7 +50,7 @@ public class GatePluggable extends PipePluggable {
         @Override
         public List<BakedQuad> renderStaticPluggable(IPipeRenderState render, IPipePluggableState pluggableState, IPipe pipe, PipePluggable pluggable,
                 EnumFacing face) {
-            return null;
+            return PipeRendererGates.renderGateStatic(GatePluggable.this, face, 0, 0, 0);
         }
 
         // @Override
@@ -58,6 +62,9 @@ public class GatePluggable extends PipePluggable {
         // }
         // }
     }
+
+    @SideOnly(Side.CLIENT)
+    private GatePluggableRenderer renderer = new GatePluggableRenderer();
 
     public GateDefinition.GateMaterial material;
     public GateDefinition.GateLogic logic;
@@ -246,14 +253,24 @@ public class GatePluggable extends PipePluggable {
         return new AxisAlignedBB(bounds[0][0], bounds[1][0], bounds[2][0], bounds[0][1], bounds[1][1], bounds[2][1]);
     }
 
-    @Override
-    public IPipePluggableStaticRenderer getRenderer() {
-        return GatePluggableRenderer.INSTANCE;
+    @SideOnly(Side.CLIENT)
+    private GatePluggableRenderer getRenderer() {
+        if (renderer == null) {
+            renderer = new GatePluggableRenderer();
+        }
+        return renderer;
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
+    public IPipePluggableStaticRenderer getStaticRenderer() {
+        return getRenderer();
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
     public IPipePluggableDynamicRenderer getDynamicRenderer() {
-        return GatePluggableRenderer.INSTANCE;
+        return getRenderer();
     }
 
     public float getPulseStage() {

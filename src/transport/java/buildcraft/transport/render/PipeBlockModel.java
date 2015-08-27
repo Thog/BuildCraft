@@ -181,7 +181,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
         for (EnumFacing face : EnumFacing.VALUES) {
             PipePluggable plug = pluggable.getPluggables()[face.ordinal()];
             if (plug != null) {
-                IPipePluggableStaticRenderer plugRender = plug.getRenderer();
+                IPipePluggableStaticRenderer plugRender = plug.getStaticRenderer();
                 if (plugRender != null) {
                     List<BakedQuad> list = plugRender.renderStaticPluggable(render, pluggable, pipe, plug, face);
                     if (list != null) {

@@ -10,13 +10,14 @@ import com.google.common.collect.SetMultimap;
 import buildcraft.transport.pipes.*;
 
 /** Controls whether one type of pipe can connect to another. */
+@SuppressWarnings("unchecked")
 public final class PipeConnectionBans {
 
-    private static final SetMultimap<Class<? extends Pipe>, Class<? extends Pipe>> connectionBans = HashMultimap.create();
+    private static final SetMultimap<Class<? extends Pipe<?>>, Class<? extends Pipe<?>>> connectionBans = HashMultimap.create();
 
     static {
         // Fluid pipes
-        banConnection(PipeFluidsStone.class, PipeFluidsCobblestone.class);
+        banConnection(PipeFluidsStone.class, PipeFluidsCobblestone.class, PipeFluidsQuartz.class);
         banConnection(PipeFluidsWood.class);
         banConnection(PipeFluidsEmerald.class);
         banConnection(PipeFluidsWood.class, PipeFluidsEmerald.class);
@@ -33,6 +34,8 @@ public final class PipeConnectionBans {
         // Power Pipes
         banConnection(PipePowerWood.class);
         banConnection(PipePowerEmerald.class);
+        banConnection(PipePowerWood.class, PipePowerEmerald.class);
+        banConnection(PipePowerStone.class, PipePowerCobblestone.class, PipePowerQuartz.class);
     }
 
     private PipeConnectionBans() {}
@@ -42,7 +45,7 @@ public final class PipeConnectionBans {
      * If only one parameter is passed in, it will ban connection to pipes of the same type.
      *
      * @param types */
-    public static void banConnection(Class<? extends Pipe>... types) {
+    public static void banConnection(Class<? extends Pipe<?>>... types) {
         if (types.length == 0) {
             return;
         }
@@ -60,6 +63,7 @@ public final class PipeConnectionBans {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public static boolean canPipesConnect(Class<? extends Pipe> type1, Class<? extends Pipe> type2) {
         return !connectionBans.containsEntry(type1, type2);
     }

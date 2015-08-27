@@ -124,7 +124,7 @@ public class PlugPluggable extends PipePluggable {
     }
 
     @Override
-    public IPipePluggableStaticRenderer getRenderer() {
+    public IPipePluggableStaticRenderer getStaticRenderer() {
         return PlugPluggableRenderer.INSTANCE;
     }
 

@@ -29,9 +29,9 @@ import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeRenderState;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.PipeTransportItems;
+import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.GatePluggable;
-import buildcraft.transport.pipes.PipePowerBase;
 
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
     public PipeRendererTESR() {}
@@ -40,6 +40,10 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
     @Override
     public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f, int argumentthatisalwaysminusone) {
         if (BuildCraftCore.render == RenderMode.NoDynamic) {
+            return;
+        }
+
+        if (tileentity == null) {
             return;
         }
 
@@ -58,7 +62,7 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
         } else if (pipeType == IPipeTile.PipeType.FLUID) {
             PipeRendererFluids.renderFluidPipe((Pipe<PipeTransportFluids>) pipe.pipe, x, y, z);
         } else if (pipeType == IPipeTile.PipeType.POWER) {
-            PipeRendererPower.renderPowerPipe((PipePowerBase) pipe.pipe, x, y, z);
+            PipeRendererPower.renderPowerPipe((Pipe<PipeTransportPower>) pipe.pipe, x, y, z);
         } /* else if (pipeType == PipeType.STRUCTURE) { // no object to render in a structure pipe; } */
     }
 
@@ -142,8 +146,9 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
         if (translateCenter != 0) {
             GL11.glPushMatrix();
-            float xt = direction.getFrontOffsetX() * translateCenter, yt = direction.getFrontOffsetY() * translateCenter, zt = direction
-                    .getFrontOffsetZ() * translateCenter;
+            float xt = direction.getFrontOffsetX() * translateCenter;
+            float yt = direction.getFrontOffsetY() * translateCenter;
+            float zt = direction.getFrontOffsetZ() * translateCenter;
 
             GL11.glTranslatef(xt, yt, zt);
         }

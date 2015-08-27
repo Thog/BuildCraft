@@ -141,7 +141,7 @@ public class LensPluggable extends PipePluggable {
     }
 
     @Override
-    public IPipePluggableStaticRenderer getRenderer() {
+    public IPipePluggableStaticRenderer getStaticRenderer() {
         return LensPluggableRenderer.INSTANCE;
     }
 

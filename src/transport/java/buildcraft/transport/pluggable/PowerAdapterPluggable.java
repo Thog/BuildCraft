@@ -145,7 +145,7 @@ public class PowerAdapterPluggable extends PipePluggable implements IMjExternalS
     }
 
     @Override
-    public IPipePluggableStaticRenderer getRenderer() {
+    public IPipePluggableStaticRenderer getStaticRenderer() {
         return new PowerAdapterPluggableRenderer();
     }
 

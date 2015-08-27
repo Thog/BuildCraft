@@ -1162,7 +1162,8 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
     public boolean recolorBlock(World world, BlockPos pos, EnumFacing side, EnumDyeColor colour) {
         TileGenericPipe pipeTile = (TileGenericPipe) world.getTileEntity(pos);
         if (!pipeTile.hasBlockingPluggable(side)) {
-            return pipeTile.setPipeColor(colour.getDyeDamage());
+            boolean did = pipeTile.setPipeColor(colour.getDyeDamage());
+            return did;
         }
 
         return false;

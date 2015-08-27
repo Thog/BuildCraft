@@ -221,7 +221,7 @@ public class RobotStationPluggable extends PipePluggable implements IPipePluggab
     }
 
     @Override
-    public IPipePluggableStaticRenderer getRenderer() {
+    public IPipePluggableStaticRenderer getStaticRenderer() {
         return new RobotStationPluggableRenderer();
     }
 
