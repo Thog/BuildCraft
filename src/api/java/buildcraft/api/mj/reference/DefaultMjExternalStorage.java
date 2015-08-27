@@ -23,8 +23,8 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     public static final IConnectionLimiter DEVICE_TYPE_LIMITER = new IConnectionLimiter() {
         @Override
         public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage from, IMjExternalStorage to, boolean flowingIn) {
-            EnumFacing side = flowingIn ? flow : flow.getOpposite();
-            EnumMjDevice fromDevice = from.getDeviceType(side.getOpposite());
+            EnumFacing side = flowingIn ? flow : (flow == null ? null : flow.getOpposite());
+            EnumMjDevice fromDevice = from.getDeviceType(side == null ? null : side.getOpposite());
             EnumMjDevice toDevice = to.getDeviceType(side);
             return toDevice.acceptsPowerFrom(fromDevice);
         }
@@ -33,8 +33,8 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
     public static final IConnectionLimiter POWER_TYPE_LIMITER = new IConnectionLimiter() {
         @Override
         public boolean allowConnection(World world, EnumFacing flow, IMjExternalStorage from, IMjExternalStorage to, boolean flowingIn) {
-            EnumFacing side = flowingIn ? flow : flow.getOpposite();
-            EnumMjPower fromPower = from.getPowerType(side.getOpposite());
+            EnumFacing side = flowingIn ? flow : (flow == null ? null : flow.getOpposite());
+            EnumMjPower fromPower = from.getPowerType(side == null ? null : side.getOpposite());
             EnumMjPower toPower = to.getPowerType(side);
             return toPower.canConvertFrom(fromPower);
         }
@@ -118,7 +118,7 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
             return storage().insertPower(world, mj, simulate);
         } else {
             double excess = storage().insertPower(world, maxPowerTransfered, simulate);
-            excess += maxPowerTransfered - mj;
+            excess += mj - maxPowerTransfered;
             return excess;
         }
     }
@@ -137,7 +137,8 @@ public class DefaultMjExternalStorage implements IMjExternalStorage {
             maxMj = maxPowerTransfered;
         }
         if (minMj > maxPowerTransfered) {
-            minMj = maxPowerTransfered;
+            // Fail completely, as we cannot satisfy the requirement to take out the minMj
+            return 0;
         }
         return storage().extractPower(world, minMj, maxMj, simulate);
     }

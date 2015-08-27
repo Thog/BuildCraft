@@ -23,10 +23,14 @@ public enum EnumMjPower {
     private final List<EnumMjPower> to;
 
     static {
+        REDSTONE.to.add(REDSTONE);
+
         NORMAL.to.add(REDSTONE);
+        NORMAL.to.add(NORMAL);
         NORMAL.to.add(LASER);
 
         LASER.to.add(NORMAL);
+        LASER.to.add(LASER);
     }
 
     private EnumMjPower() {
@@ -34,7 +38,7 @@ public enum EnumMjPower {
     }
 
     public boolean canConvertTo(EnumMjPower type) {
-        return type == this || to.contains(type);
+        return to.contains(type);
     }
 
     public boolean canConvertFrom(EnumMjPower type) {
