@@ -19,6 +19,7 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
 
     public final ConnectionMatrix pipeConnectionMatrix = new ConnectionMatrix();
     public final ConnectionMatrix pipeConnectionExtensions = new ConnectionMatrix();
+    public final ConnectionMatrix pipeConnectionBanned = new ConnectionMatrix();
     public final TextureMatrix textureMatrix = new TextureMatrix();
     public final WireMatrix wireMatrix = new WireMatrix();
     protected boolean glassColorDirty = false;
@@ -34,6 +35,7 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
         textureMatrix.clean();
         wireMatrix.clean();
         pipeConnectionExtensions.clean();
+        pipeConnectionBanned.clean();
     }
 
     public byte getGlassColor() {
@@ -45,16 +47,25 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
     }
 
     public boolean isDirty() {
-        return dirty || pipeConnectionMatrix.isDirty() || glassColorDirty || textureMatrix.isDirty() || wireMatrix.isDirty();
+        return dirty || pipeConnectionMatrix.isDirty() || pipeConnectionBanned.isDirty() || pipeConnectionExtensions.isDirty() || glassColorDirty
+            || textureMatrix.isDirty() || wireMatrix.isDirty();
     }
 
     public boolean needsRenderUpdate() {
-        return glassColorDirty || pipeConnectionMatrix.isDirty() || textureMatrix.isDirty() || wireMatrix.isDirty();
+        return glassColorDirty || pipeConnectionMatrix.isDirty() || pipeConnectionBanned.isDirty() || pipeConnectionExtensions.isDirty()
+            || textureMatrix.isDirty() || wireMatrix.isDirty();
     }
 
     public void setExtension(EnumFacing direction, float extension) {
-        pipeConnectionExtensions.setConnected(direction, extension != 0);
-        customConnections[direction.ordinal()] = extension;
+        if (extension <= -4 / 16f) {
+            pipeConnectionBanned.setConnected(direction, false);
+            pipeConnectionExtensions.setConnected(direction, false);
+            customConnections[direction.ordinal()] = extension;
+        } else {
+            pipeConnectionBanned.setConnected(direction, true);
+            pipeConnectionExtensions.setConnected(direction, extension != 0);
+            customConnections[direction.ordinal()] = extension;
+        }
     }
 
     @Override
@@ -62,11 +73,12 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
         data.writeByte(glassColor < -1 ? -1 : glassColor);
         pipeConnectionMatrix.writeData(data);
         pipeConnectionExtensions.writeData(data);
+        pipeConnectionBanned.writeData(data);
         textureMatrix.writeData(data);
         wireMatrix.writeData(data);
         for (int i = 0; i < customConnections.length; i++) {
             float f = customConnections[i];
-            if (pipeConnectionExtensions.isConnected(EnumFacing.VALUES[i])) {
+            if (pipeConnectionExtensions.isConnected(EnumFacing.VALUES[i]) && pipeConnectionBanned.isConnected(EnumFacing.VALUES[i])) {
                 data.writeFloat(f);
             }
         }
@@ -81,10 +93,12 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
         }
         pipeConnectionMatrix.readData(data);
         pipeConnectionExtensions.readData(data);
+        pipeConnectionBanned.readData(data);
         textureMatrix.readData(data);
         wireMatrix.readData(data);
         for (int i = 0; i < customConnections.length; i++) {
-            if (pipeConnectionExtensions.isConnected(EnumFacing.VALUES[i])) {
+            EnumFacing face = EnumFacing.VALUES[i];
+            if (pipeConnectionExtensions.isConnected(face) && pipeConnectionBanned.isConnected(face)) {
                 customConnections[i] = data.readFloat();
             } else {
                 customConnections[i] = 0;

@@ -38,7 +38,7 @@ public class PipeFluidsWood extends Pipe<PipeTransportFluids>implements IMjExter
     public int fluidToExtract;
 
     protected int standardIconIndex = PipeIconProvider.TYPE.PipeFluidsWood_Standard.ordinal();
-    protected int solidIconIndex = PipeIconProvider.TYPE.PipeAllWood_Solid.ordinal();
+    protected int solidIconIndex = PipeIconProvider.TYPE.PipeFluidsWood_Solid.ordinal();
 
     private PipeLogicWood logic = new PipeLogicWood(this) {
         @Override

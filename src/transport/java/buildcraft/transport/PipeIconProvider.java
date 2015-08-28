@@ -6,8 +6,6 @@ package buildcraft.transport;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -96,10 +94,13 @@ public class PipeIconProvider implements IIconProvider {
         //
         PipeFluidsCobblestone("pipeFluidsCobblestone"),
         PipeFluidsWood_Standard("pipeFluidsWood_standard"),
+        PipeFluidsWood_Solid("pipeFluidsWood_solid"),
         PipeFluidsEmerald_Standard("pipeFluidsEmerald_standard"),
+        PipeFluidsEmerald_Solid("pipeFluidsEmerald_solid"),
         PipeFluidsQuartz("pipeFluidsQuartz"),
         PipeFluidsGold("pipeFluidsGold"),
         PipeFluidsIron_Standard("pipeFluidsIron_standard"),
+        PipeFluidsIron_Solid("pipeFluidsIron_solid"),
         PipeFluidsSandstone("pipeFluidsSandstone"),
         PipeFluidsStone("pipeFluidsStone"),
         PipeFluidsVoid("pipeFluidsVoid"),
@@ -122,13 +123,8 @@ public class PipeIconProvider implements IIconProvider {
         PipePowerWood_Standard("pipePowerWood_standard"),
         PipePowerEmerald_Standard("pipePowerEmerald_standard"),
         //
-        PipePowerIronM2("pipePowerIronM2"),
-        PipePowerIronM4("pipePowerIronM4"),
-        PipePowerIronM8("pipePowerIronM8"),
-        PipePowerIronM16("pipePowerIronM16"),
-        PipePowerIronM32("pipePowerIronM32"),
-        PipePowerIronM64("pipePowerIronM64"),
-        PipePowerIronM128("pipePowerIronM128"),
+        PipePowerIronSolid("pipePowerIron_solid"),
+        PipePowerIronStandard("pipePowerIron_standard"),
         //
         PipeRobotStation("pipeRobotStation"),
         PipeRobotStationReserved("pipeRobotStationReserved"),
@@ -190,7 +186,7 @@ public class PipeIconProvider implements IIconProvider {
         }
         diamondPipeItems.put(null, TYPE.PipeItemsDiamond_Center);
         diamondPipeFluids.put(null, TYPE.PipeFluidsDiamond_Center);
-        
+
         lapisPipe = Maps.newHashMap();
         dazuliPipe = Maps.newHashMap();
 

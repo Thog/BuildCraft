@@ -7,6 +7,7 @@ package buildcraft.transport;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -14,7 +15,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -50,6 +53,8 @@ import buildcraft.api.gates.IGateExpansion;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.statements.StatementManager;
+import buildcraft.api.transport.ICustomPipeConnection;
+import buildcraft.api.transport.PipeConnectionAPI;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.BCCreativeTab;
@@ -288,9 +293,6 @@ public class BuildCraftTransport extends BuildCraftMod {
             pipePowerStone = buildPipe(PipePowerStone.class, pipeTab, "dustRedstone", pipeItemsStone);
             pipePowerQuartz = buildPipe(PipePowerQuartz.class, pipeTab, "dustRedstone", pipeItemsQuartz);
             pipePowerIron = buildPipe(PipePowerIron.class, pipeTab, "dustRedstone", pipeItemsIron);
-            pipePowerGold = buildPipe(PipePowerGold.class, pipeTab, "dustRedstone", pipeItemsGold);
-            pipePowerDiamond = buildPipe(PipePowerDiamond.class, pipeTab, "dustRedstone", pipeItemsDiamond);
-            pipePowerEmerald = buildPipe(PipePowerEmerald.class, pipeTab, "dustRedstone", pipeItemsEmerald);
             pipePowerSandstone = buildPipe(PipePowerSandstone.class, pipeTab, "dustRedstone", pipeItemsSandstone);
 
             pipeStructureCobblestone = buildPipe(PipeStructureCobblestone.class, pipeTab, Blocks.gravel, pipeItemsCobblestone);
@@ -448,6 +450,18 @@ public class BuildCraftTransport extends BuildCraftMod {
 
         TransportProxy.proxy.registerRenderers();
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new TransportGuiHandler());
+
+        // Make pipes extend to connect to blocks like chests
+        ICustomPipeConnection smallerBlockConnection = new ICustomPipeConnection() {
+            @Override
+            public float getExtension(World world, BlockPos pos, EnumFacing face, IBlockState state) {
+                return face == EnumFacing.UP ? 0 : 2 / 16f;
+            }
+        };
+
+        PipeConnectionAPI.registerConnection(Blocks.chest, smallerBlockConnection);
+        PipeConnectionAPI.registerConnection(Blocks.trapped_chest, smallerBlockConnection);
+        PipeConnectionAPI.registerConnection(Blocks.hopper, smallerBlockConnection);
     }
 
     @Mod.EventHandler

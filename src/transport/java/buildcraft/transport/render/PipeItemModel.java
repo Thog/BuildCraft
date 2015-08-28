@@ -35,7 +35,7 @@ public class PipeItemModel extends BuildCraftBakedModel {
             uvs[U_MAX] = sprite.getInterpolatedU(12);
             uvs[V_MIN] = vertical ? sprite.getInterpolatedV(4) : sprite.getMinV();
             uvs[V_MAX] = vertical ? sprite.getInterpolatedV(12) : sprite.getMaxV();
-            bakeFace(quads, face, center, radius, uvs);
+            bakeDoubleFace(quads, face, center, radius, uvs);
         }
 
         return new PipeItemModel(ImmutableList.copyOf(quads), sprite);

@@ -7,31 +7,36 @@ package buildcraft.transport.pipes;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
+import buildcraft.api.transport.ICustomPipeConnection;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportItems;
+import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.statements.ActionPipeDirection;
 
-public class PipeItemsIron extends Pipe<PipeTransportItems> {
+public class PipeItemsIron extends Pipe<PipeTransportItems>implements ICustomPipeConnection {
 
     private int standardIconIndex = PipeIconProvider.TYPE.PipeItemsIron_Standard.ordinal();
     private int solidIconIndex = PipeIconProvider.TYPE.PipeAllIron_Solid.ordinal();
     private PipeLogicIron logic = new PipeLogicIron(this) {
         @Override
-        protected boolean isValidConnectingTile(TileEntity tile) {
+        protected boolean isValidConnectingTile(TileEntity tile, EnumFacing side) {
             if (tile instanceof IPipeTile) {
                 Pipe<?> otherPipe = (Pipe<?>) ((IPipeTile) tile).getPipe();
                 if (otherPipe instanceof PipeItemsWood) {
@@ -130,5 +135,23 @@ public class PipeItemsIron extends Pipe<PipeTransportItems> {
     @Override
     public boolean canConnectRedstone() {
         return true;
+    }
+
+    @Override
+    public float getExtension(World world, BlockPos pos, EnumFacing face, IBlockState state) {
+        TileEntity tile = world.getTileEntity(pos.offset(face.getOpposite()));
+        if (tile == null) {
+            return 0;
+        }
+        if (tile instanceof TileGenericPipe) {
+            TileGenericPipe genericPipe = (TileGenericPipe) tile;
+            if (genericPipe.pipe instanceof PipeItemsIron) {
+                PipeItemsIron otherPipe = (PipeItemsIron) genericPipe.pipe;
+                if ((otherPipe.logic.getOutputDirection() != face) && (logic.getOutputDirection().getOpposite() != face)) {
+                    return -4 / 16f;
+                }
+            }
+        }
+        return 0;
     }
 }

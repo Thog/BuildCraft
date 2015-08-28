@@ -33,8 +33,6 @@ public final class PipeConnectionBans {
 
         // Power Pipes
         banConnection(PipePowerWood.class);
-        banConnection(PipePowerEmerald.class);
-        banConnection(PipePowerWood.class, PipePowerEmerald.class);
         banConnection(PipePowerStone.class, PipePowerCobblestone.class, PipePowerQuartz.class);
     }
 

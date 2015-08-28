@@ -64,14 +64,14 @@ public abstract class PipeLogicIron {
         }
 
         TileEntity tile = tileBuffer[side.ordinal()].getTile();
-        return isValidOutputTile(tile);
+        return isValidOutputTile(tile, side);
     }
 
-    protected boolean isValidOutputTile(TileEntity tile) {
-        return !(tile instanceof IInventory && ((IInventory) tile).getInventoryStackLimit() == 0) && isValidConnectingTile(tile);
+    protected boolean isValidOutputTile(TileEntity tile, EnumFacing face) {
+        return !(tile instanceof IInventory && ((IInventory) tile).getInventoryStackLimit() == 0) && isValidConnectingTile(tile, face);
     }
 
-    protected abstract boolean isValidConnectingTile(TileEntity tile);
+    protected abstract boolean isValidConnectingTile(TileEntity tile, EnumFacing dir);
 
     public void initialize() {
         lastPower = pipe.container.getWorld().isBlockIndirectlyGettingPowered(pipe.container.getPos()) > 0;

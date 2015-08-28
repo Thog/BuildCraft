@@ -44,7 +44,7 @@ public class PipeItemsDaizuli extends Pipe<PipeTransportItems>implements ISerial
     private int color = EnumColor.BLACK.ordinal();
     private PipeLogicIron logic = new PipeLogicIron(this) {
         @Override
-        protected boolean isValidConnectingTile(TileEntity tile) {
+        protected boolean isValidConnectingTile(TileEntity tile, EnumFacing face) {
             if (tile instanceof IPipeTile) {
                 Pipe<?> otherPipe = (Pipe<?>) ((IPipeTile) tile).getPipe();
                 if (otherPipe instanceof PipeItemsWood) {

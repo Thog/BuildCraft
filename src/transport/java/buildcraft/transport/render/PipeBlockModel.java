@@ -34,8 +34,6 @@ import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.render.tile.PipeRendererWires;
 
 public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockModel {
-    // private static final Map<Integer, Pipe<?>> pipes = Maps.newHashMap();
-
     public PipeBlockModel() {
         super(ImmutableList.<BakedQuad> of(), null, null);
     }
@@ -65,7 +63,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
         Pipe<?> pipe = BlockGenericPipe.PIPE_PIPE.getUnlistedValue(state);
 
         if (core == null || render == null || pluggable == null || pipe == null) {
-            return defaultModel();// Thats not good. Just return a cobblestone structure pipe center model
+            return defaultModel();// Thats not good. Just return a cobblestone structure pipe centre model
         }
 
         List<BakedQuad> quads = Lists.newArrayList();
@@ -87,7 +85,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
             uvs[V_MAX] = sprite.getInterpolatedV(maxUV);
 
             for (EnumFacing face : EnumFacing.VALUES) {
-                if (!render.pipeConnectionMatrix.isConnected(face)) {
+                if (!render.pipeConnectionMatrix.isConnected(face) || !render.pipeConnectionBanned.isConnected(face)) {
                     bakeDoubleFace(quads, face, new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.25f, 0.25f, 0.25f), uvs);
                 }
             }
@@ -95,7 +93,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
 
         // All the connected bits
         for (EnumFacing connect : EnumFacing.VALUES) {
-            if (render.pipeConnectionMatrix.isConnected(connect)) {
+            if (render.pipeConnectionMatrix.isConnected(connect) && render.pipeConnectionBanned.isConnected(connect)) {
                 float extension = render.customConnections[connect.ordinal()];
                 TextureAtlasSprite sprite = pipe.getIconProvider().getIcon(pipe.getIconIndex(connect));
 
@@ -117,9 +115,11 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
 
                 // The extra 0.001 is to stop a bug where the next texture along is used for a pixel of the cuboid
 
-                cuboid.textureStartX = connect.getAxis() == Axis.X ? 0 : 4.001;
-                cuboid.textureStartY = connect.getAxis() == Axis.Y ? 0 : 4.001;
-                cuboid.textureStartZ = connect.getAxis() == Axis.Z ? 0 : 4.001;
+                double start = connect.getAxisDirection() == AxisDirection.POSITIVE ? 12.001 : 0.001;
+
+                cuboid.textureStartX = connect.getAxis() == Axis.X ? start : 4.001;
+                cuboid.textureStartY = connect.getAxis() == Axis.Y ? start : 4.001;
+                cuboid.textureStartZ = connect.getAxis() == Axis.Z ? start : 4.001;
 
                 cuboid.textureSizeX = connect.getAxis() == Axis.X ? 3.998 : 7.998;
                 cuboid.textureSizeY = connect.getAxis() == Axis.Y ? 3.998 : 7.998;
