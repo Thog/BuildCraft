@@ -21,7 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.builders.BuildCraftBuilders;
 import buildcraft.builders.item.ItemConstructionMarker;
 import buildcraft.builders.tile.TileBuilder;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.core.lib.fluids.TankUtils;
 
@@ -76,7 +76,7 @@ public class BlockBuilder extends BlockBuildCraft {
             return true;
         } else {
             if (!world.isRemote) {
-                entityplayer.openGui(BuildCraftBuilders.instance, GuiIds.BUILDER, world, pos.getX(), pos.getY(), pos.getZ());
+                entityplayer.openGui(BuildCraftBuilders.instance, EnumGui.BUILDER.ID, world, pos.getX(), pos.getY(), pos.getZ());
             }
 
             return true;

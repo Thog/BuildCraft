@@ -28,7 +28,7 @@ import buildcraft.api.statements.containers.IRedstoneStatementContainer;
 import buildcraft.api.statements.containers.ISidedStatementContainer;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.PipeWire;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.gui.ContainerGateInterface;
@@ -301,7 +301,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     // GUI
     public void openGui(EntityPlayer player) {
         if (!player.worldObj.isRemote) {
-            player.openGui(BuildCraftTransport.instance, GuiIds.GATES, pipe.container.getWorld(), pipe.container.x(), pipe.container.y(),
+            player.openGui(BuildCraftTransport.instance, EnumGui.GATES.ID, pipe.container.getWorld(), pipe.container.x(), pipe.container.y(),
                     pipe.container.z());
             ((ContainerGateInterface) player.openContainer).setGate(direction.ordinal());
         }

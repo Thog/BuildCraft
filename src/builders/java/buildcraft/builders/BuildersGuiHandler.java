@@ -25,7 +25,7 @@ import buildcraft.builders.tile.TileFiller;
 import buildcraft.builders.urbanism.ContainerUrbanist;
 import buildcraft.builders.urbanism.GuiUrbanist;
 import buildcraft.builders.urbanism.TileUrbanist;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 
 public class BuildersGuiHandler implements IGuiHandler {
 
@@ -38,33 +38,33 @@ public class BuildersGuiHandler implements IGuiHandler {
 
         TileEntity tile = world.getTileEntity(pos);
 
-        switch (id) {
+        switch (EnumGui.from(id)) {
 
-            case GuiIds.ARCHITECT_TABLE:
+            case ARCHITECT_TABLE:
                 if (!(tile instanceof TileArchitect)) {
                     return null;
                 }
                 return new GuiArchitect(player, (TileArchitect) tile);
 
-            case GuiIds.BLUEPRINT_LIBRARY:
+            case BLUEPRINT_LIBRARY:
                 if (!(tile instanceof TileBlueprintLibrary)) {
                     return null;
                 }
                 return new GuiBlueprintLibrary(player, (TileBlueprintLibrary) tile);
 
-            case GuiIds.BUILDER:
+            case BUILDER:
                 if (!(tile instanceof TileBuilder)) {
                     return null;
                 }
                 return new GuiBuilder(player.inventory, (TileBuilder) tile);
 
-            case GuiIds.FILLER:
+            case FILLER:
                 if (!(tile instanceof TileFiller)) {
                     return null;
                 }
                 return new GuiFiller(player.inventory, (TileFiller) tile);
 
-            case GuiIds.URBANIST:
+            case URBANIST:
                 if (!(tile instanceof TileUrbanist)) {
                     return null;
                 }
@@ -84,33 +84,33 @@ public class BuildersGuiHandler implements IGuiHandler {
 
         TileEntity tile = world.getTileEntity(pos);
 
-        switch (id) {
+        switch (EnumGui.from(id)) {
 
-            case GuiIds.ARCHITECT_TABLE:
+            case ARCHITECT_TABLE:
                 if (!(tile instanceof TileArchitect)) {
                     return null;
                 }
                 return new ContainerArchitect(player, (TileArchitect) tile);
 
-            case GuiIds.BLUEPRINT_LIBRARY:
+            case BLUEPRINT_LIBRARY:
                 if (!(tile instanceof TileBlueprintLibrary)) {
                     return null;
                 }
                 return new ContainerBlueprintLibrary(player, (TileBlueprintLibrary) tile);
 
-            case GuiIds.BUILDER:
+            case BUILDER:
                 if (!(tile instanceof TileBuilder)) {
                     return null;
                 }
                 return new ContainerBuilder(player.inventory, (TileBuilder) tile);
 
-            case GuiIds.FILLER:
+            case FILLER:
                 if (!(tile instanceof TileFiller)) {
                     return null;
                 }
                 return new ContainerFiller(player.inventory, (TileFiller) tile);
 
-            case GuiIds.URBANIST:
+            case URBANIST:
                 if (!(tile instanceof TileUrbanist)) {
                     return null;
                 } else {

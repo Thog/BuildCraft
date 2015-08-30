@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.utils.FluidUtils;
 import buildcraft.core.lib.utils.NetworkUtils;
@@ -102,7 +102,7 @@ public class PipeFluidsDiamond extends Pipe<PipeTransportFluids>implements IDiam
         }
 
         if (!container.getWorld().isRemote) {
-            entityplayer.openGui(BuildCraftTransport.instance, GuiIds.PIPE_DIAMOND, container.getWorld(), container.x(), container.y(), container
+            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.PIPE_DIAMOND.ID, container.getWorld(), container.x(), container.y(), container
                     .z());
         }
 

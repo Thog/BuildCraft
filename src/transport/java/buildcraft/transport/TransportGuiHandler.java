@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
 import buildcraft.api.core.BCLog;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.transport.gui.*;
 import buildcraft.transport.pipes.PipeFluidsEmerald;
 import buildcraft.transport.pipes.PipeItemsEmerald;
@@ -46,20 +46,20 @@ public class TransportGuiHandler implements IGuiHandler {
                 return null;
             }
 
-            switch (id) {
-                case GuiIds.PIPE_DIAMOND:
+            switch (EnumGui.from(id)) {
+                case PIPE_DIAMOND:
                     return new ContainerDiamondPipe(player.inventory, (IDiamondPipe) pipe.pipe);
 
-                case GuiIds.PIPE_EMERALD_ITEM:
+                case PIPE_EMERALD_ITEM:
                     return new ContainerEmeraldPipe(player.inventory, (PipeItemsEmerald) pipe.pipe);
 
-                case GuiIds.PIPE_LOGEMERALD_ITEM:
+                case PIPE_EMZULI_ITEM:
                     return new ContainerEmzuliPipe(player.inventory, (PipeItemsEmzuli) pipe.pipe);
 
-                case GuiIds.PIPE_EMERALD_FLUID:
+                case PIPE_EMERALD_FLUID:
                     return new ContainerEmeraldFluidPipe(player.inventory, (PipeFluidsEmerald) pipe.pipe);
 
-                case GuiIds.GATES:
+                case GATES:
                     return new ContainerGateInterface(player.inventory, pipe.pipe);
 
                 default:
@@ -96,20 +96,20 @@ public class TransportGuiHandler implements IGuiHandler {
                 return null;
             }
 
-            switch (id) {
-                case GuiIds.PIPE_DIAMOND:
+            switch (EnumGui.from(id)) {
+                case PIPE_DIAMOND:
                     return new GuiDiamondPipe(player.inventory, (IDiamondPipe) pipe.pipe);
 
-                case GuiIds.PIPE_EMERALD_ITEM:
+                case PIPE_EMERALD_ITEM:
                     return new GuiEmeraldPipe(player.inventory, (PipeItemsEmerald) pipe.pipe);
 
-                case GuiIds.PIPE_LOGEMERALD_ITEM:
+                case PIPE_EMZULI_ITEM:
                     return new GuiEmzuliPipe(player.inventory, (PipeItemsEmzuli) pipe.pipe);
 
-                case GuiIds.PIPE_EMERALD_FLUID:
+                case PIPE_EMERALD_FLUID:
                     return new GuiEmeraldFluidPipe(player.inventory, (PipeFluidsEmerald) pipe.pipe);
 
-                case GuiIds.GATES:
+                case GATES:
                     return new GuiGateInterface(player.inventory, pipe.pipe);
 
                 default:

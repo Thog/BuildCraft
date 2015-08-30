@@ -91,6 +91,7 @@ import buildcraft.core.config.BuildCraftConfiguration;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.crops.CropHandlerPlantable;
 import buildcraft.core.crops.CropHandlerReeds;
+import buildcraft.core.item.ItemGuide;
 import buildcraft.core.item.ItemList;
 import buildcraft.core.item.ItemMapLocation;
 import buildcraft.core.item.ItemPaintbrush;
@@ -136,7 +137,7 @@ public class BuildCraftCore extends BuildCraftMod {
     public static BuildCraftCore instance;
 
     public static final boolean NONRELEASED_BLOCKS = true;
-    public static final boolean TABLET_TESTING = true;
+    public static final boolean TABLET_TESTING = false;
 
     public enum RenderMode {
         Full,
@@ -171,6 +172,7 @@ public class BuildCraftCore extends BuildCraftMod {
     public static ItemPaintbrush paintbrushItem;
     public static ItemList listItem;
     public static ItemTablet tabletItem;
+    public static ItemGuide guideBook;
 
     public static ITriggerExternal triggerMachineActive = new TriggerMachine(true);
     public static ITriggerExternal triggerMachineInactive = new TriggerMachine(false);
@@ -330,6 +332,10 @@ public class BuildCraftCore extends BuildCraftMod {
                     "buildcraft.core.engine.wood");
             CoreProxy.proxy.registerTileEntity(TileEngineWood.class, "buildcraft.core.engine.wood",
                     "net.minecraft.src.buildcraft.energy.TileEngineWood");
+
+            guideBook = new ItemGuide();
+            guideBook.setUnlocalizedName("guideBook");
+            CoreProxy.proxy.registerItem(guideBook);
 
             FMLCommonHandler.instance().bus().register(this);
             MinecraftForge.EVENT_BUS.register(this);
@@ -535,6 +541,8 @@ public class BuildCraftCore extends BuildCraftMod {
 
         CoreProxy.proxy.addCraftingRecipe(new ItemStack(paintbrushItem), " iw", " gi", "s  ", 's', "stickWood", 'g', "gearWood", 'w', new ItemStack(
                 Blocks.wool, 1, 0), 'i', Items.string);
+
+        CoreProxy.proxy.addCraftingRecipe(new ItemStack(guideBook), " G ", "SBS", 'B', Items.book, 'S', Items.stick, 'G', woodenGearItem);
 
         for (int i = 0; i < 16; i++) {
             ItemStack outputStack = paintbrushItem.getItemStack(EnumColor.VALUES[i]);

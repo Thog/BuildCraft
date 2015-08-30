@@ -18,7 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.builders.BuildCraftBuilders;
 import buildcraft.builders.tile.TileFiller;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.builders.patterns.FillerPattern;
 import buildcraft.core.lib.block.BlockBuildCraft;
 
@@ -40,7 +40,7 @@ public class BlockFiller extends BlockBuildCraft {
         }
 
         if (!world.isRemote) {
-            player.openGui(BuildCraftBuilders.instance, GuiIds.FILLER, world, pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(BuildCraftBuilders.instance, EnumGui.FILLER.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
 

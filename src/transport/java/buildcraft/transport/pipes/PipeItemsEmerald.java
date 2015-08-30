@@ -14,7 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.core.ISerializable;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.InventoryWrapper;
 import buildcraft.core.lib.inventory.SimpleInventory;
@@ -86,7 +86,7 @@ public class PipeItemsEmerald extends PipeItemsWood implements ISerializable, IG
         }
 
         if (!container.getWorld().isRemote) {
-            entityplayer.openGui(BuildCraftTransport.instance, GuiIds.PIPE_EMERALD_ITEM, container.getWorld(), container.x(), container.y(), container
+            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.PIPE_EMERALD_ITEM.ID, container.getWorld(), container.x(), container.y(), container
                     .z());
         }
 

@@ -20,7 +20,7 @@ import net.minecraft.util.Vec3;
 import buildcraft.api.enums.EnumColor;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.inventory.StackHelper;
@@ -61,7 +61,7 @@ public class PipeItemsEmzuli extends PipeItemsWood implements IGuiReturnHandler 
         }
 
         if (!container.getWorld().isRemote) {
-            entityplayer.openGui(BuildCraftTransport.instance, GuiIds.PIPE_LOGEMERALD_ITEM, container.getWorld(), container.x(), container.y(),
+            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.PIPE_EMZULI_ITEM.ID, container.getWorld(), container.x(), container.y(),
                     container.z());
         }
 

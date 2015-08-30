@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import buildcraft.builders.BuildCraftBuilders;
 import buildcraft.builders.item.ItemConstructionMarker;
 import buildcraft.builders.tile.TileArchitect;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 
 public class BlockArchitect extends BlockBuildCraft {
@@ -45,7 +45,7 @@ public class BlockArchitect extends BlockBuildCraft {
             return true;
         } else {
             if (!world.isRemote) {
-                entityplayer.openGui(BuildCraftBuilders.instance, GuiIds.ARCHITECT_TABLE, world, pos.getX(), pos.getY(), pos.getZ());
+                entityplayer.openGui(BuildCraftBuilders.instance, EnumGui.ARCHITECT_TABLE.ID, world, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }

@@ -421,87 +421,92 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public void update() {
-        if (!worldObj.isRemote) {
-            if (deletePipe) {
-                worldObj.setBlockToAir(getPos());
+        try {// Defensive code against errors in implementors
+            if (!worldObj.isRemote) {
+                if (deletePipe) {
+                    worldObj.setBlockToAir(getPos());
+                }
+
+                if (pipe == null) {
+                    return;
+                }
+
+                if (!initialized) {
+                    initialize(pipe);
+                }
             }
 
-            if (pipe == null) {
+            if (attachPluggables) {
+                attachPluggables = false;
+                // Attach callback
+                for (int i = 0; i < EnumFacing.VALUES.length; i++) {
+                    if (sideProperties.pluggables[i] != null) {
+                        pipe.eventBus.registerHandler(sideProperties.pluggables[i]);
+                        sideProperties.pluggables[i].onAttachedPipe(this, EnumFacing.getFront(i));
+                    }
+                }
+                notifyBlockChanged();
+            }
+
+            if (!BlockGenericPipe.isValid(pipe)) {
                 return;
             }
 
-            if (!initialized) {
-                initialize(pipe);
-            }
-        }
+            pipe.update();
 
-        if (attachPluggables) {
-            attachPluggables = false;
-            // Attach callback
-            for (int i = 0; i < EnumFacing.VALUES.length; i++) {
-                if (sideProperties.pluggables[i] != null) {
-                    pipe.eventBus.registerHandler(sideProperties.pluggables[i]);
-                    sideProperties.pluggables[i].onAttachedPipe(this, EnumFacing.getFront(i));
+            for (EnumFacing direction : EnumFacing.VALUES) {
+                PipePluggable p = getPipePluggable(direction);
+                if (p != null) {
+                    p.update(this, direction);
                 }
             }
-            notifyBlockChanged();
-        }
 
-        if (!BlockGenericPipe.isValid(pipe)) {
-            return;
-        }
+            if (worldObj.isRemote) {
+                if (resyncGateExpansions) {
+                    syncGateExpansions();
+                }
 
-        pipe.update();
-
-        for (EnumFacing direction : EnumFacing.VALUES) {
-            PipePluggable p = getPipePluggable(direction);
-            if (p != null) {
-                p.update(this, direction);
-            }
-        }
-
-        if (worldObj.isRemote) {
-            if (resyncGateExpansions) {
-                syncGateExpansions();
+                return;
             }
 
-            return;
-        }
+            if (blockNeighborChange) {
+                computeConnections();
+                pipe.onNeighborBlockChange(0);
+                blockNeighborChange = false;
+                refreshRenderState = true;
+            }
 
-        if (blockNeighborChange) {
-            computeConnections();
-            pipe.onNeighborBlockChange(0);
-            blockNeighborChange = false;
-            refreshRenderState = true;
-        }
+            if (refreshRenderState) {
+                if (refreshRenderState()) {
+                    for (EnumFacing face : EnumFacing.values()) {
+                        TileEntity tile = worldObj.getTileEntity(getPos().offset(face));
+                        if (tile != null && tile instanceof TileGenericPipe) {
+                            ((TileGenericPipe) tile).scheduleRenderUpdate();
+                        }
+                    }
+                }
+                refreshRenderState = false;
+            }
 
-        if (refreshRenderState) {
-            if (refreshRenderState()) {
-                for (EnumFacing face : EnumFacing.values()) {
-                    TileEntity tile = worldObj.getTileEntity(getPos().offset(face));
-                    if (tile != null && tile instanceof TileGenericPipe) {
-                        ((TileGenericPipe) tile).scheduleRenderUpdate();
+            if (sendClientUpdate) {
+                sendClientUpdate = false;
+
+                if (worldObj instanceof WorldServer) {
+                    WorldServer world = (WorldServer) worldObj;
+                    Packet updatePacket = getBCDescriptionPacket();
+
+                    for (Object o : world.playerEntities) {
+                        EntityPlayerMP player = (EntityPlayerMP) o;
+
+                        if (world.getPlayerManager().isPlayerWatchingChunk(player, getPos().getX() >> 4, getPos().getX() >> 4)) {
+                            BuildCraftCore.instance.sendToPlayer(player, updatePacket);
+                        }
                     }
                 }
             }
-            refreshRenderState = false;
-        }
-
-        if (sendClientUpdate) {
-            sendClientUpdate = false;
-
-            if (worldObj instanceof WorldServer) {
-                WorldServer world = (WorldServer) worldObj;
-                Packet updatePacket = getBCDescriptionPacket();
-
-                for (Object o : world.playerEntities) {
-                    EntityPlayerMP player = (EntityPlayerMP) o;
-
-                    if (world.getPlayerManager().isPlayerWatchingChunk(player, getPos().getX() >> 4, getPos().getX() >> 4)) {
-                        BuildCraftCore.instance.sendToPlayer(player, updatePacket);
-                    }
-                }
-            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new RuntimeException(t);
         }
     }
 

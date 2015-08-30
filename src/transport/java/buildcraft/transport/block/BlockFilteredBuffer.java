@@ -13,7 +13,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import buildcraft.api.transport.IItemPipe;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.TileFilteredBuffer;
@@ -47,7 +47,7 @@ public class BlockFilteredBuffer extends BlockBuildCraft {
         }
 
         if (!world.isRemote) {
-            entityplayer.openGui(BuildCraftTransport.instance, GuiIds.FILTERED_BUFFER, world, pos.getX(), pos.getY(), pos.getZ());
+            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.FILTERED_BUFFER.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         return true;

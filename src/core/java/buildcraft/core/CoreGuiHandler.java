@@ -10,21 +10,27 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 
 import buildcraft.core.gui.ContainerList;
 import buildcraft.core.gui.GuiList;
+import buildcraft.core.guide.ContainerGuide;
+import buildcraft.core.guide.GuiGuide;
 
 public class CoreGuiHandler implements IGuiHandler {
 
     @Override
     public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-        if (id == GuiIds.LIST) {
+        if (id == EnumGui.LIST.ID) {
             return new GuiList(player);
+        } else if (id == EnumGui.GUIDE.ID) {
+            return new GuiGuide();
         }
         return null;
     }
 
     @Override
     public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-        if (id == GuiIds.LIST) {
+        if (id == EnumGui.LIST.ID) {
             return new ContainerList(player);
+        } else if (id == EnumGui.GUIDE.ID) {
+            return new ContainerGuide(player);
         }
         return null;
     }

@@ -23,7 +23,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import buildcraft.api.items.IList;
 import buildcraft.core.BuildCraftCore;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.inventory.StackHelper;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.ModelHelper;
@@ -213,7 +213,7 @@ public class ItemList extends ItemBuildCraft implements IList {
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
         if (!world.isRemote) {
-            player.openGui(BuildCraftCore.instance, GuiIds.LIST, world, 0, 0, 0);
+            player.openGui(BuildCraftCore.instance, EnumGui.LIST.ID, world, 0, 0, 0);
         }
 
         return stack;

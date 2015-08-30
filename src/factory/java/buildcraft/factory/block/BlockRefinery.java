@@ -20,7 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.core.BCCreativeTab;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.core.lib.fluids.TankUtils;
 import buildcraft.factory.BuildCraftFactory;
@@ -82,7 +82,7 @@ public class BlockRefinery extends BlockBuildCraft {
         }
 
         if (!world.isRemote) {
-            player.openGui(BuildCraftFactory.instance, GuiIds.REFINERY, world, pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(BuildCraftFactory.instance, EnumGui.REFINERY.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         return true;

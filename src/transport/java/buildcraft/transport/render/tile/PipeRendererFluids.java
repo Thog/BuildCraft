@@ -33,9 +33,11 @@ public class PipeRendererFluids {
     public static final int DISPLAY_STAGES = 100;
 
     /** Map of FluidID -> Fluid Render Call Lists */
+    @Deprecated
     private static Map<Integer, DisplayFluidList> fluidLists = Maps.newHashMap();
 
     /** While this class isn't actually completely Immutable, you shouldn't modify any instances after creation */
+    @Deprecated
     static class DisplayFluidList {
         /** A list of the OpenGL call lists for all of the centre faces. Array positions are accessed like this:
          * <p>
@@ -109,7 +111,7 @@ public class PipeRendererFluids {
 
             for (EnumFacing connection : EnumFacing.VALUES) {
                 boolean connected = renderData.amount[connection.ordinal()] > 0;
-                if (connection.getAxis() != Axis.Y && connected) {
+                if (connection != EnumFacing.UP && connected) {
                     sides = true;
                 }
                 if (connected) {// Render the outer connection
@@ -147,6 +149,10 @@ public class PipeRendererFluids {
         GL11.glPopAttrib();
         GL11.glPopMatrix();
 
+    }
+    
+    private static void renderSideFluid() {
+        
     }
 
     private static DisplayFluidList getDisplayFluidList(int fluidID) {

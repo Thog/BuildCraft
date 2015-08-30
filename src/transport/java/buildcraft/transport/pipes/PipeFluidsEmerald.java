@@ -14,7 +14,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import buildcraft.api.core.ISerializable;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.utils.FluidUtils;
 import buildcraft.core.lib.utils.NetworkUtils;
@@ -73,7 +73,7 @@ public class PipeFluidsEmerald extends PipeFluidsWood implements ISerializable {
         }
 
         if (!container.getWorld().isRemote) {
-            entityplayer.openGui(BuildCraftTransport.instance, GuiIds.PIPE_EMERALD_FLUID, container.getWorld(), container.x(), container.y(),
+            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.PIPE_EMERALD_FLUID.ID, container.getWorld(), container.x(), container.y(),
                     container.z());
         }
 

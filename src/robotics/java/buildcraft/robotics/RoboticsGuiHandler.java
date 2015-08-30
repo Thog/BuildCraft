@@ -10,7 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.robotics.gui.ContainerRequester;
 import buildcraft.robotics.gui.ContainerZonePlan;
 import buildcraft.robotics.gui.GuiRequester;
@@ -28,14 +28,14 @@ public class RoboticsGuiHandler implements IGuiHandler {
 
         TileEntity tile = world.getTileEntity(pos);
 
-        switch (id) {
-            case GuiIds.MAP:
+        switch (EnumGui.from(id)) {
+            case MAP:
                 if (!(tile instanceof TileZonePlan)) {
                     return null;
                 }
                 return new GuiZonePlan(player.inventory, (TileZonePlan) tile);
 
-            case GuiIds.REQUESTER:
+            case REQUESTER:
                 if (!(tile instanceof TileRequester)) {
                     return null;
                 }
@@ -56,15 +56,15 @@ public class RoboticsGuiHandler implements IGuiHandler {
 
         TileEntity tile = world.getTileEntity(pos);
 
-        switch (id) {
-            case GuiIds.MAP:
+        switch (EnumGui.from(id)) {
+            case MAP:
                 if (!(tile instanceof TileZonePlan)) {
                     return null;
                 } else {
                     return new ContainerZonePlan(player.inventory, (TileZonePlan) tile);
                 }
 
-            case GuiIds.REQUESTER:
+            case REQUESTER:
                 if (!(tile instanceof TileRequester)) {
                     return null;
                 } else {

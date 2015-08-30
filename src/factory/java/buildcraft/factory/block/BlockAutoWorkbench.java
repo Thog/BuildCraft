@@ -13,7 +13,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import buildcraft.api.transport.IItemPipe;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.factory.BuildCraftFactory;
 import buildcraft.factory.tile.TileAutoWorkbench;
@@ -42,7 +42,7 @@ public class BlockAutoWorkbench extends BlockBuildCraft {
         }
 
         if (!world.isRemote) {
-            entityplayer.openGui(BuildCraftFactory.instance, GuiIds.AUTO_CRAFTING_TABLE, world, pos.getX(), pos.getY(), pos.getZ());
+            entityplayer.openGui(BuildCraftFactory.instance, EnumGui.AUTO_CRAFTING_TABLE.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         return true;

@@ -8,11 +8,11 @@ import java.util.BitSet;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import buildcraft.core.lib.network.PacketCoordinates;
 import buildcraft.core.lib.utils.BitSetUtils;
+import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.core.network.PacketIds;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.PipeTransportFluids;
@@ -24,6 +24,8 @@ import io.netty.buffer.ByteBuf;
 public class PacketFluidUpdate extends PacketCoordinates {
     public FluidRenderData renderCache = new FluidRenderData();
     public BitSet delta;
+    /** indicies 0-5 are for the connections, indicies 6-8 are for the centre bit's 3 axis */
+    public byte[] flow;
 
     public PacketFluidUpdate(BlockPos pos) {
         super(PacketIds.PIPE_LIQUID, pos);
@@ -40,10 +42,14 @@ public class PacketFluidUpdate extends PacketCoordinates {
     public void readData(ByteBuf data) {
         super.readData(data);
 
+        flow = NetworkUtils.readByteArray(data);
+
         World world = CoreProxy.proxy.getClientWorld();
         if (world.isAirBlock(pos)) {
             return;
         }
+
+        // TODO: Cache this somehow to be used properly on the world thread!
 
         TileEntity entity = world.getTileEntity(pos);
         if (!(entity instanceof TileGenericPipe)) {
@@ -60,6 +66,8 @@ public class PacketFluidUpdate extends PacketCoordinates {
         }
 
         PipeTransportFluids transLiq = (PipeTransportFluids) pipe.pipe.transport;
+
+        transLiq.displayFlow = flow;
 
         renderCache = transLiq.renderCache;
 
@@ -84,6 +92,8 @@ public class PacketFluidUpdate extends PacketCoordinates {
     @Override
     public void writeData(ByteBuf data) {
         super.writeData(data);
+
+        NetworkUtils.writeByteArray(data, flow);
 
         byte[] dBytes = BitSetUtils.toByteArray(delta, 1);
         // System.out.printf("write %d, %d, %d = %s, %s%n", posX, posY, posZ, Arrays.toString(dBytes), delta);

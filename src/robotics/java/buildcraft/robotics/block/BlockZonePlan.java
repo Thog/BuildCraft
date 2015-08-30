@@ -14,7 +14,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.map.MapWorld;
@@ -38,7 +38,7 @@ public class BlockZonePlan extends BlockBuildCraft {
         }
 
         if (!world.isRemote) {
-            entityplayer.openGui(BuildCraftRobotics.instance, GuiIds.MAP, world, pos.getX(), pos.getY(), pos.getZ());
+            entityplayer.openGui(BuildCraftRobotics.instance, EnumGui.MAP.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         return true;

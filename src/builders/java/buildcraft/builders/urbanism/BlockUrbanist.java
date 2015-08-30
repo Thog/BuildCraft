@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import buildcraft.api.events.BlockInteractionEvent;
 import buildcraft.builders.BuildCraftBuilders;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 
 public class BlockUrbanist extends BlockBuildCraft {
@@ -33,7 +33,7 @@ public class BlockUrbanist extends BlockBuildCraft {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer entityplayer, EnumFacing side, float par7, float par8,
             float par9) {
         if (!world.isRemote) {
-            entityplayer.openGui(BuildCraftBuilders.instance, GuiIds.URBANIST, world, pos.getX(), pos.getY(), pos.getZ());
+            entityplayer.openGui(BuildCraftBuilders.instance, EnumGui.URBANIST.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         BlockInteractionEvent event = new BlockInteractionEvent(entityplayer, state);

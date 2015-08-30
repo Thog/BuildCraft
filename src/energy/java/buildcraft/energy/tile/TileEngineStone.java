@@ -13,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.engines.TileEngineWithInventory;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.utils.MathUtils;
@@ -53,7 +53,7 @@ public class TileEngineStone extends TileEngineWithInventory {
             return true;
         }
         if (!worldObj.isRemote) {
-            player.openGui(BuildCraftEnergy.instance, GuiIds.ENGINE_STONE, worldObj, pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(BuildCraftEnergy.instance, EnumGui.ENGINE_STONE.ID, worldObj, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
     }

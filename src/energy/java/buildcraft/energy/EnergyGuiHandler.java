@@ -10,7 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.engines.TileEngineWithInventory;
 import buildcraft.energy.gui.ContainerEngine;
 import buildcraft.energy.gui.GuiCombustionEngine;
@@ -35,12 +35,12 @@ public class EnergyGuiHandler implements IGuiHandler {
 
         TileEngineWithInventory engine = (TileEngineWithInventory) tile;
 
-        switch (id) {
+        switch (EnumGui.from(id)) {
 
-            case GuiIds.ENGINE_IRON:
+            case ENGINE_IRON:
                 return new GuiCombustionEngine(player.inventory, (TileEngineIron) engine);
 
-            case GuiIds.ENGINE_STONE:
+            case ENGINE_STONE:
                 return new GuiStoneEngine(player.inventory, (TileEngineStone) engine);
 
             default:
@@ -63,12 +63,12 @@ public class EnergyGuiHandler implements IGuiHandler {
 
         TileEngineWithInventory engine = (TileEngineWithInventory) tile;
 
-        switch (id) {
+        switch (EnumGui.from(id)) {
 
-            case GuiIds.ENGINE_IRON:
+            case ENGINE_IRON:
                 return new ContainerEngine(player.inventory, engine);
 
-            case GuiIds.ENGINE_STONE:
+            case ENGINE_STONE:
                 return new ContainerEngine(player.inventory, engine);
 
             default:

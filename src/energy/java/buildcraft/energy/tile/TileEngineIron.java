@@ -25,7 +25,7 @@ import buildcraft.api.fuels.ICoolant;
 import buildcraft.api.fuels.IFuel;
 import buildcraft.api.fuels.ISolidCoolant;
 import buildcraft.api.transport.IItemPipe;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.engines.TileEngineWithInventory;
 import buildcraft.core.lib.fluids.Tank;
 import buildcraft.core.lib.fluids.TankManager;
@@ -96,7 +96,7 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
             }
         }
         if (!worldObj.isRemote) {
-            player.openGui(BuildCraftEnergy.instance, GuiIds.ENGINE_IRON, worldObj, pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(BuildCraftEnergy.instance, EnumGui.ENGINE_IRON.ID, worldObj, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
     }

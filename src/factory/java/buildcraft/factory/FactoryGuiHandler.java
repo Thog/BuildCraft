@@ -10,7 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.factory.gui.ContainerAutoWorkbench;
 import buildcraft.factory.gui.ContainerChute;
 import buildcraft.factory.gui.ContainerRefinery;
@@ -34,23 +34,23 @@ public class FactoryGuiHandler implements IGuiHandler {
 
         TileEntity tile = world.getTileEntity(pos);
 
-        switch (id) {
+        switch (EnumGui.from(id)) {
 
-            case GuiIds.AUTO_CRAFTING_TABLE:
+            case AUTO_CRAFTING_TABLE:
                 if (!(tile instanceof TileAutoWorkbench)) {
                     return null;
                 } else {
                     return new GuiAutoCrafting(player.inventory, world, (TileAutoWorkbench) tile);
                 }
 
-            case GuiIds.REFINERY:
+            case REFINERY:
                 if (!(tile instanceof TileRefinery)) {
                     return null;
                 } else {
                     return new GuiRefinery(player.inventory, (TileRefinery) tile);
                 }
 
-            case GuiIds.HOPPER:
+            case CHUTE:
                 if (!(tile instanceof TileChute)) {
                     return null;
                 } else {
@@ -73,23 +73,23 @@ public class FactoryGuiHandler implements IGuiHandler {
 
         TileEntity tile = world.getTileEntity(pos);
 
-        switch (id) {
+        switch (EnumGui.from(id)) {
 
-            case GuiIds.AUTO_CRAFTING_TABLE:
+            case AUTO_CRAFTING_TABLE:
                 if (!(tile instanceof TileAutoWorkbench)) {
                     return null;
                 } else {
                     return new ContainerAutoWorkbench(player.inventory, (TileAutoWorkbench) tile);
                 }
 
-            case GuiIds.REFINERY:
+            case REFINERY:
                 if (!(tile instanceof TileRefinery)) {
                     return null;
                 } else {
                     return new ContainerRefinery(player.inventory, (TileRefinery) tile);
                 }
 
-            case GuiIds.HOPPER:
+            case CHUTE:
                 if (!(tile instanceof TileChute)) {
                     return null;
                 } else {

@@ -12,7 +12,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.tile.TileRequester;
@@ -35,7 +35,7 @@ public class BlockRequester extends BlockBuildCraft {
         }
 
         if (!world.isRemote) {
-            entityplayer.openGui(BuildCraftRobotics.instance, GuiIds.REQUESTER, world, pos.getX(), pos.getY(), pos.getZ());
+            entityplayer.openGui(BuildCraftRobotics.instance, EnumGui.REQUESTER.ID, world, pos.getX(), pos.getY(), pos.getZ());
         }
 
         return true;

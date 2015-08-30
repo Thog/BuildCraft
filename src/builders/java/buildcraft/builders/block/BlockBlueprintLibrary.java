@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import buildcraft.builders.BuildCraftBuilders;
 import buildcraft.builders.tile.TileBlueprintLibrary;
 import buildcraft.core.BCCreativeTab;
-import buildcraft.core.GuiIds;
+import buildcraft.core.EnumGui;
 import buildcraft.core.lib.block.BlockBuildCraft;
 
 public class BlockBlueprintLibrary extends BlockBuildCraft {
@@ -37,7 +37,7 @@ public class BlockBlueprintLibrary extends BlockBuildCraft {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileBlueprintLibrary) {
             if (!world.isRemote) {
-                entityplayer.openGui(BuildCraftBuilders.instance, GuiIds.BLUEPRINT_LIBRARY, world, pos.getX(), pos.getY(), pos.getZ());
+                entityplayer.openGui(BuildCraftBuilders.instance, EnumGui.BLUEPRINT_LIBRARY.ID, world, pos.getX(), pos.getY(), pos.getZ());
             }
         }
 

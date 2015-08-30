@@ -24,6 +24,7 @@ import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
+import buildcraft.core.lib.utils.Average;
 import buildcraft.core.lib.utils.MathUtils;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketFluidUpdate;
@@ -45,6 +46,15 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
     private static int NETWORK_SYNC_TICKS = BuildCraftCore.updateFactor / 2;
     private static final EnumFacing[] directions = EnumFacing.VALUES;
     private static final int[] orientations = new int[] { 0, 1, 2, 3, 4, 5, 6 };
+
+    private Average[] averageFlow = new Average[9];
+    private Average[] averageFluid = new Average[7];
+
+    /** Used by the client for displaying fluid flow */
+    public byte[] displayFlow = new byte[9];
+
+    /** Used at the client to show flow properly */
+    public double[] clientDisplayFlow = new double[9];
 
     public class PipeSection {
         public int amount;
@@ -156,6 +166,12 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
             sections[direction.ordinal()] = new PipeSection();
             transferState[direction.ordinal()] = TransferState.None;
         }
+        for (int i = 0; i < 9; i++) {
+            averageFlow[i] = new Average(40);
+        }
+        for (int i = 0; i < 7; i++) {
+            averageFluid[i] = new Average(40);
+        }
         sections[6] = new PipeSection();
     }
 
@@ -215,6 +231,13 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
             return;
         }
 
+        for (Average avg : averageFlow) {
+            avg.tick();
+        }
+        for (int i = 0; i < averageFluid.length; i++) {
+            averageFluid[i].tick(sections[i].amount);
+        }
+
         if (fluidType != null) {
             moveFluids();
         }
@@ -259,6 +282,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
                     if (liquidToPush.amount > 0) {
                         int filled = ((IFluidHandler) target).fill(o.getOpposite(), liquidToPush, true);
                         section.drain(filled, true);
+                        averageFlow[o.ordinal()].push(filled);
                         pushed = true;
                         if (filled <= 0) {
                             outputTTL[o.ordinal()]--;
@@ -315,6 +339,8 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
                 if (amountToPush > 0) {
                     int filled = sections[direction.ordinal()].fill(amountToPush, true);
                     sections[6].drain(filled, true);
+                    averageFlow[direction.ordinal()].push(-filled);
+                    averageFlow[6 + direction.getAxis().ordinal()].push(filled * direction.getAxisDirection().getOffset());
                 }
             }
         }
@@ -346,6 +372,8 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
                 if (amountToPush > 0) {
                     int filled = sections[6].fill(amountToPush, true);
                     sections[dir.ordinal()].drain(filled, true);
+                    averageFlow[dir.ordinal()].push(filled);
+                    averageFlow[6 + dir.getAxis().ordinal()].push(-filled * dir.getAxisDirection().getOffset());
                 }
             }
         }
@@ -436,6 +464,21 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
             }
         }
 
+        for (int i = 0; i < 9; i++) {
+            double displayFlow = averageFlow[i].getAverage();
+            int top = Math.min(6, i);
+            double displayFluid = averageFluid[top].getAverage();
+            double diff = displayFlow / displayFluid;
+            if (diff < -1) {
+                diff = -1;
+            }
+            if (diff > 1) {
+                diff = 1;
+            }
+            this.displayFlow[i] = (byte) (64 * diff);
+            changed = true;
+        }
+
         if (persistChange) {
             this.renderCache = renderCacheCopy;
         }
@@ -444,6 +487,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
             PacketFluidUpdate packet = new PacketFluidUpdate(container.getPos(), initPacket);
             packet.renderCache = renderCacheCopy;
             packet.delta = delta;
+            packet.flow = displayFlow;
             return packet;
         }
 
