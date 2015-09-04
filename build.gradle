@@ -4,7 +4,6 @@ import net.minecraftforge.gradle.patcher.TaskReobfuscate
 import net.minecraftforge.gradle.util.delayed.DelayedFile
 import net.minecraftforge.gradle.util.delayed.DelayedString
 
-
 // THIS buildscript is needed to depend on the snapshot versions (from here...
 buildscript {
     repositories {

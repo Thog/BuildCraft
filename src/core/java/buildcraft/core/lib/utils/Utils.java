@@ -25,6 +25,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3i;
 import net.minecraft.world.IBlockAccess;
@@ -334,6 +335,14 @@ public final class Utils {
             return null;
         }
         return obj.toString();
+    }
+
+    public static String getModSpecificNameForBlock(Block block) {
+        Object obj = Block.blockRegistry.getNameForObject(block);
+        if (obj == null) {
+            return null;
+        }
+        return ((ResourceLocation) obj).getResourcePath();
     }
 
     /** Checks between a min and max all the chunks inbetween actually exist. Args: world, minX, minY, minZ, maxX, maxY,

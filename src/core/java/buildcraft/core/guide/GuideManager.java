@@ -6,26 +6,32 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
+import buildcraft.api.core.BCLog;
+import buildcraft.core.lib.utils.Utils;
+
 public class GuideManager {
     static final Map<ModContainer, GuideManager> managers = Maps.newHashMap();
 
     /** A cache of what has been loaded so far by this guide. */
-    private final Map<ResourceLocation, GuidePart> guideMap = Maps.newHashMap();
+    private final Map<ResourceLocation, GuidePartFactory<?>> guideMap = Maps.newHashMap();
     /** All of the guide pages that have been registered to appear in this guide manager */
-    private final Map<ResourceLocation, GuidePage> registeredLocations = Maps.newHashMap();
+    final Map<ResourceLocation, GuidePartFactory<GuidePage>> registeredPages = Maps.newHashMap();
     /** Base locations for generic chapters */
-    private final String locationBase, locationBlock, locationItem, locationMechanic;
+    private final String locationBase, locationBlock, locationItem, locationEntity, locationMechanic;
 
     public GuideManager(String assetBase) {
         locationBase = assetBase + ":guide/";
         locationBlock = locationBase + "block/";
         locationItem = locationBase + "item/";
+        locationEntity = locationBase + "entity/";
         locationMechanic = locationBase + "mechanic/";
     }
 
@@ -43,30 +49,92 @@ public class GuideManager {
         managers.put(container, manager);
     }
 
-    public void registerCustomPage(ResourceLocation location, GuidePage page) {
-        registeredLocations.put(location, page);
+    // Page Registration
+
+    public void registerCustomPage(ResourceLocation location, GuidePartFactory<GuidePage> page) {
+        registeredPages.put(location, page);
         guideMap.put(location, page);
     }
 
     public void registerPage(ResourceLocation location) {
-        registerCustomPage(location, getPage(location.toString()));
+        registerCustomPage(location, (GuidePartFactory<GuidePage>) getPartFactory(location));
     }
 
-    private GuidePart getPart(ResourceLocation location) {
+    // Registration
+
+    public void registerBlock(Block block) {
+        registerPage(new ResourceLocation(locationBlock + Utils.getModSpecificNameForBlock(block) + ".md"));
+    }
+
+    /** Automatically registers all blocks that the calling mod has registered. Use {@link #unregisterBlock(Block)} to
+     * remove specific blocks you don't want added to the guide. */
+    public void registerAllBlocks() {
+        ModContainer container = Loader.instance().activeModContainer();
+        if (container == null) {
+            // This is a definite coding error, so crash in the dev environment rather than putting up a warning
+            throw new IllegalStateException("Was called outside the scope of an active mod! This is not how this is meant to be used!");
+        }
+        String prefix = container.getModId();
+        for (Object key : Block.blockRegistry.getKeys()) {
+            if (key instanceof ResourceLocation) {
+                ResourceLocation location = (ResourceLocation) key;
+                String domain = location.getResourceDomain();
+                if (domain.equalsIgnoreCase(prefix)) {
+                    registerBlock((Block) Block.blockRegistry.getObject(key));
+                    BCLog.logger.info("Automatically added " + location + " as a block for " + prefix);
+                } else {
+                    // BCLog.logger.info("Skiped " + location + " as it was not a block for " + prefix);
+                }
+            } else {
+                BCLog.logger.info("Found a different key! (" + key.getClass() + ")");
+            }
+        }
+    }
+
+    // Unregistering
+
+    public void unregister(ResourceLocation location) {
+        registeredPages.remove(location);
+        guideMap.remove(location);
+    }
+
+    public void unregisterBlock(Block block) {
+        unregister(new ResourceLocation(locationBlock + Utils.getModSpecificNameForBlock(block)));
+    }
+
+    public void unregisterItem(Item item) {
+        unregister(new ResourceLocation(locationItem + Utils.getNameForItem(item)));
+    }
+
+    public void unregisterEntity(Entity entity) {
+        unregister(new ResourceLocation(locationEntity + EntityList.getEntityString(entity)));
+    }
+
+    public void unregisterMechanic(String mechanic) {
+        unregister(new ResourceLocation(locationEntity + mechanic));
+    }
+
+    // Part getters
+
+    GuidePartFactory<?> getPartFactory(ResourceLocation location) {
         if (guideMap.containsKey(location)) {
             return guideMap.get(location);
         }
-        GuidePart part = null;
+        GuidePartFactory<?> part = null;
         if (location.getResourcePath().endsWith("md")) {// Wiki info page (Markdown)
-            part = MarkdownLoader.loadMarkdown(location);
+            part = MarkdownLoader.loadMarkdown(location, this); 
         } else if (location.getResourcePath().endsWith("png")) { // Image
             part = ImageLoader.loadImage(location);
         } else {
             throw new IllegalArgumentException("Recieved an unknown filetype! " + location);
         }
-        System.out.println("Getting " + location + " for the first time...");
+        BCLog.logger.info("Getting " + location + " for the first time...");
         guideMap.put(location, part);
         return part;
+    }
+
+    private GuidePart getPart(ResourceLocation location) {
+        return getPartFactory(location).createNew();
     }
 
     private GuidePage getPage(String locationBase) {
@@ -74,11 +142,15 @@ public class GuideManager {
     }
 
     public GuidePage getItemPage(Item item) {
-        return getPage(locationItem + item.getUnlocalizedName());
+        return getPage(locationItem + Utils.getNameForItem(item));
     }
 
     public GuidePage getBlockPage(Block block) {
-        return getPage(locationBlock + block.getUnlocalizedName());
+        return getPage(locationBlock + Utils.getNameForBlock(block));
+    }
+
+    public GuidePage getEntityPage(Entity entity) {
+        return getPage(locationEntity + EntityList.getEntityString(entity));
     }
 
     public GuidePage getMechanicPage(String mechanic) {

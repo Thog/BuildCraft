@@ -91,6 +91,7 @@ import buildcraft.core.config.BuildCraftConfiguration;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.crops.CropHandlerPlantable;
 import buildcraft.core.crops.CropHandlerReeds;
+import buildcraft.core.guide.GuideManager;
 import buildcraft.core.item.ItemGuide;
 import buildcraft.core.item.ItemList;
 import buildcraft.core.item.ItemMapLocation;
@@ -411,6 +412,12 @@ public class BuildCraftCore extends BuildCraftMod {
         MinecraftForge.EVENT_BUS.register(TabletManagerServer.INSTANCE);
 
         TabletAPI.registerProgram(new TabletProgramMenuFactory());
+
+        // Guide book setup
+        GuideManager coreGuideManager = new GuideManager("buildcraftcore");
+        GuideManager.registerManager(coreGuideManager);
+        coreGuideManager.registerAllBlocks();
+        // coreGuideManager.registerAllItems();
     }
 
     @Mod.EventHandler

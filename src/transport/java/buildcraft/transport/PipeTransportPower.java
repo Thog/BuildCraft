@@ -4,18 +4,27 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport;
 
+import java.util.EnumMap;
 import java.util.List;
+
+import com.google.common.collect.Maps;
+
+import org.apache.commons.lang3.mutable.MutableDouble;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.mj.EnumMjDevice;
 import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
+import buildcraft.api.mj.IMjInternalStorage;
+import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.DefaultProps;
@@ -23,8 +32,22 @@ import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketPowerUpdate;
 import buildcraft.transport.pipes.PipePowerWood;
 
-public class PipeTransportPower extends PipeTransport implements IDebuggable {
+public class PipeTransportPower extends PipeTransport implements IDebuggable, IMjExternalStorage {
     public static final byte POWER_STAGES = 32;
+
+    public static final double MAX_POWER = 1024;
+    public static final double ACTIVATION = 0.1;
+    public static final long LOSS_DELAY = 10;
+    public static final double LOSS_RATE = 8;
+    /** Should be half of {@link #MAX_POWER} */
+    public static final double MAX_TRANSFER = 512;
+    public static final double MIN_TRANSFER = 1;
+
+    protected EnumMap<EnumFacing, DefaultMjInternalStorage> pipePartMap = Maps.newEnumMap(EnumFacing.class);
+    /** This is used to move power around */
+    protected EnumMap<EnumFacing, MutableDouble> powerLastTickMap = Maps.newEnumMap(EnumFacing.class);
+    /** This is cached inside the */
+    protected EnumMap<EnumFacing, MutableDouble> powerThisTickMap = Maps.newEnumMap(EnumFacing.class);
 
     /** Used by the client for displaying power */
     public byte[] displayPower = new byte[6];
@@ -96,6 +119,8 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
             packet.power = displayPower;
             BuildCraftTransport.instance.sendToPlayers(packet, container.getWorld(), container.getPos(), DefaultProps.PIPE_CONTENTS_RENDER_DIST);
         }
+
+        // Change this tick to last tick
     }
 
     @Override
@@ -112,5 +137,70 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable {
             left.add("   - flowing " + (flow < 0 ? "in by " + -flow : (flow > 0 ? "out by " + flow : "nowhere")));
             left.add("   - shown flow = " + clientDisplayFlow[ord]);
         }
+    }
+
+    @Override
+    public EnumMjDevice getDeviceType(EnumFacing side) {
+        return EnumMjDevice.TRANSPORT;
+    }
+
+    @Override
+    public EnumMjPower getPowerType(EnumFacing side) {
+        return EnumMjPower.NORMAL;
+    }
+
+    @Override
+    public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
+        return 0;// You cannot extract power (directly) from pipes. Neither can pipes.
+    }
+
+    @Override
+    public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
+        if (!(from instanceof Pipe<?>)) {
+            BCLog.logger.info(from.getClass());
+            return mj;// You cannot insert power (directly) to pipes -wooden pipes implement this separately for
+                      // redstone engines
+        }
+        EnumFacing pipePart = flowDirection.getOpposite();
+        DefaultMjInternalStorage storage = pipePartMap.get(pipePart);
+        double excess = storage.insertPower(world, mj, simulate);
+        double actual = mj - excess;
+        powerThisTickMap.get(pipePart).add(actual);
+        return excess;
+    }
+
+    @Override
+    public double getSuction(World world, EnumFacing flowDirection) {
+        if (flowDirection == null) {
+            // Get the suction of all the pipe parts
+            double suction = 0;
+            for (EnumFacing face : EnumFacing.values()) {
+                suction += getSuction(world, face);
+            }
+            return suction / 6d;
+        }
+        IMjInternalStorage storage = pipePartMap.get(flowDirection.getOpposite());
+        return storage.getSuction();
+    }
+
+    @Override
+    public void setInternalStorage(IMjInternalStorage storage) {
+        // NO-OP (Its handled seperately)
+    }
+
+    @Override
+    public double currentPower(EnumFacing side) {
+        if (side == null) {
+            return 0;
+        }
+        return pipePartMap.get(side).currentPower();
+    }
+
+    @Override
+    public double maxPower(EnumFacing side) {
+        if (side == null) {
+            return MAX_POWER;
+        }
+        return pipePartMap.get(side).maxPower();
     }
 }

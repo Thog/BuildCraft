@@ -36,7 +36,6 @@ public class BlockTank extends BlockBuildCraft implements ICustomPipeConnection 
 
     public BlockTank() {
         super(Material.glass, JOINED_BELOW);
-        setBlockBounds(0.125F, 0F, 0.125F, 0.875F, 1F, 0.875F);
         setHardness(0.5F);
         setCreativeTab(BCCreativeTab.get("main"));
     }
@@ -198,7 +197,7 @@ public class BlockTank extends BlockBuildCraft implements ICustomPipeConnection 
 
         return false;
     }
-
+    
     @Override
     public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
         if (side.getAxis() == EnumFacing.Axis.Y) {
@@ -244,7 +243,7 @@ public class BlockTank extends BlockBuildCraft implements ICustomPipeConnection 
 
     @Override
     public AxisAlignedBB getBox(IBlockAccess world, BlockPos pos, IBlockState state) {
-        return new AxisAlignedBB(0.1, 0, 0.1, 0.9, 1, 0.9);
+        return new AxisAlignedBB(2 / 16f, 0F, 2 / 16f, 14 / 16f, 1F, 14 / 16f);
     }
 
     @Override

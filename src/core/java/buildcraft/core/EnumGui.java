@@ -14,7 +14,10 @@ public enum EnumGui {
     REQUESTER,
     LIST,
     TABLET,
+    /** The actual guide book itself. Only exists on the client side. */
     GUIDE,
+    /** A way to add update books to the main guide book */
+    GUIDE_CHANGELOG,
     ENGINE_IRON,
     ENGINE_STONE,
     AUTO_CRAFTING_TABLE,

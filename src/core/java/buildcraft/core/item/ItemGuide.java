@@ -11,10 +11,11 @@ import buildcraft.core.lib.items.ItemBuildCraft;
 public class ItemGuide extends ItemBuildCraft {
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (!world.isRemote) {
-            return stack;
+        if (player.isSneaking()) {
+            player.openGui(BuildCraftCore.instance, EnumGui.GUIDE_CHANGELOG.ID, world, 0, 0, 0);
+        } else if (world.isRemote) {
+            player.openGui(BuildCraftCore.instance, EnumGui.GUIDE.ID, world, 0, 0, 0);
         }
-        player.openGui(BuildCraftCore.instance, EnumGui.GUIDE.ID, world, 0, 0, 0);
         return stack;
     }
 }
