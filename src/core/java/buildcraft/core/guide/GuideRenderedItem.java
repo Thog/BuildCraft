@@ -8,4 +8,10 @@ public class GuideRenderedItem extends GuidePart {
     public GuideRenderedItem(ItemStack stack) {
         this.stack = stack;
     }
+
+    @Override
+    public void renderIntoArea(int x, int y, int width, int height) {
+        // TODO Auto-generated method stub
+        
+    }
 }
