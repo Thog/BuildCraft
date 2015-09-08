@@ -279,7 +279,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
             // The client-side sleep indicator should also display if the robot is charging.
             // To not break gates and other things checking for sleep, this is done here.
             dataWatcher.updateObject(DATA_ACTIVE_CLIENT, Byte.valueOf((byte) ((isActive() && ticksCharging == 0) ? 1 : 0)));
-            dataWatcher.updateObject(DATA_BATTERY_ENERGY, getInternalStorage().currentPower());
+            dataWatcher.updateObject(DATA_BATTERY_ENERGY, (float) getInternalStorage().currentPower());
 
             if (needsUpdate) {
                 updateDataServer();
@@ -336,7 +336,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
 
                 if (energySpendPerCycle != mainAI.getActiveAI().getEnergyCost()) {
                     energySpendPerCycle = mainAI.getActiveAI().getEnergyCost();
-                    dataWatcher.updateObject(DATA_ENERGY_SPEND_PER_CYCLE, energySpendPerCycle);
+                    dataWatcher.updateObject(DATA_ENERGY_SPEND_PER_CYCLE, (int) energySpendPerCycle);
                 }
             }
         }

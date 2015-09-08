@@ -9,7 +9,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+
+import buildcraft.api.core.BCLog;
 
 import io.netty.buffer.ByteBuf;
 
@@ -127,5 +130,43 @@ public final class NetworkUtils {
         double y = stream.readDouble();
         double z = stream.readDouble();
         return new Vec3(x, y, z);
+    }
+
+    public static void writeBlockPos(ByteBuf stream, BlockPos pos) {
+        stream.writeInt(pos.getX());
+        stream.writeInt(pos.getY());
+        stream.writeInt(pos.getZ());
+    }
+
+    public static BlockPos readBlockPos(ByteBuf stream) {
+        int x = stream.readInt();
+        int y = stream.readInt();
+        int z = stream.readInt();
+        return new BlockPos(x, y, z);
+    }
+
+    public static <E extends Enum<E>> void writeEnum(ByteBuf stream, E value) {
+        E[] values = value.getDeclaringClass().getEnumConstants();
+        if (values.length <= Byte.MAX_VALUE) {
+            stream.writeByte(value.ordinal());
+        } else {
+            stream.writeShort(value.ordinal());
+        }
+    }
+
+    public static <E extends Enum<E>> E readEnum(ByteBuf stream, Class<E> clazz) {
+        E[] values = clazz.getEnumConstants();
+        short ordinal;
+        if (values.length <= Byte.MAX_VALUE) {
+            ordinal = stream.readUnsignedByte();
+        } else {
+            ordinal = stream.readShort();
+        }
+        if (ordinal < 0 || ordinal >= values.length) {
+            BCLog.logger.warn("Read an incorrect ordinal(" + ordinal + ") while trying to read the class " + clazz.getSimpleName(), new Throwable(
+                    "Probably en error here!"));
+            return values[0];
+        }
+        return values[ordinal];
     }
 }

@@ -1,0 +1,34 @@
+Bugs:
+    - Path markers don't connect
+    - Builder + Architect tables don't connect to land markers
+    - All gui's are too dark (Except for the guide book)
+    Missing Block Models:
+        - Pump
+        - Mining Well
+        - Filtered Buffer
+        - Requester
+        - Zone Planner
+        - Assembly table
+        - ADV Crafting Table
+        - Integration Table
+        - Charging table
+        - Programming table
+        - Stamping table
+        - Laser
+        - Recipe Packager
+    Missing Item Models:
+        - All lenses
+        - All filters
+        - All facades
+        - All robots
+        - Redstone crystal
+        - Guide Book
+        - Robot Goggles
+    Missing Player Model:
+        - Robot goggles (helmet texture and model)
+    Incorrect Item Models:
+        - Chute
+        - All gates are slightly tilted
+        - ALL item models except tools are offset way to far from the players hand in 3D
+        - Pipes are flat-on in the players inventory
+        

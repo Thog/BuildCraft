@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.entity.Render;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -29,6 +31,7 @@ import buildcraft.core.EntityLaser;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.render.RenderLaser;
+import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.EntityRobot;
 
 public class RenderRobot extends Render {
@@ -76,71 +79,76 @@ public class RenderRobot extends Render {
         float robotYaw = this.interpolateRotation(robot.prevRenderYawOffset, robot.renderYawOffset, partialTicks);
         // GL11.glRotatef(-robotYaw, 0.0f, 1.0f, 0.0f);
 
-        if (robot.getStackInSlot(0) != null) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(-0.125F, 0, -0.125F);
-            doRenderItem(robot.getStackInSlot(0));
-            GL11.glColor3f(1, 1, 1);
-            GL11.glPopMatrix();
-        }
+        boolean glasses = isWearingGlasses();
+        if (glasses) {
+            GlStateManager.disableTexture2D();
+        } else {
 
-        if (robot.getStackInSlot(1) != null) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(+0.125F, 0, -0.125F);
-            doRenderItem(robot.getStackInSlot(1));
-            GL11.glColor3f(1, 1, 1);
-            GL11.glPopMatrix();
-        }
-
-        if (robot.getStackInSlot(2) != null) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(+0.125F, 0, +0.125F);
-            doRenderItem(robot.getStackInSlot(2));
-            GL11.glColor3f(1, 1, 1);
-            GL11.glPopMatrix();
-        }
-
-        if (robot.getStackInSlot(3) != null) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(-0.125F, 0, +0.125F);
-            doRenderItem(robot.getStackInSlot(3));
-            GL11.glColor3f(1, 1, 1);
-            GL11.glPopMatrix();
-        }
-
-        if (robot.itemInUse != null) {
-            GL11.glPushMatrix();
-
-            GL11.glRotatef(robot.itemAimPitch, 0, 0, 1);
-
-            if (robot.itemActive) {
-                long newDate = new Date().getTime();
-                robot.itemActiveStage = (robot.itemActiveStage + (newDate - robot.lastUpdateTime) / 10) % 45;
-                GL11.glRotatef(robot.itemActiveStage, 0, 0, 1);
-                robot.lastUpdateTime = newDate;
+            if (robot.getStackInSlot(0) != null) {
+                GL11.glPushMatrix();
+                GL11.glTranslatef(-0.125F, 0, -0.125F);
+                doRenderItem(robot.getStackInSlot(0));
+                GL11.glColor3f(1, 1, 1);
+                GL11.glPopMatrix();
             }
 
-            GL11.glTranslatef(-0.4F, 0, 0);
-            GL11.glRotatef(-45F + 180F, 0, 1, 0);
-            GL11.glScalef(0.8F, 0.8F, 0.8F);
+            if (robot.getStackInSlot(1) != null) {
+                GL11.glPushMatrix();
+                GL11.glTranslatef(+0.125F, 0, -0.125F);
+                doRenderItem(robot.getStackInSlot(1));
+                GL11.glColor3f(1, 1, 1);
+                GL11.glPopMatrix();
+            }
 
-            ItemStack itemstack1 = robot.itemInUse;
+            if (robot.getStackInSlot(2) != null) {
+                GL11.glPushMatrix();
+                GL11.glTranslatef(+0.125F, 0, +0.125F);
+                doRenderItem(robot.getStackInSlot(2));
+                GL11.glColor3f(1, 1, 1);
+                GL11.glPopMatrix();
+            }
 
-            // if (itemstack1.getItem().requiresMultipleRenderPasses()) {
-            // for (int k = 0; k < itemstack1.getItem().getRenderPasses(itemstack1.getItemDamage()); ++k) {
-            // RenderUtils.setGLColorFromInt(itemstack1.getItem().getColorFromItemStack(itemstack1, k));
-            // this.renderManager.itemRenderer.renderItem(robot, itemstack1, k);
-            // }
-            // } else {
-            RenderUtils.setGLColorFromInt(itemstack1.getItem().getColorFromItemStack(itemstack1, 0));
-            // this.renderManager.itemRenderer.renderItem(robot, itemstack1, 0);
-            Minecraft.getMinecraft().getItemRenderer().renderItem(robot, itemstack1, TransformType.THIRD_PERSON);
-            // }
+            if (robot.getStackInSlot(3) != null) {
+                GL11.glPushMatrix();
+                GL11.glTranslatef(-0.125F, 0, +0.125F);
+                doRenderItem(robot.getStackInSlot(3));
+                GL11.glColor3f(1, 1, 1);
+                GL11.glPopMatrix();
+            }
 
-            GL11.glColor3f(1, 1, 1);
-            GL11.glPopMatrix();
+            if (robot.itemInUse != null) {
+                GL11.glPushMatrix();
+
+                GL11.glRotatef(robot.itemAimPitch, 0, 0, 1);
+
+                if (robot.itemActive) {
+                    long newDate = new Date().getTime();
+                    robot.itemActiveStage = (robot.itemActiveStage + (newDate - robot.lastUpdateTime) / 10) % 45;
+                    GL11.glRotatef(robot.itemActiveStage, 0, 0, 1);
+                    robot.lastUpdateTime = newDate;
+                }
+
+                GL11.glTranslatef(-0.4F, 0, 0);
+                GL11.glRotatef(-45F + 180F, 0, 1, 0);
+                GL11.glScalef(0.8F, 0.8F, 0.8F);
+
+                ItemStack itemstack1 = robot.itemInUse;
+
+                // if (itemstack1.getItem().requiresMultipleRenderPasses()) {
+                // for (int k = 0; k < itemstack1.getItem().getRenderPasses(itemstack1.getItemDamage()); ++k) {
+                // RenderUtils.setGLColorFromInt(itemstack1.getItem().getColorFromItemStack(itemstack1, k));
+                // this.renderManager.itemRenderer.renderItem(robot, itemstack1, k);
+                // }
+                // } else {
+                RenderUtils.setGLColorFromInt(itemstack1.getItem().getColorFromItemStack(itemstack1, 0));
+                // this.renderManager.itemRenderer.renderItem(robot, itemstack1, 0);
+                Minecraft.getMinecraft().getItemRenderer().renderItem(robot, itemstack1, TransformType.THIRD_PERSON);
+                // }
+
+                GL11.glColor3f(1, 1, 1);
+                GL11.glPopMatrix();
+            }
         }
-
         if (robot.laser.isVisible) {
             robot.laser.head = Utils.getVec(robot);
 
@@ -153,11 +161,24 @@ public class RenderRobot extends Render {
             doRenderRobot(1F / 16F, renderManager.renderEngine, storagePercent, robot.isActive());
         }
 
-        for (ItemStack s : robot.getWearables()) {
-            doRenderWearable(robot, renderManager.renderEngine, s);
+        if (glasses) {
+            GlStateManager.enableTexture2D();
+        } else {
+            for (ItemStack s : robot.getWearables()) {
+                doRenderWearable(robot, renderManager.renderEngine, s);
+            }
         }
 
         GL11.glPopMatrix();
+    }
+
+    private boolean isWearingGlasses() {
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        ItemStack helmet = player.getCurrentArmor(3);
+        if (helmet == null || helmet.getItem() != BuildCraftRobotics.gogglesItem) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -222,9 +243,18 @@ public class RenderRobot extends Render {
     }
 
     private void doRenderRobot(float factor, TextureManager texManager, float storagePercent, boolean isAsleep) {
+        boolean glasses = isWearingGlasses();
+        if (glasses) {
+            GlStateManager.color(1 - storagePercent, storagePercent, 0);
+            GlStateManager.disableDepth();
+        }
         box.render(factor);
+        if (glasses) {
+            GlStateManager.color(1, 1, 1);
+            GlStateManager.enableDepth();
+        }
 
-        if (!isAsleep) {
+        if (!isAsleep && !glasses) {
             float lastBrightnessX = OpenGlHelper.lastBrightnessX;
             float lastBrightnessY = OpenGlHelper.lastBrightnessY;
 

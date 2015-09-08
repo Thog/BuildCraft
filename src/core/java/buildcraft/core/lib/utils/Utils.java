@@ -32,6 +32,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.api.tiles.ITileAreaProvider;
@@ -414,6 +416,20 @@ public final class Utils {
         return convertFloor(convert(face, multiple));
     }
 
+    public static BlockPos min(BlockPos one, BlockPos two) {
+        int x = Math.min(one.getX(), two.getX());
+        int y = Math.min(one.getY(), two.getY());
+        int z = Math.min(one.getZ(), two.getZ());
+        return new BlockPos(x, y, z);
+    }
+
+    public static BlockPos max(BlockPos one, BlockPos two) {
+        int x = Math.max(one.getX(), two.getX());
+        int y = Math.max(one.getY(), two.getY());
+        int z = Math.max(one.getZ(), two.getZ());
+        return new BlockPos(x, y, z);
+    }
+
     public static Vec3 convert(Vector3f vec) {
         return new Vec3(vec.x, vec.y, vec.z);
     }
@@ -477,5 +493,67 @@ public final class Utils {
 
     public static BlockPos getPos(Entity entity) {
         return convertFloor(getVec(entity));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static Vec3 getInterpolatedVec(Entity entity, float partialTicks) {
+        return entity.getPositionEyes(partialTicks).addVector(0, -entity.getEyeHeight(), 0);
+    }
+
+    /** Like {@link BlockPos#getAllInBox(BlockPos, BlockPos)} but doesn't require unsafe casting. */
+    @SuppressWarnings("unchecked")
+    public static Iterable<BlockPos> allInBoxIncludingCorners(BlockPos pos1, BlockPos pos2) {
+        BlockPos min = min(pos1, pos2);
+        BlockPos max = max(pos1, pos2);
+        // max = max.add(1, 1, 1);
+        Iterable<?> iterator = BlockPos.getAllInBox(min, max);
+        return (Iterable<BlockPos>) iterator;
+    }
+
+    public static Vec3 getMinForFace(EnumFacing face, Vec3 min, Vec3 max) {
+        if (face.getAxisDirection() == AxisDirection.NEGATIVE) {
+            return min;
+        }
+        if (face == EnumFacing.EAST) {
+            return new Vec3(max.xCoord, min.yCoord, min.zCoord);
+        } else if (face == EnumFacing.UP) {
+            return new Vec3(min.xCoord, max.yCoord, min.zCoord);
+        } else {// MUST be SOUTH
+            return new Vec3(min.xCoord, min.yCoord, max.zCoord);
+        }
+    }
+
+    public static Vec3 getMaxForFace(EnumFacing face, Vec3 min, Vec3 max) {
+        if (face.getAxisDirection() == AxisDirection.POSITIVE) {
+            return max;
+        }
+        if (face == EnumFacing.WEST) {
+            return new Vec3(min.xCoord, max.yCoord, max.zCoord);
+        } else if (face == EnumFacing.DOWN) {
+            return new Vec3(max.xCoord, min.yCoord, max.zCoord);
+        } else {// MUST be NORTH
+            return new Vec3(max.xCoord, max.yCoord, min.zCoord);
+        }
+    }
+
+    public static BlockPos getMinForFace(EnumFacing face, BlockPos min, BlockPos max) {
+        return convertFloor(getMinForFace(face, convert(min), convert(max)));
+    }
+
+    public static BlockPos getMaxForFace(EnumFacing face, BlockPos min, BlockPos max) {
+        return convertFloor(getMaxForFace(face, convert(min), convert(max)));
+    }
+
+    public static boolean isInside(BlockPos toTest, BlockPos min, BlockPos max) {
+        if (toTest.getX() < min.getX() || toTest.getY() < min.getY() || toTest.getZ() < min.getZ()) {
+            return false;
+        }
+        return toTest.getX() <= max.getX() && toTest.getY() <= max.getY() && toTest.getZ() <= max.getZ();
+    }
+
+    public static BlockPos getClosestInside(BlockPos from, BlockPos min, BlockPos max) {
+        BlockPos maxMin = max(from, min);
+        BlockPos minMax = min(maxMin, max);
+        return minMax;
     }
 }

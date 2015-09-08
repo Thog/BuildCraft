@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -19,6 +20,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,6 +29,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -47,6 +51,7 @@ import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
 import buildcraft.core.Version;
 import buildcraft.core.config.ConfigManager;
+import buildcraft.core.lib.network.ChannelHandler;
 import buildcraft.core.network.EntityIds;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.robotics.ai.*;
@@ -55,8 +60,12 @@ import buildcraft.robotics.block.BlockZonePlan;
 import buildcraft.robotics.boards.*;
 import buildcraft.robotics.item.ItemRedstoneBoard;
 import buildcraft.robotics.item.ItemRobot;
+import buildcraft.robotics.item.ItemRobotGoggles;
 import buildcraft.robotics.item.ItemRobotStation;
 import buildcraft.robotics.map.MapManager;
+import buildcraft.robotics.network.PacketHandlerRobotics;
+import buildcraft.robotics.pathfinding.PacketPathfinding;
+import buildcraft.robotics.pathfinding.WorldNetworkManager;
 import buildcraft.robotics.render.RobotItemModel;
 import buildcraft.robotics.statements.*;
 import buildcraft.robotics.statements.ActionRobotWorkInArea.AreaType;
@@ -77,6 +86,7 @@ public class BuildCraftRobotics extends BuildCraftMod {
     public static ItemRedstoneBoard redstoneBoard;
     public static Item robotItem;
     public static Item robotStationItem;
+    public static ItemRobotGoggles gogglesItem;
 
     public static ITriggerInternal triggerRobotSleep = new TriggerRobotSleep();
     public static ITriggerInternal triggerRobotInStation = new TriggerRobotInStation();
@@ -124,6 +134,10 @@ public class BuildCraftRobotics extends BuildCraftMod {
         redstoneBoard = new ItemRedstoneBoard();
         redstoneBoard.setUnlocalizedName("redstone_board");
         CoreProxy.proxy.registerItem(redstoneBoard);
+
+        gogglesItem = new ItemRobotGoggles();
+        gogglesItem.setUnlocalizedName("robot_goggles");
+        CoreProxy.proxy.registerItem(gogglesItem);
 
         zonePlanBlock = (BlockZonePlan) CompatHooks.INSTANCE.getBlock(BlockZonePlan.class);
         zonePlanBlock.setUnlocalizedName("zonePlan");
@@ -191,6 +205,12 @@ public class BuildCraftRobotics extends BuildCraftMod {
     public void init(FMLInitializationEvent evt) {
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new RoboticsGuiHandler());
         MinecraftForge.EVENT_BUS.register(this);
+        FMLCommonHandler.instance().bus().register(this);
+
+        ChannelHandler roboticsHandler = new ChannelHandler();
+        roboticsHandler.registerPacketType(PacketPathfinding.class);
+
+        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-ROBOTICS", roboticsHandler, new PacketHandlerRobotics());
 
         if (BuildCraftCore.loadDefaultRecipes && Loader.isModLoaded("BuildCraft|Silicon")) {
             loadRecipes();
@@ -361,5 +381,22 @@ public class BuildCraftRobotics extends BuildCraftMod {
     public void registerModels(ModelBakeEvent event) {
         ModelResourceLocation mrl = new ModelResourceLocation("buildcraftrobotics:robot", "inventory");
         event.modelRegistry.putObject(mrl, RobotItemModel.create());
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == Phase.END) {
+            if (Minecraft.getMinecraft().theWorld != null) {
+                WorldNetworkManager.getForWorld(Minecraft.getMinecraft().theWorld).tick();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onWorldTick(TickEvent.WorldTickEvent event) {
+        if (event.phase == Phase.END) {
+            WorldNetworkManager.getForWorld(event.world).tick();
+        }
     }
 }

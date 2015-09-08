@@ -5,11 +5,13 @@
 package buildcraft.robotics;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -29,13 +31,12 @@ import buildcraft.api.robots.ResourceId;
 import buildcraft.api.robots.RobotManager;
 
 public class RobotRegistry extends WorldSavedData implements IRobotRegistry {
-
     protected World world;
     protected HashMap<StationIndex, DockingStation> stations = new HashMap<StationIndex, DockingStation>();
 
     private long nextRobotID = Long.MIN_VALUE;
 
-    private HashMap<Long, EntityRobot> robotsLoaded = new HashMap<Long, EntityRobot>();
+    private HashMap<Long, EntityRobotBase> robotsLoaded = new HashMap<Long, EntityRobotBase>();
     private HashMap<ResourceId, Long> resourcesTaken = new HashMap<ResourceId, Long>();
     private HashMap<Long, HashSet<ResourceId>> resourcesTakenByRobot = new HashMap<Long, HashSet<ResourceId>>();
 
@@ -85,12 +86,17 @@ public class RobotRegistry extends WorldSavedData implements IRobotRegistry {
     }
 
     @Override
-    public EntityRobot getLoadedRobot(long id) {
+    public EntityRobotBase getLoadedRobot(long id) {
         if (robotsLoaded.containsKey(id)) {
             return robotsLoaded.get(id);
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<EntityRobotBase> getLoadedRobots() {
+        return ImmutableList.copyOf(robotsLoaded.values());
     }
 
     @Override
@@ -117,7 +123,7 @@ public class RobotRegistry extends WorldSavedData implements IRobotRegistry {
     }
 
     @Override
-    public synchronized EntityRobot robotTaking(ResourceId resourceId) {
+    public synchronized EntityRobotBase robotTaking(ResourceId resourceId) {
         long robotId = robotIdTaking(resourceId);
 
         if (robotId == EntityRobotBase.NULL_ROBOT_ID || !robotsLoaded.containsKey(robotId)) {
@@ -370,7 +376,7 @@ public class RobotRegistry extends WorldSavedData implements IRobotRegistry {
     @SubscribeEvent
     public void onChunkUnload(ChunkEvent.Unload e) {
         if (e.world == this.world) {
-            for (EntityRobot robot : new ArrayList<EntityRobot>(robotsLoaded.values())) {
+            for (EntityRobotBase robot : getLoadedRobots()) {
                 if (!e.world.loadedEntityList.contains(robot)) {
                     robot.onChunkUnload();
                 }

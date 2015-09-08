@@ -5,6 +5,7 @@
 package buildcraft.api.robots;
 
 import java.util.Collection;
+import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
@@ -21,6 +22,8 @@ public interface IRobotRegistry {
     void unloadRobot(EntityRobotBase robot);
 
     EntityRobotBase getLoadedRobot(long id);
+    
+    List<EntityRobotBase> getLoadedRobots();
 
     boolean isTaken(ResourceId resourceId);
 

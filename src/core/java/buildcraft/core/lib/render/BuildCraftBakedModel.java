@@ -168,21 +168,18 @@ public abstract class BuildCraftBakedModel extends BakedModel {
     }
 
     public static void bakeFace(List<BakedQuad> quads, EnumFacing face, Vector3f center, Vector3f radius, float[] uvs) {
-        Vector3f centerOfFace = new Vector3f(center);
-        Vector3f faceAdd = new Vector3f(face.getFrontOffsetX() * radius.x, face.getFrontOffsetY() * radius.y, face.getFrontOffsetZ() * radius.z);
-        centerOfFace.add(faceAdd);
-        Vector3f faceRadius = new Vector3f(radius);
-        if (face.getAxisDirection() == AxisDirection.POSITIVE) {
-            faceRadius.sub(faceAdd);
-        } else {
-            faceRadius.add(faceAdd);
-        }
-        Vector3f[] points = getPoints(centerOfFace, faceRadius);
+        Vector3f[] points = getPointsForFace(face, center, radius);
         int[] quadData = getFrom(points, uvs);
         bakeQuad(quads, quadData, face);
     }
 
     public static void bakeDoubleFace(List<BakedQuad> quads, EnumFacing face, Vector3f center, Vector3f radius, float[] uvs) {
+        Vector3f[] points = getPointsForFace(face, center, radius);
+        int[][] quadData = getDoubleFrom(points, uvs);
+        bakeQuads(quads, quadData, face.getOpposite(), face);
+    }
+
+    public static Vector3f[] getPointsForFace(EnumFacing face, Vector3f center, Vector3f radius) {
         Vector3f centerOfFace = new Vector3f(center);
         Vector3f faceAdd = new Vector3f(face.getFrontOffsetX() * radius.x, face.getFrontOffsetY() * radius.y, face.getFrontOffsetZ() * radius.z);
         centerOfFace.add(faceAdd);
@@ -192,8 +189,6 @@ public abstract class BuildCraftBakedModel extends BakedModel {
         } else {
             faceRadius.add(faceAdd);
         }
-        Vector3f[] points = getPoints(centerOfFace, faceRadius);
-        int[][] quadData = getDoubleFrom(points, uvs);
-        bakeQuads(quads, quadData, face.getOpposite(), face);
+        return getPoints(centerOfFace, faceRadius);
     }
 }

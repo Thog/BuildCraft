@@ -5,9 +5,11 @@
 package buildcraft.robotics;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Loader;
 
+import buildcraft.robotics.pathfinding.RobotPathRenderer;
 import buildcraft.robotics.render.RedstoneBoardMeshDefinition;
 import buildcraft.robotics.render.RenderRobot;
 
@@ -20,6 +22,8 @@ public class RoboticsProxyClient extends RoboticsProxy {
         if (Loader.isModLoaded("BuildCraft|Transport")) {
             loadBCTransport();
         }
+
+        MinecraftForge.EVENT_BUS.register(new RobotPathRenderer());
     }
 
     private void loadBCTransport() {

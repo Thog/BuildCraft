@@ -316,6 +316,9 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
         box.readData(data);
         setDone(data.readBoolean());
         FillerPattern pattern = (FillerPattern) FillerManager.registry.getPattern(NetworkUtils.readUTF(data));
+
+        // TODO (PASS 2): Move the world changing detail into the main tick thread
+
         NBTTagCompound parameterData = NetworkUtils.readNBT(data);
         readParametersFromNBT(parameterData);
         setPattern(pattern);

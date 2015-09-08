@@ -372,6 +372,8 @@ item.Filter.name=Filter
 item.debugger.name=Debugger
 item.debugger.warning=Use only for testing! Leaks secrets.
 item.package.name=Package
+item.guideBook.name=Guide Book
+item.robot_goggles.name=Robot Goggles
 
 itemGroup.buildcraft.boards=BuildCraft Robots
 itemGroup.buildcraft.main=BuildCraft
@@ -392,7 +394,7 @@ tile.constructionMarkerBlock.name=Construction Mark
 buildcraft.energy.engineCreative.name=Creative Engine
 buildcraft.energy.engineIron.name=Combustion Engine
 buildcraft.energy.engineStone.name=Stirling Engine
-buildcraft.core.engineWood.name=Redstone Engine
+buildcraft.core.engine.wood.name=Redstone Engine
 tile.fillerBlock.name=Filler
 tile.filteredBufferBlock.name=Filtered Buffer
 tile.floodGateBlock.name=Flood Gate
