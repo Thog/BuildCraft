@@ -2,6 +2,7 @@ Bugs:
     - Path markers don't connect
     - Builder + Architect tables don't connect to land markers
     - All gui's are too dark (Except for the guide book)
+    - Pipe selection boxes do not extend out to match the extension that is rendered
     Missing Block Models:
         - Pump
         - Mining Well
@@ -16,6 +17,13 @@ Bugs:
         - Stamping table
         - Laser
         - Recipe Packager
+    Missing Pipe Models:
+        - All facades
+        - All lenses
+        - All filters
+        - All gates
+        - Pipe plug
+        - Docking station
     Missing Item Models:
         - All lenses
         - All filters
@@ -26,9 +34,19 @@ Bugs:
         - Robot Goggles
     Missing Player Model:
         - Robot goggles (helmet texture and model)
+    Missing gui elements:
+        - All gate triggers
     Incorrect Item Models:
-        - Chute
+        - Pipes are offset waay to far
+        - Chutes are offset way to far
         - All gates are slightly tilted
-        - ALL item models except tools are offset way to far from the players hand in 3D
         - Pipes are flat-on in the players inventory
-        
+    Incorrect Block models:
+        - Wooden Kinesis pipes use the Wooden Transport pipe texture for the extracting face
+
+Partially implemented:
+    - Robot goggles
+        - Show location of all robots
+        - Show current robot paths
+    - Guide Book
+        - Basically a complete wiki implementation
