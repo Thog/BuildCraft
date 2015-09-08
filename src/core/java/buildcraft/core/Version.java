@@ -5,10 +5,13 @@
 package buildcraft.core;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
@@ -35,8 +38,14 @@ public class Version implements Runnable {
     private static final String REMOTE_VERSION_FILE =
         "https://raw.githubusercontent.com/BuildCraft/BuildCraft/master/buildcraft_resources/versions.txt";
 
+    private static final String NEW_REMOTE_VERSION_FILE =
+        "https://raw.githubusercontent.com/BuildCraft/BuildCraft/master/src/core/resources/versions.txt";
+
     private static final String REMOTE_CHANGELOG_ROOT =
         "https://raw.githubusercontent.com/BuildCraft/BuildCraft/master/buildcraft_resources/changelog/";
+
+    public static final String NEW_REMOTE_CHANGELOG_ROOT =
+        "https://raw.githubusercontent.com/BuildCraft/BuildCraft/master/src/core/resources/changelog/";
 
     private static String recommendedVersion;
     private static String[] cachedChangelog;
@@ -76,13 +85,58 @@ public class Version implements Runnable {
     }
 
     public static void versionCheck() {
-        try {
+        if ("0.0.0".equals(VERSION)) {
+            return;
+        }
+        if ("@VERSION@".equals(VERSION)) {
+            BCLog.logger.info("Found a development version. Not checking for updates.");
+            currentVersion = EnumUpdateState.CURRENT;
+            return;
+        }
 
-            if ("0.0.0".equals(VERSION)) {
-                return;
+        String mcVersion = CoreProxy.proxy.getMinecraftVersion();
+        String[] lines = getLines(NEW_REMOTE_VERSION_FILE);
+        if (lines == null) {
+            lines = getLines(REMOTE_VERSION_FILE);
+        }
+        if (lines == null) {
+            BCLog.logger.warn("Unable to read from remote version authority.");
+            currentVersion = EnumUpdateState.CONNECTION_ERROR;
+            return;
+        } else {
+            boolean foundThisMcVersion = false;
+
+            for (String line : lines) {
+                String[] tokens = line.split(":");
+                if (mcVersion.matches(tokens[0])) {
+                    if (DefaultProps.MOD.matches(tokens[1])) {
+                        foundThisMcVersion = true;
+                        recommendedVersion = tokens[2];
+
+                        if (VERSION.matches(tokens[2])) {
+                            BCLog.logger.trace("Using the latest version [" + getVersion() + "] for Minecraft " + mcVersion);
+                            currentVersion = EnumUpdateState.CURRENT;
+                            return;
+                        }
+                    }
+                }
             }
+            if (foundThisMcVersion) {
+                BCLog.logger.warn("Using outdated version [" + VERSION + "] for Minecraft " + mcVersion + ". Consider updating to "
+                    + recommendedVersion + ".");
+                currentVersion = EnumUpdateState.OUTDATED;
+                sendIMCOutdatedMessage();
+            } else {
+                BCLog.logger.info("Using a development version [" + VERSION + "] for Minecraft " + mcVersion
+                    + ". Consider developing and finishing this one please? :)");
+                currentVersion = EnumUpdateState.CURRENT;
+            }
+        }
+    }
 
-            String location = REMOTE_VERSION_FILE;
+    private static String[] getLines(String remoteUrl) {
+        try {
+            String location = remoteUrl;
             HttpURLConnection conn = null;
             while (location != null && !location.isEmpty()) {
                 URL url = new URL(location);
@@ -99,39 +153,27 @@ public class Version implements Runnable {
             }
 
             if (conn == null) {
-                throw new NullPointerException();
+                throw new NullPointerException("Did not find a connection!");
             }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
             String line;
-            String mcVersion = CoreProxy.proxy.getMinecraftVersion();
+            List<String> strings = Lists.newArrayList();
             while ((line = reader.readLine()) != null) {
-                String[] tokens = line.split(":");
-                if (mcVersion.matches(tokens[0])) {
-                    if (DefaultProps.MOD.matches(tokens[1])) {
-                        recommendedVersion = tokens[2];
-
-                        if (VERSION.matches(tokens[2])) {
-                            BCLog.logger.trace("Using the latest version [" + getVersion() + "] for Minecraft " + mcVersion);
-                            currentVersion = EnumUpdateState.CURRENT;
-                            return;
-                        }
-                    }
-                }
+                strings.add(line);
             }
-
-            BCLog.logger.warn("Using outdated version [" + VERSION + "] for Minecraft " + mcVersion + ". Consider updating to " + recommendedVersion
-                + ".");
-            currentVersion = EnumUpdateState.OUTDATED;
-            sendIMCOutdatedMessage();
-
             conn.disconnect();
             reader.close();
-        } catch (Exception e) {
-            BCLog.logger.warn("Unable to read from remote version authority.");
-            BCLog.logger.warn(e.toString());
-            currentVersion = EnumUpdateState.CONNECTION_ERROR;
+            if (strings.size() == 0) {
+                return null;
+            }
+            BCLog.logger.info("Successfully read from " + remoteUrl + ", found " + strings.size() + " lines");
+            return strings.toArray(new String[strings.size()]);
+
+        } catch (IOException e) {
+            BCLog.logger.warn("Failed to read from " + remoteUrl);
+            return null;
         }
     }
 
@@ -144,50 +186,16 @@ public class Version implements Runnable {
     }
 
     public static String[] grabChangelog(String version) {
-
-        try {
-            String location = REMOTE_CHANGELOG_ROOT + version;
-            HttpURLConnection conn = null;
-            while (location != null && !location.isEmpty()) {
-                URL url = new URL(location);
-
-                if (conn != null) {
-                    conn.disconnect();
-                }
-
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent",
-                        "Mozilla/5.0 (Windows; U; Windows NT 6.0; ru; rv:1.9.0.11) Gecko/2009060215 Firefox/3.0.11 (.NET CLR 3.5.30729)");
-                conn.connect();
-                location = conn.getHeaderField("Location");
-            }
-
-            if (conn == null) {
-                throw new NullPointerException();
-            }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-            String line;
-            ArrayList<String> changelog = new ArrayList<String>();
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) {
-                    continue;
-                }
-
-                changelog.add(line);
-            }
-
-            conn.disconnect();
-
-            return changelog.toArray(new String[changelog.size()]);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            BCLog.logger.warn("Unable to read changelog from remote site.");
+        String[] lines = getLines(NEW_REMOTE_CHANGELOG_ROOT + version);
+        if (lines == null) {
+            lines = getLines(REMOTE_CHANGELOG_ROOT + version);
         }
-
-        return new String[] { String.format("Unable to retrieve changelog for %s %s", DefaultProps.MOD, version) };
+        if (lines == null) {
+            BCLog.logger.warn("Unable to read changelog from remote site.");
+            return new String[] { String.format("Unable to retrieve changelog for %s %s", DefaultProps.MOD, version) };
+        } else {
+            return lines;
+        }
     }
 
     @Override
@@ -216,6 +224,7 @@ public class Version implements Runnable {
             BCLog.logger.info("Version check failed");
         }
 
+        BCLog.logger.info("Finished version check");
     }
 
     /** This is an integration with Dynious Version Checker See http://www.minecraftforum.net/topic/2721902- */
@@ -255,6 +264,6 @@ public class Version implements Runnable {
     }
 
     public static void check() {
-        new Thread(instance).start();
+        new Thread(instance, "BuildCraft Update Checker").start();
     }
 }

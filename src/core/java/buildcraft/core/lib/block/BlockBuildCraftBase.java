@@ -28,7 +28,6 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import buildcraft.api.core.BCLog;
 import buildcraft.api.enums.EnumBlueprintType;
 import buildcraft.api.enums.EnumColor;
 import buildcraft.api.enums.EnumEnergyStage;
@@ -128,9 +127,6 @@ public abstract class BlockBuildCraftBase extends Block {
         }
 
         this.hasExtendedProperties = hasExtendedProps;
-        if (this.hasExtendedProperties) {
-            BCLog.logger.info("This block has extended properties!");
-        }
 
         this.properties = metas.toArray(new BuildCraftProperty<?>[0]);
         this.nonMetaProperties = nonMetas.toArray(new BuildCraftProperty<?>[0]);
@@ -187,38 +183,7 @@ public abstract class BlockBuildCraftBase extends Block {
                 intToState.put(i, entry.getKey());
             }
         }
-
-        // Temporary. Used for debugging early on.
-        BCLog.logger.info("Created the block " + getUnlocalizedName() + " as " + getClass().getSimpleName());
-
-        BCLog.logger.info("Int -> State: ");
-        for (Entry<Integer, IBlockState> entry : intToState.entrySet()) {
-            BCLog.logger.info("  " + entry.getKey() + " -> " + entry.getValue());
-        }
-
-        BCLog.logger.info("State -> Int: ");
-        int num = stateToInt.size();
-        int cap = num - 17;
-        for (Entry<IBlockState, Integer> entry : stateToInt.entrySet()) {
-            if (num == cap) {
-                BCLog.logger.info("");
-                BCLog.logger.info("  (" + num + " more)");
-                BCLog.logger.info("");
-            } else if (num > cap) {
-                BCLog.logger.info("  " + entry.getKey() + " -> " + entry.getValue());
-            }
-            num--;
-        }
-
         setDefaultState(defaultState);
-
-        for (BuildCraftProperty<?> prop : properties) {
-            if (metas.contains(prop)) {
-                BCLog.logger.info("  The value of " + prop.getName() + " is saved to disk");
-            } else {
-                BCLog.logger.info("  The value of " + prop.getName() + " is implied by surroundings and is temparary");
-            }
-        }
 
         List<BuildCraftProperty<?>> allProperties = Lists.newArrayList();
         allProperties.addAll(metas);
@@ -246,7 +211,6 @@ public abstract class BlockBuildCraftBase extends Block {
             props[properties.length + i] = nonMetaProperties[i];
         }
         if (hasExtendedProperties) {
-            BCLog.logger.info("Creating extended block state!");
             return new ExtendedBlockState(this, props, extendedProperties);
         }
         return new BlockState(this, props);
@@ -289,7 +253,7 @@ public abstract class BlockBuildCraftBase extends Block {
     public AxisAlignedBB[] getBoxes(IBlockAccess world, BlockPos pos, IBlockState state) {
         return new AxisAlignedBB[] { getBox(world, pos, state) };
     }
-    
+
     public MovingObjectPosition collisionRayTrace_super(World world, BlockPos pos, Vec3 origin, Vec3 direction) {
         return super.collisionRayTrace(world, pos, origin, direction);
     }
@@ -352,20 +316,8 @@ public abstract class BlockBuildCraftBase extends Block {
         return getBox(world, pos, world.getBlockState(pos)).offset(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    /*@Override
-    public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) {
-        AxisAlignedBB[] bbs = getBoxes(world, pos, world.getBlockState(pos));
-        AxisAlignedBB bb = bbs[0];
-        for (int i = 1; i < bbs.length; i++) {
-            bb = bb.union(bbs[i]);
-        }
-
-        minX = bb.minX;
-        minY = bb.minY;
-        minZ = bb.minZ;
-
-        maxX = bb.maxX;
-        maxY = bb.maxY;
-        maxZ = bb.maxZ;
-    }*/
+    /* @Override public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) { AxisAlignedBB[] bbs =
+     * getBoxes(world, pos, world.getBlockState(pos)); AxisAlignedBB bb = bbs[0]; for (int i = 1; i < bbs.length; i++) {
+     * bb = bb.union(bbs[i]); } minX = bb.minX; minY = bb.minY; minZ = bb.minZ; maxX = bb.maxX; maxY = bb.maxY; maxZ =
+     * bb.maxZ; } */
 }
