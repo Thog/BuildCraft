@@ -5,27 +5,29 @@
 package buildcraft.transport;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.lib.utils.StringUtils;
 
 @SideOnly(Side.CLIENT)
 public final class PipeToolTipManager {
 
-    private static final Map<Class<? extends Pipe<?>>, String> toolTips = new HashMap<Class<? extends Pipe<?>>, String>();
+    private static final Map<PipeDefinition, String> toolTips = Maps.newHashMap();
 
     static {
         if (!BuildCraftCore.hideFluidNumbers) {
-            for (Map.Entry<Class<? extends Pipe<?>>, Integer> pipe : PipeTransportFluids.fluidCapacities.entrySet()) {
-                PipeToolTipManager.addToolTip(pipe.getKey(), String.format("%d mB/t", pipe.getValue()));
-            }
+//            for (Map.Entry<Class<? extends Pipe>, Integer> pipe : PipeTransportFluids.fluidCapacities.entrySet()) {
+//                PipeToolTipManager.addToolTip(pipe.getKey(), String.format("%d mB/t", pipe.getValue()));
+//            }
         }
     }
 
@@ -42,9 +44,9 @@ public final class PipeToolTipManager {
         }
     }
 
-    public static void addToolTip(Class<? extends Pipe<?>> pipe, String toolTip) {
-        toolTips.put(pipe, toolTip);
-    }
+//    public static void addToolTip(Class<? extends Pipe<?>> pipe, String toolTip) {
+//        toolTips.put(pipe, toolTip);
+//    }
 
     public static List<String> getToolTip(Class<? extends Pipe> pipe, boolean advanced) {
         List<String> tips = new ArrayList<String>();

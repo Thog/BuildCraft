@@ -223,7 +223,7 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         }
 
         if (entity instanceof IPipeTile) {
-            Pipe<?> pipe = (Pipe<?>) ((IPipeTile) entity).getPipe();
+            Pipe pipe = (Pipe) ((IPipeTile) entity).getPipe();
             if (pipe == null || pipe.transport == null) {
                 return false;
             }
@@ -306,7 +306,7 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
 
     private boolean passToNextPipe(TravelingItem item, TileEntity tile) {
         if (tile instanceof IPipeTile) {
-            Pipe<?> pipe = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            Pipe pipe = (Pipe) ((IPipeTile) tile).getPipe();
             if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof PipeTransportItems) {
                 ((PipeTransportItems) pipe.transport).injectItem(item, item.output);
                 return true;
@@ -481,7 +481,7 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
     @Override
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
         if (tile instanceof IPipeTile) {
-            Pipe<?> pipe2 = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            Pipe pipe2 = (Pipe) ((IPipeTile) tile).getPipe();
             if (BlockGenericPipe.isValid(pipe2) && !(pipe2.transport instanceof PipeTransportItems)) {
                 return false;
             }

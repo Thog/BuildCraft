@@ -17,9 +17,9 @@ public class PipeActionProvider implements IActionProvider {
     @Override
     public Collection<IActionInternal> getInternalActions(IStatementContainer container) {
         LinkedList<IActionInternal> result = new LinkedList<IActionInternal>();
-        Pipe<?> pipe = null;
+        Pipe pipe = null;
         if (container instanceof IGate) {
-            pipe = (Pipe<?>) ((IGate) container).getPipe();
+            pipe = (Pipe) ((IGate) container).getPipe();
 
             if (container instanceof Gate) {
                 ((Gate) container).addActions(result);

@@ -52,9 +52,6 @@ public final class Pipe implements IDropControlInventory, IPipe {
     public boolean[] wireSet = new boolean[] { false, false, false, false };
     public final Gate[] gates = new Gate[EnumFacing.VALUES.length];
 
-    @Deprecated
-    /** Replace it with google's event bus. Because its just better amirite? */
-    public PipeEventBus eventBus = new PipeEventBus();
     public final EventBus pipeEventBus = new EventBus("buildcraft.transport.Pipe");
 
     private boolean internalUpdateScheduled = false;
@@ -67,10 +64,12 @@ public final class Pipe implements IDropControlInventory, IPipe {
         behaviour = definition.behaviourFactory.createNew();
         transport = getTransport(definition.type);
         pipeEventBus.register(behaviour);
+        pipeEventBus.register(new LensFilterHandler());
 
-        eventBus.registerHandler(this);
+//        eventBus.registerHandler(this);
         // TODO: Move to globalHandlers once a priority system is in place
-        eventBus.registerHandler(new LensFilterHandler());
+//        eventBus.registerHandler(new LensFilterHandler());
+        
     }
 
     @SubscribeEvent

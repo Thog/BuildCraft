@@ -15,6 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import buildcraft.api.transport.EnumPipeType;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.lib.utils.BitSetUtils;
 import buildcraft.transport.tile.TileGenericPipe;
 
@@ -71,6 +72,8 @@ public abstract class PipeTransport {
         nbt.setByte("inputOpen", BitSetUtils.toByteArray(inputBuf)[0]);
         nbt.setByte("outputOpen", BitSetUtils.toByteArray(outputBuf)[0]);
     }
+
+    public void initFromPipe(PipeDefinition definition) {}
 
     public void updateEntity() {}
 

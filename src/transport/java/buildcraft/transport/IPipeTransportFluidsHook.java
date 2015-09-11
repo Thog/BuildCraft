@@ -7,6 +7,7 @@ package buildcraft.transport;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 
+@Deprecated
 public interface IPipeTransportFluidsHook {
 
     int fill(EnumFacing from, FluidStack resource, boolean doFill);

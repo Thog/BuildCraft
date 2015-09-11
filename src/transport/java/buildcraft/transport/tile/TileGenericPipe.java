@@ -228,7 +228,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 // Attach callback
                 for (int i = 0; i < EnumFacing.VALUES.length; i++) {
                     if (sideProperties.pluggables[i] != null) {
-                        pipe.eventBus.registerHandler(sideProperties.pluggables[i]);
+                        pipe.pipeEventBus.register(sideProperties.pluggables[i]);
                         sideProperties.pluggables[i].onAttachedPipe(this, EnumFacing.getFront(i));
                     }
                 }

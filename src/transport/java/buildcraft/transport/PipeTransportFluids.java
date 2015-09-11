@@ -1,9 +1,7 @@
 package buildcraft.transport;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -23,18 +21,18 @@ import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.utils.Average;
 import buildcraft.core.lib.utils.MathUtils;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketFluidUpdate;
-import buildcraft.transport.pipes.*;
 import buildcraft.transport.pipes.events.PipeEventFluid;
 import buildcraft.transport.utils.FluidRenderData;
 
 public class PipeTransportFluids extends PipeTransport implements IFluidHandler, IDebuggable {
-    public static final Map<Class<? extends Pipe<?>>, Integer> fluidCapacities = new HashMap<Class<? extends Pipe<?>>, Integer>();
+    // public static final Map<PipeDefinition, Integer> fluidCapacities = Maps.newHashMap();
 
     /** The amount of liquid contained by a pipe section. For simplicity, all pipe sections are assumed to be of the
      * same volume. */
@@ -153,7 +151,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
     private final boolean[] canReceiveCache = new boolean[6];
     private byte initClient = 0;
     private int clientSyncCounter = 0;
-    private int capacity, flowRate;
+    private int capacity, flowRate = BuildCraftTransport.pipeFluidsBaseFlowRate;
     private int travelDelay = MAX_TRAVEL_DELAY;
 
     public enum TransferState {
@@ -184,9 +182,10 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
         return flowRate;
     }
 
-    public void initFromPipe(Class<? extends Pipe<?>> pipeClass) {
+    @Override
+    public void initFromPipe(PipeDefinition definition) {
         capacity = LIQUID_IN_PIPE;
-        flowRate = fluidCapacities.get(pipeClass);
+        // flowRate = fluidCapacities.get(definition);
         travelDelay = MathUtils.clamp(Math.round(16 / (flowRate / 10)), 1, MAX_TRAVEL_DELAY);
     }
 
@@ -212,7 +211,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
         }
 
         if (tile instanceof IPipeTile) {
-            Pipe<?> pipe = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            Pipe pipe = (Pipe) ((IPipeTile) tile).getPipe();
 
             if (pipe == null || !inputOpen(o.getOpposite())) {
                 return false;
@@ -655,7 +654,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
     @Override
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
         if (tile instanceof IPipeTile) {
-            Pipe<?> pipe2 = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            Pipe pipe2 = (Pipe) ((IPipeTile) tile).getPipe();
             if (BlockGenericPipe.isValid(pipe2) && !(pipe2.transport instanceof PipeTransportFluids)) {
                 return false;
             }
@@ -667,19 +666,19 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
 
         return tile instanceof IPipeTile;
     }
-
-    static {
-        fluidCapacities.put(PipeFluidsCobblestone.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsDiamond.class, 8 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsEmerald.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsGold.class, 8 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsIron.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsQuartz.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsSandstone.class, 2 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsStone.class, 2 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsVoid.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-        fluidCapacities.put(PipeFluidsWood.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    }
+    //
+    // static {
+    // fluidCapacities.put(PipeFluidsCobblestone.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsDiamond.class, 8 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsEmerald.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsGold.class, 8 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsIron.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsQuartz.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsSandstone.class, 2 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsStone.class, 2 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsVoid.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // fluidCapacities.put(PipeFluidsWood.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
+    // }
 
     @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {

@@ -2,6 +2,8 @@ package buildcraft.transport.pluggable;
 
 import java.util.List;
 
+import com.google.common.eventbus.Subscribe;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -181,13 +183,15 @@ public class LensPluggable extends PipePluggable {
         }
     }
 
-    public void eventHandler(PipeEventItem.ReachedEnd event) {
+    @Subscribe
+    public void onReachedEnd(PipeEventItem.ReachedEnd event) {
         if (!isFilter) {
             color(event.item);
         }
     }
 
-    public void eventHandler(PipeEventItem.Entered event) {
+    @Subscribe
+    public void onEntered(PipeEventItem.Entered event) {
         if (!isFilter) {
             color(event.item);
         }

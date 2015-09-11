@@ -6,7 +6,8 @@ package buildcraft.transport.pipes.events;
 
 import buildcraft.transport.Pipe;
 
-public abstract class PipeEvent {
+@Deprecated
+public final class PipeEvent {
     public final Pipe pipe;
 
     public PipeEvent(Pipe pipe) {
