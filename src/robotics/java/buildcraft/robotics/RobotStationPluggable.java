@@ -28,7 +28,7 @@ import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
-import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.tile.TileGenericPipe;
 
 import io.netty.buffer.ByteBuf;
 

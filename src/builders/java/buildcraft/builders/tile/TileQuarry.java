@@ -36,8 +36,8 @@ import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.properties.BuildCraftProperties;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeConnection;
-import buildcraft.api.transport.IPipeTile;
 import buildcraft.builders.BuildCraftBuilders;
 import buildcraft.builders.EntityMechanicalArm;
 import buildcraft.core.Box;
@@ -907,11 +907,11 @@ public class TileQuarry extends TileAbstractBuilder implements IHasWork, ISidedI
     }
 
     @Override
-    public ConnectOverride overridePipeConnection(IPipeTile.PipeType type, EnumFacing with) {
+    public ConnectOverride overridePipeConnection(EnumPipeType type, EnumFacing with) {
         if (with == BuildCraftProperties.BLOCK_FACING.getValue(worldObj.getBlockState(pos))) {
             return ConnectOverride.DISCONNECT;
         }
-        return type == IPipeTile.PipeType.ITEM ? ConnectOverride.CONNECT : ConnectOverride.DEFAULT;
+        return type == EnumPipeType.ITEM ? ConnectOverride.CONNECT : ConnectOverride.DEFAULT;
     }
 
     @Override

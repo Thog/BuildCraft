@@ -17,11 +17,11 @@ import buildcraft.api.statements.IActionExternal;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IActionProvider;
 import buildcraft.api.statements.IStatementContainer;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.IPipeTile.PipeType;
 import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.RobotUtils;
-import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class RobotsActionProvider implements IActionProvider {
 
@@ -51,12 +51,12 @@ public class RobotsActionProvider implements IActionProvider {
         result.add(BuildCraftRobotics.actionStationForbidRobot);
         result.add(BuildCraftRobotics.actionStationForceRobot);
 
-        if (pipeTile.getPipeType() == PipeType.ITEM) {
+        if (pipeTile.getPipeType() == EnumPipeType.ITEM) {
             result.add(BuildCraftRobotics.actionStationRequestItems);
             result.add(BuildCraftRobotics.actionStationAcceptItems);
         }
 
-        if (pipeTile.getPipeType() == PipeType.FLUID) {
+        if (pipeTile.getPipeType() == EnumPipeType.FLUID) {
             result.add(BuildCraftRobotics.actionStationAcceptFluids);
         }
 

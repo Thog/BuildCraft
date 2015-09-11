@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import buildcraft.core.CompatHooks;
-import buildcraft.transport.item.ItemPipe;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class TransportProxy {
     @SidedProxy(clientSide = "buildcraft.transport.TransportProxyClient", serverSide = "buildcraft.transport.TransportProxy")
@@ -31,8 +31,6 @@ public class TransportProxy {
     public void registerRenderers() {}
 
     public void initIconProviders(BuildCraftTransport instance) {}
-
-    public void setIconProviderFromPipe(ItemPipe item, Pipe<?> dummyPipe) {}
 
     public void obsidianPipePickup(World world, EntityItem item, TileEntity tile) {}
 }

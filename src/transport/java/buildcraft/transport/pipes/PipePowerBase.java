@@ -30,15 +30,6 @@ import io.netty.buffer.ByteBuf;
 public abstract class PipePowerBase extends Pipe<PipeTransportPower>implements IMjExternalStorage, ISerializable {
     // TODO (PASS 0): refactor this into PipeTransportPower
 
-    // TYPES:
-    // WOOD --extract from engines
-    // COBBLE --doesn't connect to STONE or QUARTZ
-    // STONE --doesn't connect to COBBLE or QUARTZ
-    // QUARTZ --doesn't connect to COBBLE or STONE
-    // SANDSTONE --doesn't connect to machines
-    // IRON --power only flows out one way
-    // GOLD --not sure
-    // CLAY --prioritises machines over pipes
     public static final double MAX_POWER = 1024;
     public static final double ACTIVATION = 0.1;
     public static final long LOSS_DELAY = 10;

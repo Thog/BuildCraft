@@ -28,6 +28,7 @@ import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.tiles.IHeatable;
 import buildcraft.api.tools.IToolWrench;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeConnection;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.BuildCraftCore;
@@ -519,8 +520,8 @@ public abstract class TileEngineBase extends TileBuildCraft implements IPipeConn
      * maxEnergyExtracted(); public int getEnergyStored() { return energy; } public abstract int
      * calculateCurrentOutput(); */
     @Override
-    public ConnectOverride overridePipeConnection(IPipeTile.PipeType type, EnumFacing with) {
-        if (type == IPipeTile.PipeType.POWER) {
+    public ConnectOverride overridePipeConnection(EnumPipeType type, EnumFacing with) {
+        if (type == EnumPipeType.POWER) {
             return ConnectOverride.DEFAULT;
         } else if (with == orientation) {
             return ConnectOverride.DISCONNECT;

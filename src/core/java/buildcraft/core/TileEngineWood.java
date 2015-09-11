@@ -14,7 +14,7 @@ import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjConnection;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
-import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.core.lib.engines.TileEngineBase;
 
 public class TileEngineWood extends TileEngineBase {
@@ -104,7 +104,7 @@ public class TileEngineWood extends TileEngineBase {
     }
 
     @Override
-    public ConnectOverride overridePipeConnection(IPipeTile.PipeType type, EnumFacing with) {
+    public ConnectOverride overridePipeConnection(EnumPipeType type, EnumFacing with) {
         return ConnectOverride.DISCONNECT;
     }
 

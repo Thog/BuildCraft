@@ -18,9 +18,7 @@ import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
 
@@ -44,13 +42,15 @@ public class PipeRendererItems {
         };
     }
 
-    static void renderItemPipe(Pipe<PipeTransportItems> pipe, double x, double y, double z, float f) {
+    static void renderItemPipe(Pipe pipe, double x, double y, double z, float f) {
         GL11.glPushMatrix();
+
+        PipeTransportItems transport = (PipeTransportItems) pipe.transport;
 
         float light = pipe.container.getWorld().getLightBrightness(pipe.container.getPos());
 
         int count = 0;
-        for (TravelingItem item : pipe.transport.items) {
+        for (TravelingItem item : transport.items) {
             if (count >= MAX_ITEMS_TO_RENDER) {
                 break;
             }
@@ -114,7 +114,7 @@ public class PipeRendererItems {
             Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
             EntityResizableCuboid erc = new EntityResizableCuboid(null);
-            erc.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.ItemBox.ordinal());
+            erc.texture = null;// BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.ItemBox.ordinal());
             erc.xSize = 1;
             erc.ySize = 1;
             erc.zSize = 1;

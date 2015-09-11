@@ -26,13 +26,14 @@ import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IDebuggable;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.DefaultProps;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketPowerUpdate;
-import buildcraft.transport.pipes.PipePowerWood;
+import buildcraft.transport.pipes.PipeBehaviourWood;
 
-public class PipeTransportPower extends PipeTransport implements IDebuggable, IMjExternalStorage {
+public final class PipeTransportPower extends PipeTransport implements IDebuggable, IMjExternalStorage {
     public static final byte POWER_STAGES = 32;
 
     public static final double MAX_POWER = 1024;
@@ -64,14 +65,14 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable, IM
     public PipeTransportPower() {}
 
     @Override
-    public IPipeTile.PipeType getPipeType() {
-        return IPipeTile.PipeType.POWER;
+    public EnumPipeType getPipeType() {
+        return EnumPipeType.POWER;
     }
 
     @Override
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
         if (tile instanceof IPipeTile) {
-            Pipe<?> pipe2 = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            Pipe pipe2 = (Pipe) ((IPipeTile) tile).getPipe();
             if (BlockGenericPipe.isValid(pipe2) && !(pipe2.transport instanceof PipeTransportPower)) {
                 return false;
             }
@@ -79,7 +80,7 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable, IM
         }
 
         if (tile instanceof IMjHandler) {
-            if (container.pipe instanceof PipePowerWood) {
+            if (container.pipe.behaviour instanceof PipeBehaviourWood) {
                 IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
                 return storage.getDeviceType(side.getOpposite()).givesPowerTo(EnumMjDevice.TRANSPORT);
             }
@@ -156,7 +157,7 @@ public class PipeTransportPower extends PipeTransport implements IDebuggable, IM
 
     @Override
     public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
-        if (!(from instanceof Pipe<?>)) {
+        if (!(from instanceof PipeTransportPower)) {
             BCLog.logger.info(from.getClass());
             return mj;// You cannot insert power (directly) to pipes -wooden pipes implement this separately for
                       // redstone engines

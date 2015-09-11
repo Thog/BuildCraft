@@ -50,7 +50,7 @@ public class TriggerPipeSignal extends BCStatement implements ITriggerInternal {
             return false;
         }
 
-        Pipe<?> pipe = (Pipe<?>) ((IGate) container).getPipe();
+        Pipe pipe = (Pipe) ((IGate) container).getPipe();
 
         if (active) {
             if (pipe.signalStrength[color.ordinal()] == 0) {

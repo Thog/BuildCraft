@@ -37,6 +37,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.api.tiles.ITileAreaProvider;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IInjectable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.CompatHooks;
@@ -295,7 +296,7 @@ public final class Utils {
         return true;
     }
 
-    public static boolean isPipeConnected(IBlockAccess access, BlockPos pos, EnumFacing dir, IPipeTile.PipeType type) {
+    public static boolean isPipeConnected(IBlockAccess access, BlockPos pos, EnumFacing dir, EnumPipeType type) {
         TileEntity tile = access.getTileEntity(pos.offset(dir));
         return tile instanceof IPipeTile && ((IPipeTile) tile).getPipeType() == type && ((IPipeTile) tile).isPipeConnected(dir.getOpposite());
     }

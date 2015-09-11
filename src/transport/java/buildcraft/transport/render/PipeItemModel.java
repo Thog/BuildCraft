@@ -7,6 +7,7 @@ import javax.vecmath.Vector3f;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -23,8 +24,11 @@ public class PipeItemModel extends BuildCraftBakedModel {
 
     public static PipeItemModel create(ItemPipe item) {
         List<BakedQuad> quads = Lists.newArrayList();
-        TextureAtlasSprite sprite = item.getSprite();
 
+        TextureAtlasSprite sprite = item.getSprite();
+        if (sprite == null) {
+            sprite = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
+        }
         Vector3f center = new Vector3f(0.5f, 0.5f, 0.5f);
         Vector3f radius = new Vector3f(0.25f, 0.5f, 0.25f);
 

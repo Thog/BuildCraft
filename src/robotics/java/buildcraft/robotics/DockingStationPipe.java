@@ -14,6 +14,7 @@ import buildcraft.api.robots.EntityRobotBase;
 import buildcraft.api.robots.IRequestProvider;
 import buildcraft.api.robots.RobotManager;
 import buildcraft.api.statements.StatementSlot;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IInjectable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.utils.Utils;
@@ -77,7 +78,7 @@ public class DockingStationPipe extends DockingStation {
 
     @Override
     public IInjectable getItemOutput() {
-        if (getPipe().getPipeType() != IPipeTile.PipeType.ITEM) {
+        if (getPipe().getPipeType() != EnumPipeType.ITEM) {
             return null;
         }
 
@@ -86,7 +87,7 @@ public class DockingStationPipe extends DockingStation {
 
     @Override
     public IInventory getItemInput() {
-        if (getPipe().getPipeType() != IPipeTile.PipeType.ITEM) {
+        if (getPipe().getPipeType() != EnumPipeType.ITEM) {
             return null;
         }
 
@@ -107,7 +108,7 @@ public class DockingStationPipe extends DockingStation {
 
     @Override
     public IFluidHandler getFluidInput() {
-        if (getPipe().getPipeType() != IPipeTile.PipeType.FLUID) {
+        if (getPipe().getPipeType() != EnumPipeType.FLUID) {
             return null;
         }
 
@@ -128,7 +129,7 @@ public class DockingStationPipe extends DockingStation {
 
     @Override
     public IFluidHandler getFluidOutput() {
-        if (getPipe().getPipeType() != IPipeTile.PipeType.FLUID) {
+        if (getPipe().getPipeType() != EnumPipeType.FLUID) {
             return null;
         }
 
@@ -137,7 +138,7 @@ public class DockingStationPipe extends DockingStation {
 
     @Override
     public boolean providesPower() {
-        return getPipe().getPipeType() == IPipeTile.PipeType.POWER;
+        return getPipe().getPipeType() == EnumPipeType.POWER;
     }
 
     @Override

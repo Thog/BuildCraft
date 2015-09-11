@@ -7,7 +7,6 @@ package buildcraft.transport.item;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -31,7 +30,6 @@ import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.items.ItemBuildCraft;
-import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
@@ -246,7 +244,7 @@ public class ItemGate extends ItemBuildCraft implements IPipePluggableItem {
 
     @Override
     public PipePluggable createPipePluggable(IPipe pipe, EnumFacing side, ItemStack stack) {
-        Pipe<?> realPipe = (Pipe<?>) pipe;
+        Pipe realPipe = (Pipe) pipe;
 
         return new GatePluggable(GateFactory.makeGate(realPipe, stack, side));
     }

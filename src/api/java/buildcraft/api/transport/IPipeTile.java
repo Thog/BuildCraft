@@ -7,6 +7,7 @@ package buildcraft.api.transport;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -14,21 +15,19 @@ import buildcraft.api.enums.EnumColor;
 import buildcraft.api.transport.pluggable.PipePluggable;
 
 public interface IPipeTile extends IInjectable {
-    enum PipeType {
-        ITEM,
-        FLUID,
-        POWER,
-        STRUCTURE
-    }
-
-    PipeType getPipeType();
+    EnumPipeType getPipeType();
 
     World getWorld();
 
+    BlockPos getPos();
+
+    @Deprecated
     int x();
 
+    @Deprecated
     int y();
 
+    @Deprecated
     int z();
 
     /** True if the pipe is connected to the block/pipe in the specific direction

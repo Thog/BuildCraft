@@ -18,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
 
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IFacadePluggable;
@@ -29,6 +30,7 @@ import buildcraft.core.lib.render.BuildCraftBakedModel;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.item.ItemFacade;
+import buildcraft.transport.pipes.EnumPipeMaterial;
 
 import io.netty.buffer.ByteBuf;
 
@@ -95,7 +97,7 @@ public class FacadePluggable extends PipePluggable implements IFacadePluggable {
             center = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 5 / 16d));
             radius = new Vec3(4 / 16d, 4 / 16d, 4 / 16d).subtract(Utils.convert(Utils.convertPositive(face), 3 / 16d));
 
-            sprite = PipeIconProvider.TYPE.PipeStructureCobblestone.getIcon();
+            sprite = TransportItems.getPipe(EnumPipeType.STRUCTURE, EnumPipeMaterial.COBBLESTONE).getSprite(0);
             for (EnumFacing renderFace : EnumFacing.VALUES) {
                 Vector3f centerF = Utils.convertFloat(center);
                 Vector3f radiusF = Utils.convertFloat(radius);

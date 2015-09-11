@@ -10,15 +10,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import com.google.common.eventbus.EventBus;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -27,8 +29,11 @@ import buildcraft.api.gates.IGate;
 import buildcraft.api.statements.ActionState;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.PipeBehaviour;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.internal.IDropControlInventory;
 import buildcraft.core.lib.inventory.InvUtils;
@@ -36,29 +41,52 @@ import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.statements.ActionValve.ValveState;
+import buildcraft.transport.tile.TileGenericPipe;
 
-public abstract class Pipe<T extends PipeTransport> implements IDropControlInventory, IPipe {
+public final class Pipe implements IDropControlInventory, IPipe {
+    public final PipeDefinition definition;
+    public final PipeBehaviour behaviour;
+    public final PipeTransport transport;
     public int[] signalStrength = new int[] { 0, 0, 0, 0 };
     public TileGenericPipe container;
-    public final T transport;
-    public final Item item;
     public boolean[] wireSet = new boolean[] { false, false, false, false };
     public final Gate[] gates = new Gate[EnumFacing.VALUES.length];
 
+    @Deprecated
+    /** Replace it with google's event bus. Because its just better amirite? */
     public PipeEventBus eventBus = new PipeEventBus();
+    public final EventBus pipeEventBus = new EventBus("buildcraft.transport.Pipe");
 
     private boolean internalUpdateScheduled = false;
     private boolean initialized = false;
 
     private ArrayList<ActionState> actionStates = new ArrayList<ActionState>();
 
-    public Pipe(T transport, Item item) {
-        this.transport = transport;
-        this.item = item;
+    public Pipe(PipeDefinition definition) {
+        this.definition = definition;
+        behaviour = definition.behaviourFactory.createNew();
+        transport = getTransport(definition.type);
+        pipeEventBus.register(behaviour);
 
         eventBus.registerHandler(this);
         // TODO: Move to globalHandlers once a priority system is in place
         eventBus.registerHandler(new LensFilterHandler());
+    }
+
+    @SubscribeEvent
+    private static PipeTransport getTransport(EnumPipeType type) {
+        switch (type) {
+            case FLUID:
+                return new PipeTransportFluids();
+            case ITEM:
+                return new PipeTransportItems();
+            case POWER:
+                return new PipeTransportPower();
+            case STRUCTURE:
+                return new PipeTransportStructure();
+            default:
+                return null;
+        }
     }
 
     public void setTile(TileEntity tile) {
@@ -90,10 +118,10 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
     }
 
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
-        Pipe<?> otherPipe;
+        Pipe otherPipe;
 
         if (tile instanceof IPipeTile) {
-            otherPipe = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            otherPipe = (Pipe) ((IPipeTile) tile).getPipe();
             if (!BlockGenericPipe.isFullyDefined(otherPipe)) {
                 return false;
             }
@@ -107,7 +135,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
     }
 
     /** Should return the textureindex used by the Pipe Item Renderer, as this is done client-side the default
-     * implementation might not work if your getTextureIndex(Orienations.Unknown) has logic. Then override this */
+     * implementation might not work if your getTextureIndex(null) has logic. Then override this */
     public int getIconIndexForItem() {
         return getIconIndex(null);
     }
@@ -116,14 +144,18 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
      *
      * @return An array of icons */
     @SideOnly(Side.CLIENT)
-    public abstract IIconProvider getIconProvider();
+    public IIconProvider getIconProvider() {
+        return null;
+    }
 
     /** Should return the index in the array returned by GetTextureIcons() for a specified direction
      *
      * @param direction - The direction for which the indexed should be rendered. Unknown for pipe center
      *
      * @return An index valid in the array returned by getTextureIcons() */
-    public abstract int getIconIndex(EnumFacing direction);
+    public int getIconIndex(EnumFacing direction) {
+        return 0;
+    }
 
     public void update() {
         transport.updateEntity();
@@ -209,7 +241,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
 
             if (tile instanceof IPipeTile) {
                 IPipeTile tilePipe = (IPipeTile) tile;
-                Pipe<?> pipe = (Pipe<?>) tilePipe.getPipe();
+                Pipe pipe = (Pipe) tilePipe.getPipe();
 
                 if (BlockGenericPipe.isFullyDefined(pipe)) {
                     if (isWireConnectedTo(tile, color, o)) {
@@ -229,7 +261,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
 
                 if (tile instanceof IPipeTile) {
                     IPipeTile tilePipe = (IPipeTile) tile;
-                    Pipe<?> pipe = (Pipe<?>) tilePipe.getPipe();
+                    Pipe pipe = (Pipe) tilePipe.getPipe();
 
                     if (BlockGenericPipe.isFullyDefined(pipe)) {
                         pipe.internalUpdateScheduled = true;
@@ -272,7 +304,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
 
                 if (tile instanceof IPipeTile) {
                     IPipeTile tilePipe = (IPipeTile) tile;
-                    Pipe<?> pipe = (Pipe<?>) tilePipe.getPipe();
+                    Pipe pipe = (Pipe) tilePipe.getPipe();
 
                     if (BlockGenericPipe.isFullyDefined(pipe) && pipe.wireSet[wire.ordinal()]) {
                         if (isWireConnectedTo(tile, wire, o)) {
@@ -463,7 +495,7 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
             return false;
         }
 
-        Pipe<?> pipe = (Pipe<?>) ((IPipeTile) tile).getPipe();
+        Pipe pipe = (Pipe) ((IPipeTile) tile).getPipe();
 
         if (!BlockGenericPipe.isFullyDefined(pipe)) {
             return false;
@@ -551,5 +583,10 @@ public abstract class Pipe<T extends PipeTransport> implements IDropControlInven
 
     private Collection<ActionState> getActionStates() {
         return actionStates;
+    }
+
+    @Override
+    public PipeBehaviour getBehaviour() {
+        return behaviour;
     }
 }

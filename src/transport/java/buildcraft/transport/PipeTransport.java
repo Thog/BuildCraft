@@ -14,8 +14,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.core.lib.utils.BitSetUtils;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public abstract class PipeTransport {
 
@@ -31,7 +32,7 @@ public abstract class PipeTransport {
         }
     }
 
-    public abstract IPipeTile.PipeType getPipeType();
+    public abstract EnumPipeType getPipeType();
 
     public World getWorld() {
         return container.getWorld();

@@ -26,6 +26,7 @@ import net.minecraftforge.common.util.Constants;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.api.tiles.IDebuggable;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.inventory.Transactor;
@@ -45,8 +46,8 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
     public final TravelerSet items = new TravelerSet(this);
 
     @Override
-    public IPipeTile.PipeType getPipeType() {
-        return IPipeTile.PipeType.ITEM;
+    public EnumPipeType getPipeType() {
+        return EnumPipeType.ITEM;
     }
 
     public void readjustSpeed(TravelingItem item) {

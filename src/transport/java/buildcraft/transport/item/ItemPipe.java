@@ -22,29 +22,28 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.BCLog;
-import buildcraft.api.core.IIconProvider;
 import buildcraft.api.transport.IItemPipe;
+import buildcraft.api.transport.PipeAPI;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.ColorUtils;
-import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeToolTipManager;
-import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class ItemPipe extends ItemBuildCraft implements IItemPipe {
 
-    @SideOnly(Side.CLIENT)
-    private IIconProvider iconProvider;
-    private int pipeIconIndex;
+    public final PipeDefinition pipeDefinition;
 
-    public ItemPipe(BCCreativeTab creativeTab) {
-        super(creativeTab);
+    public ItemPipe(PipeDefinition pipeDefinition) {
+        super(BCCreativeTab.get("pipes"));
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
+        this.pipeDefinition = pipeDefinition;
     }
 
     @Override
@@ -66,12 +65,14 @@ public class ItemPipe extends ItemBuildCraft implements IItemPipe {
         }
 
         if (world.canBlockBePlaced(block, pos, false, side, entityplayer, itemstack)) {
-            Pipe<?> pipe = BlockGenericPipe.createPipe(this);
+            PipeDefinition definition = PipeAPI.registry.getDefinition(this);
 
-            if (pipe == null) {
-                BCLog.logger.log(Level.WARN, "Pipe failed to create during placement at {0}", pos);
+            if (definition == null) {
+                BCLog.logger.log(Level.WARN, "Pipe failed to create during placement at " + pos);
                 return true;
             }
+
+            Pipe pipe = new Pipe(definition);
 
             if (BlockGenericPipe.placePipe(pipe, world, pos, block.getDefaultState(), entityplayer)) {
                 block.onBlockPlacedBy(world, pos, block.getDefaultState(), entityplayer, itemstack);
@@ -94,21 +95,9 @@ public class ItemPipe extends ItemBuildCraft implements IItemPipe {
     }
 
     @SideOnly(Side.CLIENT)
-    public void setPipesIcons(IIconProvider iconProvider) {
-        this.iconProvider = iconProvider;
-    }
-
-    public void setPipeIconIndex(int index) {
-        this.pipeIconIndex = index;
-    }
-
-    @SideOnly(Side.CLIENT)
     public TextureAtlasSprite getSprite() {
-        if (iconProvider != null) { // invalid pipes won't have this set
-            return iconProvider.getIcon(pipeIconIndex);
-        } else {
-            return null;
-        }
+        // TODO: Use the pipeDefinition!
+        return pipeDefinition.getSprite(pipeDefinition.itemSpriteIndex);
     }
 
     @Override
@@ -124,9 +113,9 @@ public class ItemPipe extends ItemBuildCraft implements IItemPipe {
         list.addAll(toolTip);
     }
 
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public void registerModels() {
-//        ModelHelper.registerItemModel(this, 0, "");
-//    }
+    // @Override
+    // @SideOnly(Side.CLIENT)
+    // public void registerModels() {
+    // ModelHelper.registerItemModel(this, 0, "");
+    // }
 }

@@ -30,10 +30,10 @@ public class PipeRendererPower {
 
     private static boolean initialized = false;
 
-    static void renderPowerPipe(Pipe<PipeTransportPower> pipe, double x, double y, double z) {
+    static void renderPowerPipe(Pipe pipe, double x, double y, double z) {
         initializeDisplayPowerList();
 
-        PipeTransportPower pow = pipe.transport;
+        PipeTransportPower pow = (PipeTransportPower) pipe.transport;
 
         GL11.glPushMatrix();
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
@@ -119,7 +119,7 @@ public class PipeRendererPower {
 
         EntityResizableCuboid cuboid = new EntityResizableCuboid(null);
         cuboid.setSize(size);
-        cuboid.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
+        cuboid.texture =null;// BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
         cuboid.makeClient();
 
         double offsetNonFlow = 0;// 8 - textureWidth / 2;

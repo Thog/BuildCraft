@@ -10,15 +10,34 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
+import buildcraft.api.transport.IPipe;
+import buildcraft.api.transport.IPipeFactory;
+import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportStructure;
 
 public class PipeStructureCobblestone extends Pipe<PipeTransportStructure> {
+    private final PipeInfo info;
 
-    public PipeStructureCobblestone(Item item) {
+    public PipeStructureCobblestone(Item item, PipeInfo info) {
         super(new PipeTransportStructure(), item);
+        this.info = info;
+    }
+
+    public static Item createFactory(final PipeInfo info) {
+        final Item item = PipeAPI.registry.createNewPipeItem();
+        // TODO (JDK1.8): Convert this to a lambda
+        IPipeFactory factory = new IPipeFactory() {
+            @Override
+            public IPipe createPipe() {
+                return new PipeStructureCobblestone(item, info);
+            }
+        };
+        PipeAPI.registry.registerFactory(item, factory);
+        item.setUnlocalizedName(info.getUnlocalizedName());
+        return item;
     }
 
     @Override
@@ -29,6 +48,6 @@ public class PipeStructureCobblestone extends Pipe<PipeTransportStructure> {
 
     @Override
     public int getIconIndex(EnumFacing direction) {
-        return PipeIconProvider.TYPE.PipeStructureCobblestone.ordinal();
+        return PipeIconProvider.getIndex(info);
     }
 }

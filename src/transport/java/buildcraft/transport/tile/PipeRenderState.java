@@ -2,7 +2,7 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.transport;
+package buildcraft.transport.tile;
 
 import net.minecraft.util.EnumFacing;
 
@@ -22,7 +22,7 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
     public final ConnectionMatrix pipeConnectionBanned = new ConnectionMatrix();
     public final TextureMatrix textureMatrix = new TextureMatrix();
     public final WireMatrix wireMatrix = new WireMatrix();
-    protected boolean glassColorDirty = false;
+    boolean glassColorDirty = false;
     private byte glassColor = -127;
     public final float[] customConnections = new float[6];
 

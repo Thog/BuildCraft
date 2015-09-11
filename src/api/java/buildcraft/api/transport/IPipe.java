@@ -11,6 +11,8 @@ import buildcraft.api.gates.IGate;
 public interface IPipe {
     IPipeTile getTile();
 
+    PipeBehaviour getBehaviour();
+
     IGate getGate(EnumFacing side);
 
     boolean hasGate(EnumFacing side);

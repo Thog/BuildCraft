@@ -2,7 +2,7 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.transport;
+package buildcraft.transport.tile;
 
 import java.util.List;
 
@@ -19,11 +19,9 @@ import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -36,20 +34,10 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.enums.EnumColor;
 import buildcraft.api.gates.IGateExpansion;
-import buildcraft.api.mj.EnumMjDevice;
-import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
-import buildcraft.api.mj.IMjInternalStorage;
-import buildcraft.api.mj.reference.NonExistantStorage;
 import buildcraft.api.tiles.IDebuggable;
-import buildcraft.api.transport.ICustomPipeConnection;
-import buildcraft.api.transport.IPipe;
-import buildcraft.api.transport.IPipeConnection;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.PipeConnectionAPI;
-import buildcraft.api.transport.PipeManager;
-import buildcraft.api.transport.PipeWire;
+import buildcraft.api.transport.*;
 import buildcraft.api.transport.pluggable.IFacadePluggable;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
@@ -63,12 +51,11 @@ import buildcraft.core.lib.network.ISyncedTile;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.network.PacketTileState;
 import buildcraft.core.lib.utils.Utils;
+import buildcraft.transport.*;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.item.ItemFacade.FacadeState;
-import buildcraft.transport.item.ItemPipe;
-import buildcraft.transport.pluggable.PlugPluggable;
 
 import io.netty.buffer.ByteBuf;
 
@@ -81,7 +68,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public final CoreState coreState = new CoreState();
     public boolean[] pipeConnectionsBuffer = new boolean[6];
 
-    public Pipe<?> pipe;
+    public Pipe pipe;
     public int redstoneInput;
     public int[] redstoneInputSide = new int[EnumFacing.VALUES.length];
 
@@ -94,233 +81,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     protected boolean attachPluggables = false;
     protected SideProperties sideProperties = new SideProperties();
 
-    private final SidedExternalStorage storage = new SidedExternalStorage();
+    private final SidedExternalStorage storage = new SidedExternalStorage(this);
 
     private TileBuffer[] tileBuffer;
     private int glassColor = -1;
-
-    public static class CoreState implements ISerializable {
-        public int pipeId = -1;
-
-        @Override
-        public void writeData(ByteBuf data) {
-            data.writeInt(pipeId);
-        }
-
-        @Override
-        public void readData(ByteBuf data) {
-            pipeId = data.readInt();
-        }
-    }
-
-    public static class SideProperties {
-        PipePluggable[] pluggables = new PipePluggable[EnumFacing.VALUES.length];
-
-        public void writeToNBT(NBTTagCompound nbt) {
-            for (int i = 0; i < EnumFacing.VALUES.length; i++) {
-                PipePluggable pluggable = pluggables[i];
-                final String key = "pluggable[" + i + "]";
-                if (pluggable == null) {
-                    nbt.removeTag(key);
-                } else {
-                    NBTTagCompound pluggableData = new NBTTagCompound();
-                    pluggableData.setString("pluggableName", PipeManager.getPluggableName(pluggable.getClass()));
-                    pluggable.writeToNBT(pluggableData);
-                    nbt.setTag(key, pluggableData);
-                }
-            }
-        }
-
-        public void readFromNBT(NBTTagCompound nbt) {
-            for (int i = 0; i < EnumFacing.VALUES.length; i++) {
-                final String key = "pluggable[" + i + "]";
-                if (!nbt.hasKey(key)) {
-                    continue;
-                }
-                try {
-                    NBTTagCompound pluggableData = nbt.getCompoundTag(key);
-                    Class<?> pluggableClass = null;
-                    // Migration support for 6.1.x/6.2.x // No Longer Required
-                    // if (pluggableData.hasKey("pluggableClass")) {
-                    // String c = pluggableData.getString("pluggableClass");
-                    // if ("buildcraft.transport.gates.ItemGate$GatePluggable".equals(c)) {
-                    // pluggableClass = GatePluggable.class;
-                    // } else if ("buildcraft.transport.ItemFacade$FacadePluggable".equals(c)) {
-                    // pluggableClass = FacadePluggable.class;
-                    // } else if ("buildcraft.transport.ItemPlug$PlugPluggable".equals(c)) {
-                    // pluggableClass = PlugPluggable.class;
-                    // } else if ("buildcraft.transport.gates.ItemRobotStation$RobotStationPluggable".equals(c)
-                    // || "buildcraft.transport.ItemRobotStation$RobotStationPluggable".equals(c)) {
-                    // pluggableClass = PipeManager.getPluggableByName("robotStation");
-                    // }
-                    // } else {
-                    pluggableClass = PipeManager.getPluggableByName(pluggableData.getString("pluggableName"));
-                    // }
-                    if (!PipePluggable.class.isAssignableFrom(pluggableClass)) {
-                        BCLog.logger.warn("Wrong pluggable class: " + pluggableClass);
-                        continue;
-                    }
-                    PipePluggable pluggable = (PipePluggable) pluggableClass.newInstance();
-                    pluggable.readFromNBT(pluggableData);
-                    pluggables[i] = pluggable;
-                } catch (Exception e) {
-                    BCLog.logger.warn("Failed to load side state");
-                    e.printStackTrace();
-                }
-            }
-
-            // Migration code
-            for (int i = 0; i < EnumFacing.VALUES.length; i++) {
-                PipePluggable pluggable = null;
-                if (nbt.hasKey("facadeState[" + i + "]")) {
-                    pluggable = new FacadePluggable(FacadeState.readArray(nbt.getTagList("facadeState[" + i + "]", Constants.NBT.TAG_COMPOUND)));
-                } else {
-                    // Migration support for 5.0.x and 6.0.x // no longer required
-                    // if (nbt.hasKey("facadeBlocks[" + i + "]")) {
-                    // // 5.0.x
-                    // Block block = (Block) Block.blockRegistry.getObjectById(nbt.getInteger("facadeBlocks[" + i +
-                    // "]"));
-                    // int blockId = nbt.getInteger("facadeBlocks[" + i + "]");
-                    //
-                    // if (blockId != 0) {
-                    // int metadata = nbt.getInteger("facadeMeta[" + i + "]");
-                    // pluggable = new FacadePluggable(new FacadeState[] { FacadeState.create(state) });
-                    // }
-                    // } else if (nbt.hasKey("facadeBlocksStr[" + i + "][0]")) {
-                    // // 6.0.x
-                    // FacadeState mainState = FacadeState.create((Block)
-                    // Block.blockRegistry.getObject(nbt.getString("facadeBlocksStr[" + i
-                    // + "][0]")), nbt.getInteger("facadeMeta[" + i + "][0]"));
-                    // if (nbt.hasKey("facadeBlocksStr[" + i + "][1]")) {
-                    // FacadeState phasedState = FacadeState.create((Block)
-                    // Block.blockRegistry.getObject(nbt.getString("facadeBlocksStr[" + i
-                    // + "][1]")), nbt.getInteger("facadeMeta[" + i + "][1]"),
-                    // PipeWire.fromOrdinal(nbt.getInteger("facadeWires[" + i
-                    // + "]")));
-                    // pluggable = new FacadePluggable(new FacadeState[] { mainState, phasedState });
-                    // } else {
-                    // pluggable = new FacadePluggable(new FacadeState[] { mainState });
-                    // }
-                    // }
-                }
-
-                if (nbt.getBoolean("plug[" + i + "]")) {
-                    pluggable = new PlugPluggable();
-                }
-
-                if (pluggable != null) {
-                    pluggables[i] = pluggable;
-                }
-            }
-        }
-
-        public void rotateLeft() {
-            PipePluggable[] newPluggables = new PipePluggable[EnumFacing.VALUES.length];
-            for (EnumFacing dir : EnumFacing.VALUES) {
-                EnumFacing rotated = dir.getAxis() == Axis.Y ? dir : dir.rotateY();
-                newPluggables[rotated.ordinal()] = pluggables[dir.ordinal()];
-            }
-            pluggables = newPluggables;
-        }
-
-        public boolean dropItem(TileGenericPipe pipe, EnumFacing direction, EntityPlayer player) {
-            boolean result = false;
-            PipePluggable pluggable = pluggables[direction.ordinal()];
-            if (pluggable != null) {
-                pluggable.onDetachedPipe(pipe, direction);
-                if (!pipe.getWorld().isRemote) {
-                    ItemStack[] stacks = pluggable.getDropItems(pipe);
-                    if (stacks != null) {
-                        for (ItemStack stack : stacks) {
-                            Utils.dropTryIntoPlayerInventory(pipe.worldObj, pipe.pos, stack, player);
-                        }
-                    }
-                }
-                result = true;
-            }
-            return result;
-        }
-
-        public void invalidate() {
-            for (PipePluggable p : pluggables) {
-                if (p != null) {
-                    p.invalidate();
-                }
-            }
-        }
-
-        public void validate(TileGenericPipe pipe) {
-            for (EnumFacing d : EnumFacing.VALUES) {
-                PipePluggable p = pluggables[d.ordinal()];
-
-                if (p != null) {
-                    p.validate(pipe, d);
-                }
-            }
-        }
-    }
-
-    public class SidedExternalStorage implements IMjExternalStorage {
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("SidedExternalStorage [" + getSidedStorage(null) + "]");
-            return builder.toString();
-        }
-
-        private IMjExternalStorage getSidedStorage(EnumFacing side) {
-            if (side != null && hasPipePluggable(side)) {
-                PipePluggable pluggable = getPipePluggable(side);
-                if (pluggable instanceof IMjExternalStorage) {
-                    return (IMjExternalStorage) pluggable;
-                } else if (pluggable.isBlocking(TileGenericPipe.this, side)) {
-                    return NonExistantStorage.INSTANCE;
-                }
-            }
-            if (pipe instanceof IMjExternalStorage) {
-                return (IMjExternalStorage) pipe;
-            }
-            return NonExistantStorage.INSTANCE;
-        }
-
-        @Override
-        public EnumMjDevice getDeviceType(EnumFacing side) {
-            return getSidedStorage(side).getDeviceType(side);
-        }
-
-        @Override
-        public EnumMjPower getPowerType(EnumFacing side) {
-            return getSidedStorage(side).getPowerType(side);
-        }
-
-        @Override
-        public double extractPower(World world, EnumFacing flowDirection, IMjExternalStorage to, double minMj, double maxMj, boolean simulate) {
-            return getSidedStorage(flowDirection).extractPower(world, flowDirection, to, minMj, maxMj, simulate);
-        }
-
-        @Override
-        public double insertPower(World world, EnumFacing flowDirection, IMjExternalStorage from, double mj, boolean simulate) {
-            return getSidedStorage(flowDirection == null ? null : flowDirection.getOpposite()).insertPower(world, flowDirection, from, mj, simulate);
-        }
-
-        @Override
-        public double getSuction(World world, EnumFacing flowDirection) {
-            return getSidedStorage(flowDirection == null ? null : flowDirection.getOpposite()).getSuction(world, flowDirection);
-        }
-
-        @Override
-        public void setInternalStorage(IMjInternalStorage storage) {}
-
-        @Override
-        public double currentPower(EnumFacing side) {
-            return getSidedStorage(side).currentPower(side);
-        }
-
-        @Override
-        public double maxPower(EnumFacing side) {
-            return getSidedStorage(side).maxPower(side);
-        }
-    }
 
     public TileGenericPipe() {}
 
@@ -337,7 +101,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         if (pipe != null) {
-            nbt.setInteger("pipeId", Item.getIdFromItem(pipe.item));
+            nbt.setString("pipeTag", pipe.definition.uniqueTag);
             pipe.writeToNBT(nbt);
         } else {
             nbt.setInteger("pipeId", coreState.pipeId);
@@ -366,9 +130,16 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 redstoneInputSide[i] = 0;
             }
         }
+        PipeDefinition definition = PipeAPI.registry.getDefinition(nbt.getString("pipeTag"));
+        if (nbt.hasKey("pipeId")) {
+            // Pre 7.x compat
+            int id = nbt.getInteger("pipeId");
+            definition = PipeAPI.registry.getDefinition(Item.getItemById(id));
 
-        coreState.pipeId = nbt.getInteger("pipeId");
-        pipe = BlockGenericPipe.createPipe((ItemPipe) Item.getItemById(coreState.pipeId));
+        }
+        coreState.pipeId = Item.getIdFromItem(PipeAPI.registry.getItem(definition));
+
+        pipe = new Pipe(definition);
         bindPipe();
 
         if (pipe != null) {
@@ -615,7 +386,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         return changed;
     }
 
-    public void initialize(Pipe<?> pipe) {
+    public void initialize(Pipe pipe) {
         this.blockType = getBlockType();
 
         if (pipe == null) {
@@ -653,7 +424,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     private void bindPipe() {
         if (!pipeBound && pipe != null) {
             pipe.setTile(this);
-            coreState.pipeId = Item.getIdFromItem(pipe.item);
+            coreState.setDefinition(pipe.definition);
             pipeBound = true;
         }
     }
@@ -668,7 +439,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public boolean canInjectItems(EnumFacing from) {
-        if (getPipeType() != IPipeTile.PipeType.ITEM) {
+        if (getPipeType() != EnumPipeType.ITEM) {
             return false;
         }
         return isPipeConnected(from);
@@ -697,7 +468,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     @Override
-    public PipeType getPipeType() {
+    public EnumPipeType getPipeType() {
         if (BlockGenericPipe.isValid(pipe)) {
             return pipe.transport.getPipeType();
         }
@@ -735,8 +506,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         packet.addStateForSerialization((byte) 1, renderState);
         packet.addStateForSerialization((byte) 2, pluggableState);
 
-        if (pipe instanceof ISerializable) {
-            packet.addStateForSerialization((byte) 3, (ISerializable) pipe);
+        if (pipe.behaviour instanceof ISerializable) {
+            packet.addStateForSerialization((byte) 3, (ISerializable) pipe.behaviour);
         }
 
         return packet;
@@ -797,7 +568,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     protected boolean canPipeConnect_internal(TileEntity with, EnumFacing side) {
-        if (!(pipe instanceof IPipeConnectionForced) || !((IPipeConnectionForced) pipe).ignoreConnectionOverrides(side)) {
+        if (!(pipe.behaviour instanceof IPipeConnectionForced) || !((IPipeConnectionForced) pipe.behaviour).ignoreConnectionOverrides(side)) {
             if (with instanceof IPipeConnection) {
                 IPipeConnection.ConnectOverride override = ((IPipeConnection) with).overridePipeConnection(pipe.transport.getPipeType(), side
                         .getOpposite());
@@ -818,7 +589,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 return false;
             }
 
-            Pipe<?> otherPipe = (Pipe<?>) other.getPipe();
+            Pipe otherPipe = (Pipe) other.getPipe();
 
             if (!BlockGenericPipe.isValid(otherPipe)) {
                 return false;
@@ -1053,7 +824,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             case 2:
                 return pluggableState;
             case 3:
-                return (ISerializable) pipe;
+                return (ISerializable) pipe.behaviour;
         }
         throw new RuntimeException("Unknown state requested: " + stateId + " this is a bug!");
     }
@@ -1071,7 +842,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 }
 
                 if (pipe == null && coreState.pipeId != 0) {
-                    initialize(BlockGenericPipe.createPipe((ItemPipe) Item.itemRegistry.getObjectById(coreState.pipeId)));
+                    initialize(new Pipe(coreState.getDefinition()));
                 }
 
                 if (pipe == null) {
@@ -1168,8 +939,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             return true;
         }
 
-        if (BlockGenericPipe.isValid(pipe) && pipe instanceof ISolidSideTile) {
-            if (((ISolidSideTile) pipe).isSolidOnSide(side)) {
+        if (BlockGenericPipe.isValid(pipe) && pipe.behaviour instanceof ISolidSideTile) {
+            if (((ISolidSideTile) pipe.behaviour).isSolidOnSide(side)) {
                 return true;
             }
         }
@@ -1209,15 +980,15 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public void writeGuiData(ByteBuf data) {
-        if (BlockGenericPipe.isValid(pipe) && pipe instanceof IGuiReturnHandler) {
-            ((IGuiReturnHandler) pipe).writeGuiData(data);
+        if (BlockGenericPipe.isValid(pipe) && pipe.behaviour instanceof IGuiReturnHandler) {
+            ((IGuiReturnHandler) pipe.behaviour).writeGuiData(data);
         }
     }
 
     @Override
     public void readGuiData(ByteBuf data, EntityPlayer sender) {
-        if (BlockGenericPipe.isValid(pipe) && pipe instanceof IGuiReturnHandler) {
-            ((IGuiReturnHandler) pipe).readGuiData(data, sender);
+        if (BlockGenericPipe.isValid(pipe) && pipe.behaviour instanceof IGuiReturnHandler) {
+            ((IGuiReturnHandler) pipe.behaviour).readGuiData(data, sender);
         }
     }
 
@@ -1251,8 +1022,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         if (pipe == null || pipe.transport == null) {
             return;
         }
-        if (pipe instanceof IDebuggable) {
-            ((IDebuggable) pipe).getDebugInfo(left, right, side);
+        if (pipe.behaviour instanceof IDebuggable) {
+            ((IDebuggable) pipe.behaviour).getDebugInfo(left, right, side);
         }
         if (pipe.transport instanceof IDebuggable) {
             ((IDebuggable) pipe.transport).getDebugInfo(left, right, side);

@@ -13,7 +13,7 @@ import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.core.statements.BCStatement;
 import buildcraft.core.statements.StatementParameterRedstoneGateSideOnly;
-import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class TriggerRedstoneFaderInput extends BCStatement implements ITriggerInternal {
 

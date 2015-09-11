@@ -6,6 +6,9 @@ package buildcraft.transport;
 
 import java.io.PrintWriter;
 import java.util.LinkedList;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -54,7 +57,9 @@ import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.statements.StatementManager;
 import buildcraft.api.transport.ICustomPipeConnection;
+import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeConnectionAPI;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.BCCreativeTab;
@@ -93,7 +98,7 @@ import buildcraft.transport.network.PacketPipeTransportItemStack;
 import buildcraft.transport.network.PacketPipeTransportItemStackRequest;
 import buildcraft.transport.network.PacketPipeTransportTraveler;
 import buildcraft.transport.network.PacketPowerUpdate;
-import buildcraft.transport.pipes.*;
+import buildcraft.transport.pipes.PipeRegistry;
 import buildcraft.transport.pluggable.ItemLens;
 import buildcraft.transport.pluggable.ItemPlug;
 import buildcraft.transport.pluggable.LensPluggable;
@@ -110,6 +115,7 @@ import buildcraft.transport.statements.ActionValve.ValveState;
 import buildcraft.transport.statements.TriggerClockTimer.Time;
 import buildcraft.transport.statements.TriggerPipeContents.PipeContents;
 import buildcraft.transport.stripes.*;
+import buildcraft.transport.tile.TileGenericPipe;
 
 @Mod(version = Version.VERSION, modid = "BuildCraft|Transport", name = "Buildcraft Transport", dependencies = DefaultProps.DEPENDENCY_CORE)
 public class BuildCraftTransport extends BuildCraftMod {
@@ -139,6 +145,12 @@ public class BuildCraftTransport extends BuildCraftMod {
     public static Item pipeItemsEmerald;
     public static Item pipeItemsStone;
     public static Item pipeItemsCobblestone;
+    public static Item pipeItemsAndersite;
+    public static Item pipeItemsPolishedAndersite;
+    public static Item pipeItemsDiorite;
+    public static Item pipeItemsPolishedDiorite;
+    public static Item pipeItemsGranite;
+    public static Item pipeItemsPolishedGranite;
     public static Item pipeItemsIron;
     public static Item pipeItemsQuartz;
     public static Item pipeItemsGold;
@@ -151,6 +163,7 @@ public class BuildCraftTransport extends BuildCraftMod {
     public static Item pipeItemsEmzuli;
     public static Item pipeItemsStripes;
     public static Item pipeItemsClay;
+
     public static Item pipeFluidsWood;
     public static Item pipeFluidsCobblestone;
     public static Item pipeFluidsStone;
@@ -161,6 +174,7 @@ public class BuildCraftTransport extends BuildCraftMod {
     public static Item pipeFluidsSandstone;
     public static Item pipeFluidsEmerald;
     public static Item pipeFluidsDiamond;
+
     public static Item pipePowerWood;
     public static Item pipePowerCobblestone;
     public static Item pipePowerStone;
@@ -202,7 +216,7 @@ public class BuildCraftTransport extends BuildCraftMod {
     private static LinkedList<PipeRecipe> pipeRecipes = new LinkedList<PipeRecipe>();
     private static ChannelHandler transportChannelHandler;
 
-    public PipeIconProvider pipeIconProvider = new PipeIconProvider();
+    public PipeIconProvider pipeIconProvider = PipeIconProvider.instance;
     public WireIconProvider wireIconProvider = new WireIconProvider();
 
     private static class PipeRecipe {
@@ -218,6 +232,8 @@ public class BuildCraftTransport extends BuildCraftMod {
         if (Loader.isModLoaded("BuildCraft|Silicon")) {
             new BCCreativeTab("gates");
         }
+
+        PipeAPI.registry = new PipeRegistry();
 
         try {
             BuildCraftCore.mainConfigManager.register("experimental.kinesisPowerLossOnTravel", false,
@@ -246,126 +262,190 @@ public class BuildCraftTransport extends BuildCraftMod {
             BuildCraftCore.mainConfigManager.register("general.pipes.facadeNoLaserRecipe", false,
                     "Should non-laser (crafting table) facade recipes be forced?", ConfigManager.RestartRequirement.GAME);
 
-            reloadConfig(ConfigManager.RestartRequirement.GAME);
-
-            filteredBufferBlock = new BlockFilteredBuffer();
-            CoreProxy.proxy.registerBlock(filteredBufferBlock.setUnlocalizedName("filteredBufferBlock"));
-
-            pipeWaterproof = new ItemBuildCraft();
-            pipeWaterproof.setUnlocalizedName("pipeWaterproof");
-            CoreProxy.proxy.registerItem(pipeWaterproof);
-
-            genericPipeBlock = (BlockGenericPipe) CompatHooks.INSTANCE.getBlock(BlockGenericPipe.class);
-
-            CoreProxy.proxy.registerBlock(genericPipeBlock.setUnlocalizedName("pipeBlock"), ItemBlock.class);
-
-            BCCreativeTab pipeTab = BCCreativeTab.get("pipes");
-            pipeItemsWood = buildPipe(PipeItemsWood.class, pipeTab, "plankWood", "blockGlassColorless", "plankWood");
-            pipeItemsEmerald = buildPipe(PipeItemsEmerald.class, pipeTab, "gemEmerald", "blockGlassColorless", "gemEmerald");
-            pipeItemsCobblestone = buildPipe(PipeItemsCobblestone.class, pipeTab, "cobblestone", "blockGlassColorless", "cobblestone");
-            pipeItemsStone = buildPipe(PipeItemsStone.class, pipeTab, "stone", "blockGlassColorless", "stone");
-            pipeItemsQuartz = buildPipe(PipeItemsQuartz.class, pipeTab, "blockQuartz", "blockGlassColorless", "blockQuartz");
-            pipeItemsIron = buildPipe(PipeItemsIron.class, pipeTab, "ingotIron", "blockGlassColorless", "ingotIron");
-            pipeItemsGold = buildPipe(PipeItemsGold.class, pipeTab, "ingotGold", "blockGlassColorless", "ingotGold");
-            pipeItemsDiamond = buildPipe(PipeItemsDiamond.class, pipeTab, "gemDiamond", "blockGlassColorless", "gemDiamond");
-            pipeItemsObsidian = buildPipe(PipeItemsObsidian.class, pipeTab, Blocks.obsidian, "blockGlassColorless", Blocks.obsidian);
-            pipeItemsLapis = buildPipe(PipeItemsLapis.class, pipeTab, "blockLapis", "blockGlassColorless", "blockLapis");
-            pipeItemsDaizuli = buildPipe(PipeItemsDaizuli.class, pipeTab, "blockLapis", "blockGlassColorless", "gemDiamond");
-            pipeItemsSandstone = buildPipe(PipeItemsSandstone.class, pipeTab, Blocks.sandstone, "blockGlassColorless", Blocks.sandstone);
-            pipeItemsVoid = buildPipe(PipeItemsVoid.class, pipeTab, "dyeBlack", "blockGlassColorless", "dustRedstone");
-            pipeItemsEmzuli = buildPipe(PipeItemsEmzuli.class, pipeTab, "blockLapis", "blockGlassColorless", "gemEmerald");
-            pipeItemsStripes = buildPipe(PipeItemsStripes.class, pipeTab, "gearGold", "blockGlassColorless", "gearGold");
-            pipeItemsClay = buildPipe(PipeItemsClay.class, pipeTab, Blocks.clay, "blockGlassColorless", Blocks.clay);
-
-            pipeFluidsWood = buildPipe(PipeFluidsWood.class, pipeTab, pipeWaterproof, pipeItemsWood);
-            pipeFluidsCobblestone = buildPipe(PipeFluidsCobblestone.class, pipeTab, pipeWaterproof, pipeItemsCobblestone);
-            pipeFluidsStone = buildPipe(PipeFluidsStone.class, pipeTab, pipeWaterproof, pipeItemsStone);
-            pipeFluidsQuartz = buildPipe(PipeFluidsQuartz.class, pipeTab, pipeWaterproof, pipeItemsQuartz);
-            pipeFluidsIron = buildPipe(PipeFluidsIron.class, pipeTab, pipeWaterproof, pipeItemsIron);
-            pipeFluidsGold = buildPipe(PipeFluidsGold.class, pipeTab, pipeWaterproof, pipeItemsGold);
-            pipeFluidsEmerald = buildPipe(PipeFluidsEmerald.class, pipeTab, pipeWaterproof, pipeItemsEmerald);
-            pipeFluidsDiamond = buildPipe(PipeFluidsDiamond.class, pipeTab, pipeWaterproof, pipeItemsDiamond);
-            pipeFluidsSandstone = buildPipe(PipeFluidsSandstone.class, pipeTab, pipeWaterproof, pipeItemsSandstone);
-            pipeFluidsVoid = buildPipe(PipeFluidsVoid.class, pipeTab, pipeWaterproof, pipeItemsVoid);
-
-            pipePowerWood = buildPipe(PipePowerWood.class, pipeTab, "dustRedstone", pipeItemsWood);
-            pipePowerCobblestone = buildPipe(PipePowerCobblestone.class, pipeTab, "dustRedstone", pipeItemsCobblestone);
-            pipePowerStone = buildPipe(PipePowerStone.class, pipeTab, "dustRedstone", pipeItemsStone);
-            pipePowerQuartz = buildPipe(PipePowerQuartz.class, pipeTab, "dustRedstone", pipeItemsQuartz);
-            pipePowerIron = buildPipe(PipePowerIron.class, pipeTab, "dustRedstone", pipeItemsIron);
-            pipePowerSandstone = buildPipe(PipePowerSandstone.class, pipeTab, "dustRedstone", pipeItemsSandstone);
-
-            pipeStructureCobblestone = buildPipe(PipeStructureCobblestone.class, pipeTab, Blocks.gravel, pipeItemsCobblestone);
-
-            pipeWire = new ItemPipeWire();
-            CoreProxy.proxy.registerItem(pipeWire);
-            PipeWire.item = pipeWire;
-
-            pipeGate = new ItemGate();
-            pipeGate.setTextureLocation("buildcrafttransport:gate");
-            pipeGate.setUnlocalizedName("pipeGate");
-            CoreProxy.proxy.registerItem(pipeGate);
-
-            facadeItem = new ItemFacade();
-            facadeItem.setUnlocalizedName("pipeFacade");
-            CoreProxy.proxy.registerItem(facadeItem);
-            FacadeAPI.facadeItem = facadeItem;
-
-            plugItem = new ItemPlug();
-            plugItem.setUnlocalizedName("pipePlug");
-            CoreProxy.proxy.registerItem(plugItem);
-
-            lensItem = new ItemLens();
-            lensItem.setUnlocalizedName("pipeLens");
-            CoreProxy.proxy.registerItem(lensItem);
-
-            // powerAdapterItem = new ItemPowerAdapter();
-            // powerAdapterItem.setUnlocalizedName("pipePowerAdapter");
-            // CoreProxy.proxy.registerItem(powerAdapterItem);
-
-            gateCopier = new ItemGateCopier();
-            CoreProxy.proxy.registerItem(gateCopier);
-
-            for (PipeContents kind : PipeContents.values()) {
-                triggerPipe[kind.ordinal()] = new TriggerPipeContents(kind);
-            }
-
-            for (PipeWire wire : PipeWire.values()) {
-                triggerPipeWireActive[wire.ordinal()] = new TriggerPipeSignal(true, wire);
-                triggerPipeWireInactive[wire.ordinal()] = new TriggerPipeSignal(false, wire);
-                actionPipeWire[wire.ordinal()] = new ActionSignalOutput(wire);
-            }
-
-            for (Time time : TriggerClockTimer.Time.VALUES) {
-                triggerTimer[time.ordinal()] = new TriggerClockTimer(time);
-            }
-
-            for (int level = 0; level < triggerRedstoneLevel.length; level++) {
-                triggerRedstoneLevel[level] = new TriggerRedstoneFaderInput(level + 1);
-                actionRedstoneLevel[level] = new ActionRedstoneFaderOutput(level + 1);
-            }
-
-            for (EnumColor color : EnumColor.VALUES) {
-                actionPipeColor[color.ordinal()] = new ActionPipeColor(color);
-            }
-
-            for (EnumFacing direction : EnumFacing.VALUES) {
-                actionPipeDirection[direction.ordinal()] = new ActionPipeDirection(direction);
-            }
-
-            for (ValveState state : ValveState.VALUES) {
-                actionValve[state.ordinal()] = new ActionValve(state);
-            }
-
-            for (PowerMode limit : PowerMode.VALUES) {
-                actionPowerLimiter[limit.ordinal()] = new ActionPowerLimiter(limit);
-            }
-
-            triggerLightSensorBright = new TriggerLightSensor(true);
-            triggerLightSensorDark = new TriggerLightSensor(false);
         } finally {
             BuildCraftCore.mainConfiguration.save();
         }
+
+        reloadConfig(ConfigManager.RestartRequirement.GAME);
+
+        filteredBufferBlock = new BlockFilteredBuffer();
+        CoreProxy.proxy.registerBlock(filteredBufferBlock.setUnlocalizedName("filteredBufferBlock"));
+
+        pipeWaterproof = new ItemBuildCraft();
+        pipeWaterproof.setUnlocalizedName("pipeWaterproof");
+        CoreProxy.proxy.registerItem(pipeWaterproof);
+
+        genericPipeBlock = (BlockGenericPipe) CompatHooks.INSTANCE.getBlock(BlockGenericPipe.class);
+
+        CoreProxy.proxy.registerBlock(genericPipeBlock.setUnlocalizedName("pipeBlock"), ItemBlock.class);
+
+        TransportItems.initItems();
+
+        BCCreativeTab pipeTab = BCCreativeTab.get("pipes");
+
+        // Init pipe items
+        //
+        // pipeItemsWood = buildPipe(PipeItemsWood.class, pipeTab, "plankWood", "blockGlassColorless", "plankWood");
+        // pipeItemsEmerald = buildPipe(PipeItemsEmerald.class, pipeTab, "gemEmerald", "blockGlassColorless",
+        // "gemEmerald");
+        // pipeItemsCobblestone = buildPipe(PipeItemsCobblestone.class, pipeTab, "cobblestone", "blockGlassColorless",
+        // "cobblestone");
+        // pipeItemsStone = buildPipe(PipeItemsStone.class, pipeTab, "stone", "blockGlassColorless", "stone");
+        //
+        // PipeInfo andersiteInfo = new PipeInfo(PipeType.ITEM, EnumPipeMaterial.ANDERSITE);
+        // ItemStack andersiteStack = new ItemStack(Blocks.stone, 1, BlockStone.EnumType.ANDESITE.getMetadata());
+        // pipeItemsAndersite = buildPipe(PipeItemsBase.createFactory(andersiteInfo), andersiteInfo, pipeTab,
+        // andersiteStack, "blockGlassColorless",
+        // andersiteStack);
+        //
+        // PipeInfo andersitePolishedInfo = new PipeInfo(PipeType.ITEM, EnumPipeMaterial.POLISHED_ANDERSITE);
+        // ItemStack andersitePolishedStack = new ItemStack(Blocks.stone, 1,
+        // BlockStone.EnumType.ANDESITE_SMOOTH.getMetadata());
+        // pipeItemsPolishedAndersite = buildPipe(PipeItemsBase.createFactory(andersitePolishedInfo),
+        // andersitePolishedInfo, pipeTab,
+        // andersitePolishedStack, "blockGlassColourless", andersitePolishedStack);
+        //
+        // PipeInfo dioriteInfo = new PipeInfo(PipeType.ITEM, EnumPipeMaterial.DIORITE);
+        // ItemStack dioriteStack = new ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE.getMetadata());
+        // pipeItemsDiorite = buildPipe(PipeItemsBase.createFactory(dioriteInfo), dioriteInfo, pipeTab, dioriteStack,
+        // "blockGlassColorless",
+        // dioriteStack);
+        //
+        // PipeInfo dioritePolishedInfo = new PipeInfo(PipeType.ITEM, EnumPipeMaterial.POLISHED_DIORITE);
+        // ItemStack dioritePolishedStack = new ItemStack(Blocks.stone, 1,
+        // BlockStone.EnumType.DIORITE_SMOOTH.getMetadata());
+        // pipeItemsPolishedDiorite = buildPipe(PipeItemsBase.createFactory(dioritePolishedInfo), dioritePolishedInfo,
+        // pipeTab, dioritePolishedStack,
+        // "blockGlassColourless", dioritePolishedStack);
+        //
+        // PipeInfo graniteInfo = new PipeInfo(PipeType.ITEM, EnumPipeMaterial.GRANITE);
+        // ItemStack graniteStack = new ItemStack(Blocks.stone, 1, BlockStone.EnumType.GRANITE.getMetadata());
+        // pipeItemsGranite = buildPipe(PipeItemsBase.createFactory(graniteInfo), graniteInfo, pipeTab, graniteStack,
+        // "blockGlassColorless",
+        // graniteStack);
+        //
+        // PipeInfo granitePolishedInfo = new PipeInfo(PipeType.ITEM, EnumPipeMaterial.POLISHED_GRANITE);
+        // ItemStack granitePolishedStack = new ItemStack(Blocks.stone, 1,
+        // BlockStone.EnumType.GRANITE_SMOOTH.getMetadata());
+        // pipeItemsPolishedGranite = buildPipe(PipeItemsBase.createFactory(granitePolishedInfo), granitePolishedInfo,
+        // pipeTab, granitePolishedStack,
+        // "blockGlassColourless", granitePolishedStack);
+        //
+        // pipeItemsQuartz = buildPipe(PipeItemsQuartz.class, pipeTab, "blockQuartz", "blockGlassColorless",
+        // "blockQuartz");
+        // pipeItemsIron = buildPipe(PipeItemsIron.class, pipeTab, "ingotIron", "blockGlassColorless", "ingotIron");
+        // pipeItemsGold = buildPipe(PipeItemsGold.class, pipeTab, "ingotGold", "blockGlassColorless", "ingotGold");
+        // pipeItemsDiamond = buildPipe(PipeItemsDiamond.class, pipeTab, "gemDiamond", "blockGlassColorless",
+        // "gemDiamond");
+        // pipeItemsObsidian = buildPipe(PipeItemsObsidian.class, pipeTab, Blocks.obsidian, "blockGlassColorless",
+        // Blocks.obsidian);
+        // pipeItemsLapis = buildPipe(PipeItemsLapis.class, pipeTab, "blockLapis", "blockGlassColorless", "blockLapis");
+        // pipeItemsDaizuli = buildPipe(PipeItemsDaizuli.class, pipeTab, "blockLapis", "blockGlassColorless",
+        // "gemDiamond");
+        // pipeItemsSandstone = buildPipe(PipeItemsSandstone.class, pipeTab, Blocks.sandstone, "blockGlassColorless",
+        // Blocks.sandstone);
+        // pipeItemsVoid = buildPipe(PipeItemsVoid.class, pipeTab, "dyeBlack", "blockGlassColorless", "dustRedstone");
+        // pipeItemsEmzuli = buildPipe(PipeItemsEmzuli.class, pipeTab, "blockLapis", "blockGlassColorless",
+        // "gemEmerald");
+        // pipeItemsStripes = buildPipe(PipeItemsStripes.class, pipeTab, "gearGold", "blockGlassColorless", "gearGold");
+        // pipeItemsClay = buildPipe(PipeItemsClay.class, pipeTab, Blocks.clay, "blockGlassColorless", Blocks.clay);
+        //
+        // // Init pipe fluids
+        //
+        // pipeFluidsWood = buildPipe(PipeFluidsWood.class, pipeTab, pipeWaterproof, pipeItemsWood);
+        // pipeFluidsCobblestone = buildPipe(PipeFluidsCobblestone.class, pipeTab, pipeWaterproof,
+        // pipeItemsCobblestone);
+        // pipeFluidsStone = buildPipe(PipeFluidsStone.class, pipeTab, pipeWaterproof, pipeItemsStone);
+        // pipeFluidsQuartz = buildPipe(PipeFluidsQuartz.class, pipeTab, pipeWaterproof, pipeItemsQuartz);
+        // pipeFluidsIron = buildPipe(PipeFluidsIron.class, pipeTab, pipeWaterproof, pipeItemsIron);
+        // pipeFluidsGold = buildPipe(PipeFluidsGold.class, pipeTab, pipeWaterproof, pipeItemsGold);
+        // pipeFluidsEmerald = buildPipe(PipeFluidsEmerald.class, pipeTab, pipeWaterproof, pipeItemsEmerald);
+        // pipeFluidsDiamond = buildPipe(PipeFluidsDiamond.class, pipeTab, pipeWaterproof, pipeItemsDiamond);
+        // pipeFluidsSandstone = buildPipe(PipeFluidsSandstone.class, pipeTab, pipeWaterproof, pipeItemsSandstone);
+        // pipeFluidsVoid = buildPipe(PipeFluidsVoid.class, pipeTab, pipeWaterproof, pipeItemsVoid);
+        //
+        // // Init pipe power
+        //
+        // pipePowerWood = buildPipe(PipePowerWood.class, pipeTab, "dustRedstone", pipeItemsWood);
+        // pipePowerCobblestone = buildPipe(PipePowerCobblestone.class, pipeTab, "dustRedstone", pipeItemsCobblestone);
+        // pipePowerStone = buildPipe(PipePowerStone.class, pipeTab, "dustRedstone", pipeItemsStone);
+        // pipePowerQuartz = buildPipe(PipePowerQuartz.class, pipeTab, "dustRedstone", pipeItemsQuartz);
+        // pipePowerIron = buildPipe(PipePowerIron.class, pipeTab, "dustRedstone", pipeItemsIron);
+        // pipePowerSandstone = buildPipe(PipePowerSandstone.class, pipeTab, "dustRedstone", pipeItemsSandstone);
+        //
+        // // Init the pipe structures
+        //
+        // pipeStructureCobblestone = buildPipe(PipeStructureCobblestone.class, pipeTab, Blocks.gravel,
+        // pipeItemsCobblestone);
+
+        // Set up connection whitelist + blacklists
+
+        pipeWire = new ItemPipeWire();
+        CoreProxy.proxy.registerItem(pipeWire);
+        PipeWire.item = pipeWire;
+
+        pipeGate = new ItemGate();
+        pipeGate.setTextureLocation("buildcrafttransport:gate");
+        pipeGate.setUnlocalizedName("pipeGate");
+        CoreProxy.proxy.registerItem(pipeGate);
+
+        facadeItem = new ItemFacade();
+        facadeItem.setUnlocalizedName("pipeFacade");
+        CoreProxy.proxy.registerItem(facadeItem);
+        FacadeAPI.facadeItem = facadeItem;
+
+        plugItem = new ItemPlug();
+        plugItem.setUnlocalizedName("pipePlug");
+        CoreProxy.proxy.registerItem(plugItem);
+
+        lensItem = new ItemLens();
+        lensItem.setUnlocalizedName("pipeLens");
+        CoreProxy.proxy.registerItem(lensItem);
+
+        // powerAdapterItem = new ItemPowerAdapter();
+        // powerAdapterItem.setUnlocalizedName("pipePowerAdapter");
+        // CoreProxy.proxy.registerItem(powerAdapterItem);
+
+        gateCopier = new ItemGateCopier();
+        CoreProxy.proxy.registerItem(gateCopier);
+
+        for (PipeContents kind : PipeContents.values()) {
+            triggerPipe[kind.ordinal()] = new TriggerPipeContents(kind);
+        }
+
+        for (PipeWire wire : PipeWire.values()) {
+            triggerPipeWireActive[wire.ordinal()] = new TriggerPipeSignal(true, wire);
+            triggerPipeWireInactive[wire.ordinal()] = new TriggerPipeSignal(false, wire);
+            actionPipeWire[wire.ordinal()] = new ActionSignalOutput(wire);
+        }
+
+        for (Time time : TriggerClockTimer.Time.VALUES) {
+            triggerTimer[time.ordinal()] = new TriggerClockTimer(time);
+        }
+
+        for (int level = 0; level < triggerRedstoneLevel.length; level++) {
+            triggerRedstoneLevel[level] = new TriggerRedstoneFaderInput(level + 1);
+            actionRedstoneLevel[level] = new ActionRedstoneFaderOutput(level + 1);
+        }
+
+        for (EnumColor color : EnumColor.VALUES) {
+            actionPipeColor[color.ordinal()] = new ActionPipeColor(color);
+        }
+
+        for (EnumFacing direction : EnumFacing.VALUES) {
+            actionPipeDirection[direction.ordinal()] = new ActionPipeDirection(direction);
+        }
+
+        for (ValveState state : ValveState.VALUES) {
+            actionValve[state.ordinal()] = new ActionValve(state);
+        }
+
+        for (PowerMode limit : PowerMode.VALUES) {
+            actionPowerLimiter[limit.ordinal()] = new ActionPowerLimiter(limit);
+        }
+
+        triggerLightSensorBright = new TriggerLightSensor(true);
+        triggerLightSensorDark = new TriggerLightSensor(false);
 
         InterModComms.registerHandler(new IMCHandlerTransport());
     }
@@ -445,7 +525,8 @@ public class BuildCraftTransport extends BuildCraftMod {
         GateExpansions.registerExpansion(GateExpansionLightSensor.INSTANCE, new ItemStack(Blocks.daylight_detector));
 
         if (BuildCraftCore.loadDefaultRecipes) {
-            loadRecipes();
+            // loadRecipes();
+            TransportItems.addRecipies();
         }
 
         TransportProxy.proxy.registerRenderers();
@@ -518,11 +599,8 @@ public class BuildCraftTransport extends BuildCraftMod {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void textureHook(TextureStitchEvent.Pre event) {
-        for (ItemPipe i : BlockGenericPipe.pipes.keySet()) {
-            Pipe<?> dummyPipe = BlockGenericPipe.createPipe(i);
-            if (dummyPipe != null) {
-                dummyPipe.getIconProvider().registerIcons(event.map);
-            }
+        for (Entry<String, Pair<PipeDefinition, Item>> entry : PipeAPI.registry.getPipeDefinitions()) {
+            entry.getValue().getLeft().registerSprites(event.map);
         }
 
         WireIconProvider.registerIcons(event.map);
@@ -617,57 +695,6 @@ public class BuildCraftTransport extends BuildCraftMod {
         InterModComms.processIMC(event);
     }
 
-    public static Item buildPipe(Class<? extends Pipe<?>> clas, BCCreativeTab creativeTab, Object... ingredients) {
-        ItemPipe res = BlockGenericPipe.registerPipe(clas, creativeTab);
-        res.setUnlocalizedName(clas.getSimpleName());
-
-        // Add appropriate recipes to temporary list
-        if (ingredients.length == 3) {
-            for (int i = 0; i < 17; i++) {
-                PipeRecipe recipe = new PipeRecipe();
-                Object glass;
-
-                if (i == 0) {
-                    glass = ingredients[1];
-                } else {
-                    glass = new ItemStack(Blocks.stained_glass, 1, i - 1);
-                }
-
-                recipe.result = new ItemStack(res, 8, i);
-                recipe.input = new Object[] { "ABC", 'A', ingredients[0], 'B', glass, 'C', ingredients[2] };
-
-                pipeRecipes.add(recipe);
-            }
-        } else if (ingredients.length == 2) {
-            for (int i = 0; i < 17; i++) {
-                PipeRecipe recipe = new PipeRecipe();
-
-                Object left = ingredients[0];
-                Object right = ingredients[1];
-
-                if (ingredients[1] instanceof ItemPipe) {
-                    right = new ItemStack((Item) right, 1, i);
-                }
-
-                recipe.isShapeless = true;
-                recipe.result = new ItemStack(res, 1, i);
-                recipe.input = new Object[] { left, right };
-
-                pipeRecipes.add(recipe);
-
-                if (ingredients[1] instanceof ItemPipe) {
-                    PipeRecipe uncraft = new PipeRecipe();
-                    uncraft.isShapeless = true;
-                    uncraft.input = new Object[] { recipe.result };
-                    uncraft.result = (ItemStack) right;
-                    pipeRecipes.add(uncraft);
-                }
-            }
-        }
-
-        return res;
-    }
-
     @Mod.EventHandler
     public void whiteListAppliedEnergetics(FMLInitializationEvent event) {
         FMLInterModComms.sendMessage("appliedenergistics2", "whitelist-spatial", TileGenericPipe.class.getCanonicalName());
@@ -690,7 +717,9 @@ public class BuildCraftTransport extends BuildCraftMod {
     public void registerModels(ModelBakeEvent event) {
         ModelResourceLocation mrl = new ModelResourceLocation("buildcrafttransport:pipeBlock");
         event.modelRegistry.putObject(mrl, new PipeBlockModel());
-        for (ItemPipe itemPipe : BlockGenericPipe.pipes.keySet()) {
+        for (Entry<String, Pair<PipeDefinition, Item>> entry : PipeAPI.registry.getPipeDefinitions()) {
+            Item item = entry.getValue().getRight();
+            ItemPipe itemPipe = (ItemPipe) item;
             mrl = ModelHelper.getItemResourceLocation(itemPipe, "");
             event.modelRegistry.putObject(mrl, PipeItemModel.create(itemPipe));
         }

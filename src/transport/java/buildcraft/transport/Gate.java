@@ -40,7 +40,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     public static int MAX_STATEMENTS = 8;
     public static int MAX_PARAMETERS = 3;
 
-    public final Pipe<?> pipe;
+    public final Pipe pipe;
     public final GateMaterial material;
     public final GateLogic logic;
     public final BiMap<IGateExpansion, GateExpansionController> expansions = HashBiMap.create();
@@ -68,7 +68,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     private int[] actionGroups = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
     // / CONSTRUCTOR
-    public Gate(Pipe<?> pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
+    public Gate(Pipe pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
         this.pipe = pipe;
         this.material = material;
         this.logic = logic;

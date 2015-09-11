@@ -23,8 +23,8 @@ import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeTransportItems;
-import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.tile.TileGenericPipe;
 import buildcraft.transport.utils.TransportUtils;
 
 /** Created by asie on 3/20/15. */

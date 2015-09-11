@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.tiles.IDebuggable;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
@@ -199,8 +200,8 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
     }
 
     @Override
-    public IPipeTile.PipeType getPipeType() {
-        return IPipeTile.PipeType.FLUID;
+    public EnumPipeType getPipeType() {
+        return EnumPipeType.FLUID;
     }
 
     private boolean canReceiveFluid(EnumFacing o) {

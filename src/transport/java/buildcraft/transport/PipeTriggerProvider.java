@@ -14,12 +14,13 @@ import buildcraft.api.statements.ITriggerExternal;
 import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.statements.ITriggerProvider;
 import buildcraft.transport.statements.TriggerPipeContents;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class PipeTriggerProvider implements ITriggerProvider {
     @Override
     public LinkedList<ITriggerInternal> getInternalTriggers(IStatementContainer container) {
         LinkedList<ITriggerInternal> result = new LinkedList<ITriggerInternal>();
-        Pipe<?> pipe = null;
+        Pipe pipe = null;
         TileEntity tile = container.getTile();
 
         if (tile instanceof TileGenericPipe) {

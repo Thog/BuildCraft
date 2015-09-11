@@ -24,11 +24,11 @@ public final class GateFactory {
     /** Deactivate constructor */
     private GateFactory() {}
 
-    public static Gate makeGate(Pipe<?> pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
+    public static Gate makeGate(Pipe pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
         return new Gate(pipe, material, logic, direction);
     }
 
-    public static Gate makeGate(Pipe<?> pipe, ItemStack stack, EnumFacing direction) {
+    public static Gate makeGate(Pipe pipe, ItemStack stack, EnumFacing direction) {
         if (stack == null || stack.stackSize <= 0 || !(stack.getItem() instanceof ItemGate)) {
             return null;
         }
@@ -42,7 +42,7 @@ public final class GateFactory {
         return gate;
     }
 
-    public static Gate makeGate(Pipe<?> pipe, NBTTagCompound nbt) {
+    public static Gate makeGate(Pipe pipe, NBTTagCompound nbt) {
         GateMaterial material = GateMaterial.REDSTONE;
         GateLogic logic = GateLogic.AND;
         EnumFacing direction = null;

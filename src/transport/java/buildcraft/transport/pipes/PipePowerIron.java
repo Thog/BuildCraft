@@ -27,8 +27,8 @@ import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportPower;
-import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.statements.ActionPipeDirection;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class PipePowerIron extends PipePowerBase implements ICustomPipeConnection {
     protected int standardIconIndex = PipeIconProvider.TYPE.PipePowerIronStandard.ordinal();

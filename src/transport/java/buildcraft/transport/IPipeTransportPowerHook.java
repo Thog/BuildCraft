@@ -6,6 +6,7 @@ package buildcraft.transport;
 
 import net.minecraft.util.EnumFacing;
 
+// TODO (PASS 0): Fix this!
 public interface IPipeTransportPowerHook {
 
     /** Override default behavior on receiving energy into the pipe.

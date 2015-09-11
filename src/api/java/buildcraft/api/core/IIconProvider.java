@@ -6,7 +6,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IIconProvider {
-    public TextureAtlasSprite getIcon(int iconIndex);
+    public TextureAtlasSprite getIcon(int index);
 
     @SideOnly(Side.CLIENT)
     public void registerIcons(TextureMap iconRegister);

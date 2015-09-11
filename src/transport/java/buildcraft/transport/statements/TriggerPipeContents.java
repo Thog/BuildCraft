@@ -23,6 +23,7 @@ import buildcraft.core.statements.BCStatement;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.PipeTransportItems;
+import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.pipes.PipePowerBase;
 
@@ -68,7 +69,7 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
             return false;
         }
 
-        Pipe<?> pipe = (Pipe<?>) ((IGate) container).getPipe();
+        Pipe pipe = (Pipe) ((IGate) container).getPipe();
         IStatementParameter parameter = parameters[0];
 
         if (pipe.transport instanceof PipeTransportItems) {
@@ -114,8 +115,8 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
 
                 return false;
             }
-        } else if (pipe instanceof PipePowerBase) {
-            PipePowerBase pipePower = (PipePowerBase) pipe;
+        } else if (pipe.transport instanceof PipeTransportPower) {
+            PipeTransportPower pipePower = (PipeTransportPower) pipe.transport;
 
             switch (kind) {
                 case empty:

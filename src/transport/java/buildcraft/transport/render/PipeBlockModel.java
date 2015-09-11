@@ -28,10 +28,10 @@ import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipePluggableState;
-import buildcraft.transport.PipeRenderState;
-import buildcraft.transport.TileGenericPipe.CoreState;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.render.tile.PipeRendererWires;
+import buildcraft.transport.tile.CoreState;
+import buildcraft.transport.tile.PipeRenderState;
 
 public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockModel {
     public PipeBlockModel() {
@@ -60,7 +60,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
         CoreState core = BlockGenericPipe.PIPE_CORE_STATE.getUnlistedValue(state);// Not required... :P
         PipeRenderState render = BlockGenericPipe.PIPE_RENDER_STATE.getUnlistedValue(state);
         PipePluggableState pluggable = BlockGenericPipe.PIPE_PLUGGABLE_STATE.getUnlistedValue(state);
-        Pipe<?> pipe = BlockGenericPipe.PIPE_PIPE.getUnlistedValue(state);
+        Pipe pipe = BlockGenericPipe.PIPE_PIPE.getUnlistedValue(state);
 
         if (core == null || render == null || pluggable == null || pipe == null) {
             return defaultModel();// Thats not good. Just return a cobblestone structure pipe centre model

@@ -17,7 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.gates.IGateExpansion;
-import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.BuildCraftCore.RenderMode;
@@ -26,12 +26,12 @@ import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeRenderState;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.PipeTransportPower;
-import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.GatePluggable;
+import buildcraft.transport.tile.PipeRenderState;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
     public PipeRendererTESR() {}
@@ -55,14 +55,14 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
         renderPluggables(pipe, x, y, z);
 
-        IPipeTile.PipeType pipeType = pipe.getPipeType();
+        EnumPipeType pipeType = pipe.getPipeType();
 
-        if (pipeType == IPipeTile.PipeType.ITEM) {
-            PipeRendererItems.renderItemPipe((Pipe<PipeTransportItems>) pipe.pipe, x, y, z, f);
-        } else if (pipeType == IPipeTile.PipeType.FLUID) {
-            PipeRendererFluids.renderFluidPipe((Pipe<PipeTransportFluids>) pipe.pipe, x, y, z);
-        } else if (pipeType == IPipeTile.PipeType.POWER) {
-            PipeRendererPower.renderPowerPipe((Pipe<PipeTransportPower>) pipe.pipe, x, y, z);
+        if (pipeType == EnumPipeType.ITEM) {
+            PipeRendererItems.renderItemPipe((Pipe) pipe.pipe, x, y, z, f);
+        } else if (pipeType == EnumPipeType.FLUID) {
+            PipeRendererFluids.renderFluidPipe((Pipe) pipe.pipe, x, y, z);
+        } else if (pipeType == EnumPipeType.POWER) {
+            PipeRendererPower.renderPowerPipe((Pipe) pipe.pipe, x, y, z);
         } /* else if (pipeType == PipeType.STRUCTURE) { // no object to render in a structure pipe; } */
     }
 

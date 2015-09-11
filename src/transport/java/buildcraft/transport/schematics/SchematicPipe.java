@@ -25,8 +25,8 @@ import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.StatementManager;
 import buildcraft.transport.Gate;
 import buildcraft.transport.Pipe;
-import buildcraft.transport.TileGenericPipe.SideProperties;
 import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.tile.SideProperties;
 
 public class SchematicPipe extends SchematicTile {
 
@@ -34,7 +34,7 @@ public class SchematicPipe extends SchematicTile {
 
     @Override
     public boolean isAlreadyBuilt(IBuilderContext context, BlockPos pos) {
-        Pipe<?> pipe = BlockGenericPipe.getPipe(context.world(), pos);
+        Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
             return pipe.item == Item.getItemById(tileNBT.getInteger("pipeId"));
@@ -156,7 +156,7 @@ public class SchematicPipe extends SchematicTile {
     @Override
     public void initializeFromObjectAt(IBuilderContext context, BlockPos pos) {
         TileEntity tile = context.world().getTileEntity(pos);
-        Pipe<?> pipe = BlockGenericPipe.getPipe(context.world(), pos);
+        Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
             tile.writeToNBT(tileNBT);
@@ -181,7 +181,7 @@ public class SchematicPipe extends SchematicTile {
 
     @Override
     public void storeRequirements(IBuilderContext context, BlockPos pos) {
-        Pipe<?> pipe = BlockGenericPipe.getPipe(context.world(), pos);
+        Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
             ArrayList<ItemStack> items = pipe.computeItemDrop();

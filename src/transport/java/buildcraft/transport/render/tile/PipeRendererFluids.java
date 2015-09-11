@@ -73,8 +73,8 @@ public class PipeRendererFluids {
         }
     }
 
-    static void renderFluidPipe(Pipe<PipeTransportFluids> pipe, double x, double y, double z) {
-        PipeTransportFluids trans = pipe.transport;
+    static void renderFluidPipe(Pipe pipe, double x, double y, double z) {
+        PipeTransportFluids trans = (PipeTransportFluids) pipe.transport;
 
         boolean needsRender = false;
         FluidRenderData renderData = trans.renderCache;

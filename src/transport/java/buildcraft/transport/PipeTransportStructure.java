@@ -7,20 +7,21 @@ package buildcraft.transport;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.block.BlockGenericPipe;
 
 public class PipeTransportStructure extends PipeTransport {
 
     @Override
-    public IPipeTile.PipeType getPipeType() {
-        return IPipeTile.PipeType.STRUCTURE;
+    public EnumPipeType getPipeType() {
+        return EnumPipeType.STRUCTURE;
     }
 
     @Override
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
         if (tile instanceof IPipeTile) {
-            Pipe<?> pipe2 = (Pipe<?>) ((IPipeTile) tile).getPipe();
+            Pipe pipe2 = (Pipe) ((IPipeTile) tile).getPipe();
 
             if (BlockGenericPipe.isValid(pipe2) && !(pipe2.transport instanceof PipeTransportStructure)) {
                 return false;

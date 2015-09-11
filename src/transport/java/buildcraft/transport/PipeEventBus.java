@@ -14,7 +14,7 @@ import com.google.common.collect.Maps;
 import buildcraft.transport.pipes.events.PipeEvent;
 import buildcraft.transport.pipes.events.PipeEventPriority;
 
-// TODO: Make this use something other than reflection
+// TODO: Make this use something other than reflection. Or just use google's own event bus
 public class PipeEventBus {
     private class EventHandler {
         public Method method;

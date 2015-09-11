@@ -87,7 +87,7 @@ public class TriggerEnergy extends BCStatement implements ITriggerInternal {
     // public static boolean isTriggeringPipe(TileEntity tile) {
     // if (tile instanceof IPipeTile) {
     // IPipeTile pipeTile = (IPipeTile) tile;
-    // if (pipeTile.getPipeType() == IPipeTile.PipeType.POWER && pipeTile.getPipe() instanceof IMjExternalStorage) {
+    // if (pipeTile.getPipeType() == EnumPipeType.POWER && pipeTile.getPipe() instanceof IMjExternalStorage) {
     // return true;
     // }
     // }

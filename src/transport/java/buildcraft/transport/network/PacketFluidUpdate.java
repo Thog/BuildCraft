@@ -16,7 +16,7 @@ import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.core.network.PacketIds;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.PipeTransportFluids;
-import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.tile.TileGenericPipe;
 import buildcraft.transport.utils.FluidRenderData;
 
 import io.netty.buffer.ByteBuf;

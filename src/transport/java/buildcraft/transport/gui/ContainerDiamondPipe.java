@@ -8,10 +8,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 
+import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.core.lib.gui.BuildCraftContainer;
 import buildcraft.core.lib.gui.slots.SlotPhantom;
 import buildcraft.transport.IDiamondPipe;
-import buildcraft.transport.Pipe;
 
 public class ContainerDiamondPipe extends BuildCraftContainer {
 
@@ -44,6 +44,6 @@ public class ContainerDiamondPipe extends BuildCraftContainer {
 
     @Override
     public boolean canInteractWith(EntityPlayer entityplayer) {
-        return ((Pipe) pipe).container.isUseableByPlayer(entityplayer);
+        return ((IInventory) ((PipeBehaviour) pipe).owner.getTile()).isUseableByPlayer(entityplayer);
     }
 }

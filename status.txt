@@ -3,6 +3,7 @@ Bugs:
     - Builder + Architect tables don't connect to land markers
     - All gui's are too dark (Except for the guide book)
     - Pipe selection boxes do not extend out to match the extension that is rendered
+    - Oil doesn't generate?
     Missing Block Models:
         - Pump
         - Mining Well

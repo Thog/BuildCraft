@@ -13,6 +13,7 @@ import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
@@ -59,6 +60,12 @@ public class BlockBuildCraftFluid extends BlockFluidClassic implements ICustomSt
     public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
         if (entity == null) {
             return;
+        }
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) entity;
+            if (player.capabilities.isFlying) {
+                return;
+            }
         }
 
         Vec3 acc = new Vec3(0, 0, 0);

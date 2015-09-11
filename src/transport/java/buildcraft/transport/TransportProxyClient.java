@@ -13,6 +13,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import buildcraft.transport.item.ItemPipe;
 import buildcraft.transport.render.TileEntityPickupFX;
 import buildcraft.transport.render.tile.PipeRendererTESR;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class TransportProxyClient extends TransportProxy {
 
@@ -36,9 +37,4 @@ public class TransportProxyClient extends TransportProxy {
 
     @Override
     public void registerRenderers() {}
-
-    @Override
-    public void setIconProviderFromPipe(ItemPipe item, Pipe<?> dummyPipe) {
-        item.setPipesIcons(dummyPipe.getIconProvider());
-    }
 }
