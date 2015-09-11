@@ -122,7 +122,7 @@ public class GuideManager {
         }
         GuidePartFactory<?> part = null;
         if (location.getResourcePath().endsWith("md")) {// Wiki info page (Markdown)
-            part = MarkdownLoader.loadMarkdown(location, this); 
+            part = MarkdownLoader.loadMarkdown(location, this);
         } else if (location.getResourcePath().endsWith("png")) { // Image
             part = ImageLoader.loadImage(location);
         } else {

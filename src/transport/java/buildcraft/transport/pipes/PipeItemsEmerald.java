@@ -86,8 +86,8 @@ public class PipeItemsEmerald extends PipeItemsWood implements ISerializable, IG
         }
 
         if (!container.getWorld().isRemote) {
-            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.PIPE_EMERALD_ITEM.ID, container.getWorld(), container.x(), container.y(), container
-                    .z());
+            entityplayer.openGui(BuildCraftTransport.instance, EnumGui.PIPE_EMERALD_ITEM.ID, container.getWorld(), container.x(), container.y(),
+                    container.z());
         }
 
         return true;

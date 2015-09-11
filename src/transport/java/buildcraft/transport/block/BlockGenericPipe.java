@@ -80,8 +80,8 @@ import buildcraft.transport.tile.PipeRenderState;
 import buildcraft.transport.tile.TileGenericPipe;
 
 public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable, ICustomHighlight, ICustomStateMapper, ICustomPipeConnection {
-    public static final BuildCraftExtendedProperty<CoreState> PIPE_CORE_STATE = BuildCraftExtendedProperty.createExtended(
-            "core_state", CoreState.class);
+    public static final BuildCraftExtendedProperty<CoreState> PIPE_CORE_STATE = BuildCraftExtendedProperty.createExtended("core_state",
+            CoreState.class);
 
     public static final BuildCraftExtendedProperty<PipeRenderState> PIPE_RENDER_STATE = BuildCraftExtendedProperty.createExtended("render_state",
             PipeRenderState.class);

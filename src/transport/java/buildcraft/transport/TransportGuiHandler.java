@@ -14,10 +14,8 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.core.EnumGui;
-import buildcraft.transport.gui.*;
-import buildcraft.transport.pipes.PipeFluidsEmerald;
-import buildcraft.transport.pipes.PipeItemsEmerald;
-import buildcraft.transport.pipes.PipeItemsEmzuli;
+import buildcraft.transport.gui.ContainerFilteredBuffer;
+import buildcraft.transport.gui.GuiFilteredBuffer;
 import buildcraft.transport.tile.TileGenericPipe;
 
 public class TransportGuiHandler implements IGuiHandler {
@@ -49,20 +47,20 @@ public class TransportGuiHandler implements IGuiHandler {
 
             switch (EnumGui.from(id)) {
                 // TODO (PASS 0): Fix THESE!
-//                case PIPE_DIAMOND:
-//                    return new ContainerDiamondPipe(player.inventory, (IDiamondPipe) pipe.pipe);
-//
-//                case PIPE_EMERALD_ITEM:
-//                    return new ContainerEmeraldPipe(player.inventory, (PipeItemsEmerald) pipe.pipe);
-//
-//                case PIPE_EMZULI_ITEM:
-//                    return new ContainerEmzuliPipe(player.inventory, (PipeItemsEmzuli) pipe.pipe);
-//
-//                case PIPE_EMERALD_FLUID:
-//                    return new ContainerEmeraldFluidPipe(player.inventory, (PipeFluidsEmerald) pipe.pipe);
-//
-//                case GATES:
-//                    return new ContainerGateInterface(player.inventory, pipe.pipe);
+                // case PIPE_DIAMOND:
+                // return new ContainerDiamondPipe(player.inventory, (IDiamondPipe) pipe.pipe);
+                //
+                // case PIPE_EMERALD_ITEM:
+                // return new ContainerEmeraldPipe(player.inventory, (PipeItemsEmerald) pipe.pipe);
+                //
+                // case PIPE_EMZULI_ITEM:
+                // return new ContainerEmzuliPipe(player.inventory, (PipeItemsEmzuli) pipe.pipe);
+                //
+                // case PIPE_EMERALD_FLUID:
+                // return new ContainerEmeraldFluidPipe(player.inventory, (PipeFluidsEmerald) pipe.pipe);
+                //
+                // case GATES:
+                // return new ContainerGateInterface(player.inventory, pipe.pipe);
 
                 default:
                     return null;
@@ -100,20 +98,20 @@ public class TransportGuiHandler implements IGuiHandler {
 
             switch (EnumGui.from(id)) {
                 // TODO (PASS 0): Fix These!
-//                case PIPE_DIAMOND:
-//                    return new GuiDiamondPipe(player.inventory, (IDiamondPipe) pipe.pipe);
-//
-//                case PIPE_EMERALD_ITEM:
-//                    return new GuiEmeraldPipe(player.inventory, (PipeItemsEmerald) pipe.pipe);
-//
-//                case PIPE_EMZULI_ITEM:
-//                    return new GuiEmzuliPipe(player.inventory, (PipeItemsEmzuli) pipe.pipe);
-//
-//                case PIPE_EMERALD_FLUID:
-//                    return new GuiEmeraldFluidPipe(player.inventory, (PipeFluidsEmerald) pipe.pipe);
-//
-//                case GATES:
-//                    return new GuiGateInterface(player.inventory, pipe.pipe);
+                // case PIPE_DIAMOND:
+                // return new GuiDiamondPipe(player.inventory, (IDiamondPipe) pipe.pipe);
+                //
+                // case PIPE_EMERALD_ITEM:
+                // return new GuiEmeraldPipe(player.inventory, (PipeItemsEmerald) pipe.pipe);
+                //
+                // case PIPE_EMZULI_ITEM:
+                // return new GuiEmzuliPipe(player.inventory, (PipeItemsEmzuli) pipe.pipe);
+                //
+                // case PIPE_EMERALD_FLUID:
+                // return new GuiEmeraldFluidPipe(player.inventory, (PipeFluidsEmerald) pipe.pipe);
+                //
+                // case GATES:
+                // return new GuiGateInterface(player.inventory, pipe.pipe);
 
                 default:
                     return null;

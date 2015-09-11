@@ -29,7 +29,7 @@ public class TriggerParameterSignal implements IStatementParameter {
 
     public boolean active = false;
     public PipeWire color = null;
-    
+
     public TriggerParameterSignal() {
 
     }

@@ -21,8 +21,8 @@ import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.block.BlockGenericPipe.Part;
 import buildcraft.transport.block.BlockGenericPipe.RaytraceResult;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
-import buildcraft.transport.tile.TileGenericPipe;
 import buildcraft.transport.gates.GatePluggable;
+import buildcraft.transport.tile.TileGenericPipe;
 
 public class ItemGateCopier extends ItemBuildCraft {
     // Item damages for what the gate copier holds

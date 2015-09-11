@@ -11,6 +11,6 @@ public class GuideText extends GuidePart {
 
     @Override
     public void renderIntoArea(int x, int y, int width, int height) {
-        
+
     }
 }

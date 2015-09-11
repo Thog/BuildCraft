@@ -65,7 +65,7 @@ public class DefaultTriggerProvider implements ITriggerProvider {
             res.add(BuildCraftCore.triggerRedstoneInactive);
         }
 
-        if (/*TriggerEnergy.isTriggeringPipe(container.getTile()) ||*/ TriggerEnergy.getTriggeringNeighbor(container.getTile()) != null) {
+        if (/* TriggerEnergy.isTriggeringPipe(container.getTile()) || */ TriggerEnergy.getTriggeringNeighbor(container.getTile()) != null) {
             res.add((ITriggerInternal) BuildCraftCore.triggerEnergyHigh);
             res.add((ITriggerInternal) BuildCraftCore.triggerEnergyLow);
         }

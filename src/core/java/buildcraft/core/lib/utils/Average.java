@@ -89,19 +89,19 @@ public class Average implements ISerializable {
     @Override
     public void writeData(ByteBuf stream) {
         stream.writeInt(data.length);
-//        for (double d : data) {
-//            stream.writeDouble(d);
-//        }
+        // for (double d : data) {
+        // stream.writeDouble(d);
+        // }
         stream.writeDouble(averageRaw);
     }
 
     @Override
     public void readData(ByteBuf stream) {
         precise = stream.readInt();
-//        data = new double[precise];
-//        for (int i = 0; i < data.length; i++) {
-//            data[i] = stream.readDouble();
-//        }
+        // data = new double[precise];
+        // for (int i = 0; i < data.length; i++) {
+        // data[i] = stream.readDouble();
+        // }
         averageRaw = stream.readDouble();
     }
 }

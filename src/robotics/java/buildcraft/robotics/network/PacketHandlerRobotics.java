@@ -23,7 +23,7 @@ public class PacketHandlerRobotics extends PacketHandler {
 
             INetHandler netHandler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
             EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(netHandler);
-            
+
             WorldNetworkManager.getForWorld(player.worldObj).addPacket(pathFinder);
         }
     }

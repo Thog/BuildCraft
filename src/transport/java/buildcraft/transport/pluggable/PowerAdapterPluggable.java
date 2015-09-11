@@ -159,47 +159,47 @@ public class PowerAdapterPluggable extends PipePluggable implements IMjExternalS
 
     }
 
-//    @Override
-//    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-//        int maxR = Math.min(40, maxReceive);
-//        if (container instanceof IEnergyHandler) {
-//            int energyCanReceive = ((IEnergyHandler) container).receiveEnergy(from, maxR, true);
-//            if (!simulate) {
-//                return ((IEnergyHandler) container).receiveEnergy(from, energyCanReceive, false);
-//            } else {
-//                return energyCanReceive;
-//            }
-//        }
-//        return 0;
-//    }
-//
-//    @Override
-//    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int getEnergyStored(EnumFacing from) {
-//        if (container instanceof IEnergyHandler) {
-//            return ((IEnergyHandler) container).getEnergyStored(from);
-//        } else {
-//            return 0;
-//        }
-//    }
-//
-//    @Override
-//    public int getMaxEnergyStored(EnumFacing from) {
-//        if (container instanceof IEnergyHandler) {
-//            return ((IEnergyHandler) container).getMaxEnergyStored(from);
-//        } else {
-//            return 0;
-//        }
-//    }
-//
-//    @Override
-//    public boolean canConnectEnergy(EnumFacing from) {
-//        return true;
-//    } FIXME!!!!! PowerAdapterPluggable!
+    // @Override
+    // public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+    // int maxR = Math.min(40, maxReceive);
+    // if (container instanceof IEnergyHandler) {
+    // int energyCanReceive = ((IEnergyHandler) container).receiveEnergy(from, maxR, true);
+    // if (!simulate) {
+    // return ((IEnergyHandler) container).receiveEnergy(from, energyCanReceive, false);
+    // } else {
+    // return energyCanReceive;
+    // }
+    // }
+    // return 0;
+    // }
+    //
+    // @Override
+    // public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+    // return 0;
+    // }
+    //
+    // @Override
+    // public int getEnergyStored(EnumFacing from) {
+    // if (container instanceof IEnergyHandler) {
+    // return ((IEnergyHandler) container).getEnergyStored(from);
+    // } else {
+    // return 0;
+    // }
+    // }
+    //
+    // @Override
+    // public int getMaxEnergyStored(EnumFacing from) {
+    // if (container instanceof IEnergyHandler) {
+    // return ((IEnergyHandler) container).getMaxEnergyStored(from);
+    // } else {
+    // return 0;
+    // }
+    // }
+    //
+    // @Override
+    // public boolean canConnectEnergy(EnumFacing from) {
+    // return true;
+    // } FIXME!!!!! PowerAdapterPluggable!
 
     @Override
     public EnumMjDevice getDeviceType(EnumFacing side) {

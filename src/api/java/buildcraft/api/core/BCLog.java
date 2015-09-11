@@ -41,7 +41,7 @@ public final class BCLog {
             logger.log(Level.ERROR, msg.toString());
         }
     }
-    
+
     public static String getVersion() {
         try {
             Class<?> clazz = Class.forName("buildcraft.core.Version");

@@ -197,7 +197,7 @@ public class BlockTank extends BlockBuildCraft implements ICustomPipeConnection 
 
         return false;
     }
-    
+
     @Override
     public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side) {
         if (side.getAxis() == EnumFacing.Axis.Y) {

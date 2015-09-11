@@ -28,10 +28,11 @@ public class TriggerRobotLinked extends BCStatement implements ITriggerInternal 
         return StringUtils.localize("gate.trigger.robot." + (reserved ? "reserved" : "linked"));
     }
 
-//    @Override
-//    public void registerIcons(TextureAtlasSpriteRegister iconRegister) {
-//        icon = iconRegister.registerIcon("buildcraftrobotics:triggers/trigger_robot_" + (reserved ? "reserved" : "linked"));
-    //    }
+    // @Override
+    // public void registerIcons(TextureAtlasSpriteRegister iconRegister) {
+    // icon = iconRegister.registerIcon("buildcraftrobotics:triggers/trigger_robot_" + (reserved ? "reserved" :
+    // "linked"));
+    // }
 
     @Override
     public boolean isTriggerActive(IStatementContainer container, IStatementParameter[] parameters) {

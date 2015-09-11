@@ -42,7 +42,7 @@ public abstract class BlockBuildCraft extends BlockBuildCraftBase implements ITi
     protected BlockBuildCraft(Material material, BuildCraftProperty<?>... properties) {
         this(material, BCCreativeTab.get("main"), properties);
     }
-    
+
     protected BlockBuildCraft(Material material, BCCreativeTab bcCreativeTab, BuildCraftProperty<?>... properties) {
         this(material, bcCreativeTab, false, properties);
     }

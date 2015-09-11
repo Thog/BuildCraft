@@ -150,9 +150,9 @@ public class PipeRendererFluids {
         GL11.glPopMatrix();
 
     }
-    
+
     private static void renderSideFluid() {
-        
+
     }
 
     private static DisplayFluidList getDisplayFluidList(int fluidID) {

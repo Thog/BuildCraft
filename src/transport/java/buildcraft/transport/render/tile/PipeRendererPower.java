@@ -119,7 +119,7 @@ public class PipeRendererPower {
 
         EntityResizableCuboid cuboid = new EntityResizableCuboid(null);
         cuboid.setSize(size);
-        cuboid.texture =null;// BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
+        cuboid.texture = null;// BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
         cuboid.makeClient();
 
         double offsetNonFlow = 0;// 8 - textureWidth / 2;

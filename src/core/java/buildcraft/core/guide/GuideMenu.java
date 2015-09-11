@@ -48,9 +48,9 @@ public class GuideMenu extends GuidePage {
             for (ResourceLocation location : entry.getValue()) {
                 BCLog.logger.info("   - " + location);
                 lines.add(new PageLine(null, 1, location + ""));
-//                lines.add(new PageLine(null, 2, "domain = " + location.getResourceDomain()));
-//                lines.add(new PageLine(null, 2, "path = " + location.getResourcePath()));
-//                lines.add(new PageLine(null, 2, "length = " + location.toString().length()));
+                // lines.add(new PageLine(null, 2, "domain = " + location.getResourceDomain()));
+                // lines.add(new PageLine(null, 2, "path = " + location.getResourcePath()));
+                // lines.add(new PageLine(null, 2, "length = " + location.toString().length()));
             }
         }
     }

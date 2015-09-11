@@ -135,7 +135,7 @@ public class PathFinderVolume {
             // volumes to see if they will help
 
             // Pick the direction and try to see if we can expand the current volume at all
-//            BlockPos direction = ;
+            // BlockPos direction = ;
         }
 
         return lowestCost;

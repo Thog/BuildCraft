@@ -16,9 +16,7 @@ public class SidedExternalStorage implements IMjExternalStorage {
      */
     private final TileGenericPipe tileGenericPipe;
 
-    /**
-     * @param tileGenericPipe
-     */
+    /** @param tileGenericPipe */
     SidedExternalStorage(TileGenericPipe tileGenericPipe) {
         this.tileGenericPipe = tileGenericPipe;
     }

@@ -22,7 +22,7 @@ public interface IRobotRegistry {
     void unloadRobot(EntityRobotBase robot);
 
     EntityRobotBase getLoadedRobot(long id);
-    
+
     List<EntityRobotBase> getLoadedRobots();
 
     boolean isTaken(ResourceId resourceId);

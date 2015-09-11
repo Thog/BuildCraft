@@ -98,7 +98,7 @@ public final class SimplexNoise { // Simplex noise in 2D, 3D and 4D
             // lower triangle, XY order: (0,0)->(1,0)->(1,1)
             i1 = 0;
             j1 = 1;
-        }   // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+        }     // upper triangle, YX order: (0,0)->(0,1)->(1,1)
         // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
         // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
         // c = (3-sqrt(3))/6
