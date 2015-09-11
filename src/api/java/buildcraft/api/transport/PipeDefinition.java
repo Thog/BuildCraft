@@ -12,7 +12,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /** Contains all of the definitions of a pipe. */
 public final class PipeDefinition {
     /** A globally unique tag for the pipe */
-    public final String uniqueTag;
+    public final String globalUniqueTag;
+    /** A mod unique tag for the pipe. WARNING: this wshould only be used to register other mod-unique things, such as
+     * the pipe item. For general use, use {@link #globalUniqueTag} */
+    public final String modUniqueTag;
     /** The number of sprites to register related to this definition. */
     public final int maxSprites;
     /** A string containing the location of the texture of a pipe. The final texture location will be
@@ -20,7 +23,7 @@ public final class PipeDefinition {
     public final String textureLocationStart;
     /** An array containing the end locations of each pipe texture. This array have a length equal to maxSprites. It is
      * up to each indervidual pipe to determine which sprite to use for locations though. By default all of them will be
-     * initialised to {@link #textureLocationStart}+{@link #uniqueTag} */
+     * initialised to {@link #textureLocationStart}+{@link #globalUniqueTag} */
     public final String[] spriteLocations;
     /** A factory the creates the behaviour of this definition. */
     public final IBehaviourFactory behaviourFactory;
@@ -44,7 +47,8 @@ public final class PipeDefinition {
      * @param textureStart
      * @param factory */
     public PipeDefinition(String tag, EnumPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IBehaviourFactory factory) {
-        this.uniqueTag = getCurrentMod() + ":" + tag;
+        this.globalUniqueTag = getCurrentMod() + ":" + tag;
+        this.modUniqueTag = tag;
         this.type = type;
         this.maxSprites = maxSprites;
         this.itemSpriteIndex = itemSpriteIndex;

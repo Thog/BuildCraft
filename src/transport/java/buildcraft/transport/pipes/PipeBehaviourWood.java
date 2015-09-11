@@ -17,7 +17,7 @@ import buildcraft.api.transport.event.PipeEventTick;
 import buildcraft.core.lib.utils.NBTUtils;
 
 public class PipeBehaviourWood extends PipeBehaviour {
-    private static final String[] textureSuffix = { "/clear", "/filled" };
+    private static final String[] textureSuffix = { "_clear", "_filled" };
     private static final double POWER_EXTRACT_SINGLE = 10;
     private static final double MAX_POWER = POWER_EXTRACT_SINGLE * 64;
     private static final int LOSS_DELAY = 200;

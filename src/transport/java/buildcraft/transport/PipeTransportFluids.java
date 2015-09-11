@@ -2,9 +2,11 @@ package buildcraft.transport;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -22,13 +24,14 @@ import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeDefinition;
+import buildcraft.api.transport.event.PipeContents;
+import buildcraft.api.transport.event.PipeEventMovement;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.utils.Average;
 import buildcraft.core.lib.utils.MathUtils;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketFluidUpdate;
-import buildcraft.transport.pipes.events.PipeEventFluid;
 import buildcraft.transport.utils.FluidRenderData;
 
 public class PipeTransportFluids extends PipeTransport implements IFluidHandler, IDebuggable {
@@ -316,21 +319,28 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
 
         int testAmount = flowRate;
         // Move liquid from the center to the output sides
-        Multiset<EnumFacing> realDirections = HashMultiset.create(6);
+        Map<EnumFacing, TileEntity> potentialDestinations = Maps.newHashMap();
+        Set<EnumFacing> destinations = Sets.newHashSet();
         for (EnumFacing direction : directions) {
             if (transferState[direction.ordinal()] == TransferState.Output) {
-                realDirections.add(direction);
+                potentialDestinations.put(direction, container.getNeighborTile(direction));
+                destinations.add(direction);
             }
         }
 
-        if (realDirections.size() > 0) {
-            container.pipe.eventBus.handleEvent(PipeEventFluid.FindDest.class, new PipeEventFluid.FindDest(container.pipe, new FluidStack(fluidType,
-                    pushAmount), realDirections));
-            float min = Math.min(flowRate * realDirections.size(), totalAvailable) / (float) flowRate / realDirections.size();
+        FluidStack availableFluid = new FluidStack(fluidType.getFluid(), totalAvailable);
+        if (destinations.size() > 0) {
+            PipeContents.PipeContentsFluid contents = new PipeContents.PipeContentsFluid(availableFluid);
+            PipeEventMovement.ReachCenter reachCenter = new PipeEventMovement.ReachCenter(1, contents, null, potentialDestinations, destinations, 6);
+            container.pipe.eventBus.post(reachCenter);
+        }
 
-            for (EnumFacing direction : realDirections.elementSet()) {
+        if (destinations.size() > 0 && availableFluid.amount > 0) {
+            float min = Math.min(flowRate * destinations.size(), totalAvailable) / (float) flowRate / destinations.size();
+
+            for (EnumFacing direction : destinations) {
                 int available = sections[direction.ordinal()].fill(testAmount, false);
-                int amountToPush = (int) (available * min * realDirections.count(direction));
+                int amountToPush = (int) (available * min);
                 if (amountToPush < 1) {
                     amountToPush++;
                 }
@@ -588,13 +598,7 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
             return 0;
         }
 
-        int filled;
-
-        if (this.container.pipe instanceof IPipeTransportFluidsHook) {
-            filled = ((IPipeTransportFluidsHook) this.container.pipe).fill(from, resource, doFill);
-        } else {
-            filled = sections[from.ordinal()].fill(resource.amount, doFill);
-        }
+        int filled = sections[from.ordinal()].fill(resource.amount, doFill);
 
         if (doFill && filled > 0) {
             if (fluidType == null) {

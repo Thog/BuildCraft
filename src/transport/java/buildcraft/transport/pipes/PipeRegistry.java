@@ -27,8 +27,8 @@ public class PipeRegistry implements IPipeRegistry {
             throw new IllegalArgumentException("Tried to register with a null pipe definition!");
         }
         Item item = new ItemPipe(definition);
-        item.setUnlocalizedName(definition.uniqueTag);
-        pipeMap.put(definition.uniqueTag, Pair.of(definition, item));
+        item.setUnlocalizedName(definition.modUniqueTag);
+        pipeMap.put(definition.globalUniqueTag, Pair.of(definition, item));
         definitionItemMap.put(definition, item);
         return item;
     }
@@ -63,6 +63,6 @@ public class PipeRegistry implements IPipeRegistry {
         if (definition == null) {
             return null;
         }
-        return definition.uniqueTag;
+        return definition.globalUniqueTag;
     }
 }

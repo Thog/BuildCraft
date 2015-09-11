@@ -117,7 +117,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         if (pipe != null) {
-            nbt.setString("pipeTag", pipe.definition.uniqueTag);
+            nbt.setString("pipeTag", pipe.definition.globalUniqueTag);
             pipe.writeToNBT(nbt);
         } else {
             nbt.setInteger("pipeId", coreState.pipeId);
@@ -228,7 +228,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 // Attach callback
                 for (int i = 0; i < EnumFacing.VALUES.length; i++) {
                     if (sideProperties.pluggables[i] != null) {
-                        pipe.pipeEventBus.register(sideProperties.pluggables[i]);
+                        pipe.eventBus.register(sideProperties.pluggables[i]);
                         sideProperties.pluggables[i].onAttachedPipe(this, EnumFacing.getFront(i));
                     }
                 }
@@ -795,12 +795,12 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         // Remove old pluggable
         if (sideProperties.pluggables[direction.ordinal()] != null) {
             sideProperties.dropItem(this, direction, player);
-            pipe.eventBus.unregisterHandler(sideProperties.pluggables[direction.ordinal()]);
+            pipe.eventBus.unregister(sideProperties.pluggables[direction.ordinal()]);
         }
 
         sideProperties.pluggables[direction.ordinal()] = pluggable;
         if (pluggable != null) {
-            pipe.eventBus.registerHandler(pluggable);
+            pipe.eventBus.register(pluggable);
             pluggable.onAttachedPipe(this, direction);
         }
         notifyBlockChanged();

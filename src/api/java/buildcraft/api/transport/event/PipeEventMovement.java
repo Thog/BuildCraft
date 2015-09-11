@@ -1,6 +1,7 @@
 package buildcraft.api.transport.event;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -21,14 +22,16 @@ public abstract class PipeEventMovement extends PipeEvent {
     public static class ReachCenter extends PipeEventMovement {
         public final EnumFacing from;
         public final ImmutableMap<EnumFacing, TileEntity> potentialDestinations;
-        public EnumFacing destination;
+        public final Set<EnumFacing> destinations;
+        public final int maxDestinations;
 
         public ReachCenter(double speed, PipeContents contents, EnumFacing from, Map<EnumFacing, TileEntity> potentialDestinations,
-                EnumFacing destination) {
+                Set<EnumFacing> destinations, int maxDestinations) {
             super(speed, contents);
             this.from = from;
             this.potentialDestinations = ImmutableMap.copyOf(potentialDestinations);
-            this.destination = destination;
+            this.destinations = destinations;
+            this.maxDestinations = maxDestinations;
         }
     }
 

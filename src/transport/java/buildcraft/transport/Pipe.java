@@ -52,7 +52,7 @@ public final class Pipe implements IDropControlInventory, IPipe {
     public boolean[] wireSet = new boolean[] { false, false, false, false };
     public final Gate[] gates = new Gate[EnumFacing.VALUES.length];
 
-    public final EventBus pipeEventBus = new EventBus("buildcraft.transport.Pipe");
+    public final EventBus eventBus = new EventBus("buildcraft.transport.Pipe");
 
     private boolean internalUpdateScheduled = false;
     private boolean initialized = false;
@@ -63,8 +63,8 @@ public final class Pipe implements IDropControlInventory, IPipe {
         this.definition = definition;
         behaviour = definition.behaviourFactory.createNew();
         transport = getTransport(definition.type);
-        pipeEventBus.register(behaviour);
-        pipeEventBus.register(new LensFilterHandler());
+        eventBus.register(behaviour);
+        eventBus.register(new LensFilterHandler());
 
 //        eventBus.registerHandler(this);
         // TODO: Move to globalHandlers once a priority system is in place
@@ -72,7 +72,6 @@ public final class Pipe implements IDropControlInventory, IPipe {
         
     }
 
-    @SubscribeEvent
     private static PipeTransport getTransport(EnumPipeType type) {
         switch (type) {
             case FLUID:

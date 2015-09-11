@@ -137,7 +137,7 @@ public class TransportItems {
     }
 
     private static PipeDefinition createDefinition(EnumPipeType type, EnumPipeMaterial material, IBehaviourFactory factory) {
-        String name = type.name().toLowerCase(Locale.ROOT) + "_" + material.name().toLowerCase(Locale.ROOT);
+        String name = material.name().toLowerCase(Locale.ROOT) + "_" + type.name().toLowerCase(Locale.ROOT);
         PipeDefinition definition = new PipeDefinition(name, type, material.maxSprites, "buildcrafttransport:pipes/", factory);
         return definition;
     }

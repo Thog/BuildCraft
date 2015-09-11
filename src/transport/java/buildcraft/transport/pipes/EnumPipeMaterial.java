@@ -15,11 +15,11 @@ public enum EnumPipeMaterial {
     COBBLESTONE(1, new ItemStack(Blocks.cobblestone)),
     STONE(1, new ItemStack(Blocks.stone)),
     ANDERSITE(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.ANDESITE.getMetadata())),
-    POLISHED_ANDERSITE(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.ANDESITE_SMOOTH.getMetadata())),
+    ANDERSITE_POLISHED(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.ANDESITE_SMOOTH.getMetadata())),
     DIORITE(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE.getMetadata())),
-    POLISHED_DIORITE(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.getMetadata())),
+    DIORITE_POLISHED(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.getMetadata())),
     GRANITE(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.GRANITE.getMetadata())),
-    POLISHED_GRANITE(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.GRANITE_SMOOTH.getMetadata())),
+    GRANITE_POLISHED(1, new ItemStack(Blocks.stone, 1, BlockStone.EnumType.GRANITE_SMOOTH.getMetadata())),
     // Different functionality
     IRON(2, new ItemStack(Items.iron_ingot)),
     GOLD(1, new ItemStack(Items.gold_ingot)),
@@ -47,6 +47,6 @@ public enum EnumPipeMaterial {
         ingredient2 = stack2;
     }
 
-    public static final EnumPipeMaterial[] STONES = new EnumPipeMaterial[] { COBBLESTONE, STONE, ANDERSITE, POLISHED_ANDERSITE, DIORITE,
-        POLISHED_DIORITE, GRANITE, POLISHED_GRANITE };
+    public static final EnumPipeMaterial[] STONES = new EnumPipeMaterial[] { COBBLESTONE, STONE, ANDERSITE, ANDERSITE_POLISHED, DIORITE,
+        DIORITE_POLISHED, GRANITE, GRANITE_POLISHED };
 }
