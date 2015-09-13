@@ -51,4 +51,19 @@ public class PacketTileUpdate extends PacketUpdate {
         return world.getTileEntity(pos);
     }
 
+    @Override
+    public void applyData(World world) {
+        if (!targetExists(world)) {
+            return;
+        }
+
+        TileEntity entity = getTarget(world);
+
+        if (!(entity instanceof ISerializable)) {
+            return;
+        }
+
+        ISerializable tile = (ISerializable) entity;
+        tile.readData(payloadData);
+    }
 }

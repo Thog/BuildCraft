@@ -85,4 +85,10 @@ public final class PipeDefinition {
             sprites[i] = map.registerSprite(location);
         }
     }
+
+    @Override
+    public String toString() {
+        return "PipeDefinition [globalUniqueTag=" + globalUniqueTag + ", modUniqueTag=" + modUniqueTag + ", behaviourFactory=" + behaviourFactory
+            + ", type=" + type + "]";
+    }
 }

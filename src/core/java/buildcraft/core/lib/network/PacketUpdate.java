@@ -7,11 +7,12 @@ package buildcraft.core.lib.network;
 import buildcraft.api.core.ISerializable;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 public abstract class PacketUpdate extends Packet {
-    public ByteBuf stream;
     public ISerializable payload;
 
+    protected ByteBuf payloadData;
     private int packetId;
 
     public PacketUpdate() {}
@@ -32,9 +33,13 @@ public abstract class PacketUpdate extends Packet {
         data.writeByte(packetId);
         writeIdentificationData(data);
 
+        ByteBuf payloadData = Unpooled.buffer();
         if (payload != null) {
-            payload.writeData(data);
+            payload.writeData(payloadData);
         }
+
+        data.writeInt(payloadData.readableBytes());
+        data.writeBytes(payloadData);
     }
 
     public abstract void writeIdentificationData(ByteBuf data);
@@ -43,8 +48,8 @@ public abstract class PacketUpdate extends Packet {
     public void readData(ByteBuf data) {
         packetId = data.readByte();
         readIdentificationData(data);
-
-        stream = data; // for further reading
+        int length = data.readInt();
+        payloadData = Unpooled.copiedBuffer(data.readBytes(length));
     }
 
     public abstract void readIdentificationData(ByteBuf data);

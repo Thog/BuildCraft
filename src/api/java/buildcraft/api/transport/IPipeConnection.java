@@ -15,7 +15,13 @@ public interface IPipeConnection {
         DEFAULT
     }
 
-    /** Allows you to override pipe connection logic.
+    /** Allows you to hint at pipe connection logic.
+     * 
+     * Note that this is merely a hint to the pipe that you would like to connect, as the pipe can *always* disallow a
+     * connection if it wishes (For example sandstone will never connect to anything that is not a buildcraft pipe, even
+     * if you override the connection here).
+     * 
+     * If you specify DISCONNECT however then the pipe will not be asked if it wants to connect.
      *
      * @param type
      * @param with

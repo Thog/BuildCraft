@@ -35,7 +35,7 @@ public class BehaviourBasic extends PipeBehaviour {
     }
 
     @Subscribe
-    public void pipeConnectEvent(PipeEventConnection.PipeConnect connect) {
+    public void pipeConnectEvent(PipeEventConnection.ConnectPipe connect) {
         if (blacklist == EnumListStatus.BLACKLIST) {
             if (connectionList.contains(connect.behaviour.definition)) {
                 connect.allow = false;

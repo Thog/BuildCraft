@@ -43,4 +43,7 @@ public class PacketTabletMessage extends Packet {
             BCLog.logger.error("NBT data is too large (" + index + " > 65,535)! Please report!");
         }
     }
+
+    @Override
+    public void applyData() {}
 }

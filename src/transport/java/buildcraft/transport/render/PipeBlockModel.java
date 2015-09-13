@@ -76,7 +76,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
 
         // Center bit
         {
-            TextureAtlasSprite sprite = pipe.getIconProvider().getIcon(pipe.getIconIndex(null));
+            TextureAtlasSprite sprite = pipe.definition.getSprite(render.textureMatrix.getTextureIndex(null));
 
             float[] uvs = new float[4];
             uvs[U_MIN] = sprite.getInterpolatedU(minUV);
@@ -95,7 +95,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
         for (EnumFacing connect : EnumFacing.VALUES) {
             if (render.pipeConnectionMatrix.isConnected(connect) && render.pipeConnectionBanned.isConnected(connect)) {
                 float extension = render.customConnections[connect.ordinal()];
-                TextureAtlasSprite sprite = pipe.getIconProvider().getIcon(pipe.getIconIndex(connect));
+                TextureAtlasSprite sprite = pipe.definition.getSprite(render.textureMatrix.getTextureIndex(connect));
 
                 Vec3 actualCenter = Utils.convert(connect, 0.375f + extension / 2).addVector(0.5, 0.5, 0.5);
 
@@ -152,7 +152,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
             }
         }
 
-        TextureAtlasSprite particle = pipe.getIconProvider().getIcon(pipe.getIconIndex(null));
+        TextureAtlasSprite particle = pipe.definition.getSprite(pipe.behaviour.getIconIndex(null));
 
         return new PipeBlockModel(ImmutableList.copyOf(quads), particle, DefaultVertexFormats.BLOCK);
     }

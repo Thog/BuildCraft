@@ -21,6 +21,7 @@ import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.pipes.BehaviourFactoryBasic;
 import buildcraft.transport.pipes.BehaviourFactoryBasic.EnumListStatus;
+import buildcraft.transport.pipes.BehaviourFactoryPolishedStone;
 import buildcraft.transport.pipes.BehaviourFactoryWooden;
 import buildcraft.transport.pipes.EnumPipeMaterial;
 
@@ -28,11 +29,17 @@ public class TransportItems {
     private static final Table<EnumPipeMaterial, EnumPipeType, PipeDefinition> pipes = HashBasedTable.create();
 
     public static void initItems() {
+        // Register everything that applies to all different types
         for (EnumPipeType type : EnumPipeType.CONTENTS) {
-            // Register everything that applies to all different types
-            for (EnumPipeMaterial material : EnumPipeMaterial.STONES) {
+            for (int i = 0; i < 4; i++) {
                 // Don't set the factory as we will set it below
+                EnumPipeMaterial material = EnumPipeMaterial.STONES[i * 2];
+                // Create the unpolished variant
                 registerDefinition(material, type, createBasicDefinition(type, material, false));
+
+                material = EnumPipeMaterial.STONES[i * 2 + 1];
+                // Create the polished variant
+                registerDefinition(material, type, createPolishedStonesDefinition(type, material));
             }
 
             // Register blacklist for the unpolished stones
@@ -41,14 +48,14 @@ public class TransportItems {
                 BehaviourFactoryBasic[] unpolishedFactories = new BehaviourFactoryBasic[4];
 
                 PipeDefinition[] polished = new PipeDefinition[4];
-                BehaviourFactoryBasic[] polishedFactories = new BehaviourFactoryBasic[4];
+                BehaviourFactoryPolishedStone[] polishedFactories = new BehaviourFactoryPolishedStone[4];
 
                 for (int i = 0; i < 4; i++) {
                     unpolished[i] = pipes.get(EnumPipeMaterial.STONES[i * 2], type);
                     unpolishedFactories[i] = (BehaviourFactoryBasic) unpolished[i].behaviourFactory;
 
                     polished[i] = pipes.get(EnumPipeMaterial.STONES[i * 2 + 1], type);
-                    polishedFactories[i] = (BehaviourFactoryBasic) polished[i].behaviourFactory;
+                    polishedFactories[i] = (BehaviourFactoryPolishedStone) polished[i].behaviourFactory;
                 }
 
                 for (int i = 0; i < 4; i++) {
@@ -63,9 +70,8 @@ public class TransportItems {
             registerDefinition(EnumPipeMaterial.WOOD, type, createWoodenDefinition(type));
         }
 
-        PipeDefinition definition = createBasicDefinition(EnumPipeType.STRUCTURE, EnumPipeMaterial.COBBLESTONE);
+        PipeDefinition definition = createBasicDefinition(EnumPipeType.STRUCTURE, EnumPipeMaterial.COBBLESTONE, true);
         registerDefinition(EnumPipeMaterial.COBBLESTONE, EnumPipeType.STRUCTURE, definition);
-
     }
 
     public static void addRecipies() {
@@ -116,16 +122,18 @@ public class TransportItems {
         return pipes.get(material, type);
     }
 
-    private static PipeDefinition createBasicDefinition(EnumPipeType type, EnumPipeMaterial material) {
-        return createBasicDefinition(type, material, true);
-    }
-
     private static PipeDefinition createBasicDefinition(EnumPipeType type, EnumPipeMaterial material, boolean defineFactoryFully) {
         BehaviourFactoryBasic factory = new BehaviourFactoryBasic();
         PipeDefinition definition = createDefinition(type, material, factory);
         if (defineFactoryFully) {
             factory.setDefinition(definition, EnumListStatus.BLACKLIST);
         }
+        return definition;
+    }
+
+    private static PipeDefinition createPolishedStonesDefinition(EnumPipeType type, EnumPipeMaterial material) {
+        BehaviourFactoryPolishedStone factory = new BehaviourFactoryPolishedStone();
+        PipeDefinition definition = createDefinition(type, material, factory);
         return definition;
     }
 
@@ -144,6 +152,7 @@ public class TransportItems {
 
     private static void registerDefinition(EnumPipeMaterial material, EnumPipeType type, PipeDefinition definition) {
         Item item = PipeAPI.registry.registerPipeDefinition(definition);
+        item.setUnlocalizedName("buildcraft_" + item.getUnlocalizedName().replace("item.", ""));
         pipes.put(material, type, definition);
         CoreProxy.proxy.registerItem(item);
     }

@@ -5,6 +5,7 @@
 package buildcraft.transport.network;
 
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 import buildcraft.core.lib.network.PacketCoordinates;
 import buildcraft.core.network.PacketIds;
@@ -40,5 +41,10 @@ public class PacketPowerUpdate extends PacketCoordinates {
             stream.writeByte(power[i]);
             stream.writeByte(flow[i]);
         }
+    }
+
+    @Override
+    public void applyData(World world) {
+        
     }
 }

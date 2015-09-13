@@ -7,8 +7,12 @@ package buildcraft.transport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.apache.logging.log4j.Level;
 
@@ -28,6 +32,10 @@ import buildcraft.api.core.BCLog;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.event.PipeContents;
+import buildcraft.api.transport.event.PipeEventDropItem;
+import buildcraft.api.transport.event.PipeEventFindDestination;
+import buildcraft.api.transport.event.PipeEventMovement;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.inventory.Transactor;
 import buildcraft.core.lib.utils.BlockUtils;
@@ -35,7 +43,6 @@ import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.network.PacketPipeTransportItemStackRequest;
 import buildcraft.transport.network.PacketPipeTransportTraveler;
-import buildcraft.transport.pipes.events.PipeEventItem;
 import buildcraft.transport.utils.TransportUtils;
 
 public class PipeTransportItems extends PipeTransport implements IDebuggable {
@@ -48,14 +55,6 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
     @Override
     public EnumPipeType getPipeType() {
         return EnumPipeType.ITEM;
-    }
-
-    public void readjustSpeed(TravelingItem item) {
-        PipeEventItem.AdjustSpeed event = new PipeEventItem.AdjustSpeed(container.pipe, item);
-        container.pipe.eventBus.handleEvent(PipeEventItem.AdjustSpeed.class, event);
-        if (!event.handled) {
-            defaultReajustSpeed(item);
-        }
     }
 
     public void defaultReajustSpeed(TravelingItem item) {
@@ -94,14 +93,23 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         item.reset();
         item.input = inputOrientation;
 
-        readjustSpeed(item);
-        readjustPosition(item);
+        PipeContents.Item contents = new PipeContents.Item(item.itemStack);
+        PipeEventMovement.Enter enter = new PipeEventMovement.Enter(item.speed, contents, inputOrientation);
+        container.pipe.eventBus.post(enter);
 
-        PipeEventItem.Entered event = new PipeEventItem.Entered(container.pipe, item);
-        container.pipe.eventBus.handleEvent(PipeEventItem.Entered.class, event);
-        if (event.cancelled) {
+        item.setItemStack(contents.item);
+
+        if (item.getItemStack() == null || item.getItemStack().stackSize <= 0) {
             return;
         }
+
+        if (enter.hasSetNewSpeed()) {
+            item.setSpeed(enter.getSpeed());
+        } else {
+            defaultReajustSpeed(item);
+        }
+
+        readjustPosition(item);
 
         if (!container.getWorld().isRemote) {
             item.output = resolveDestination(item);
@@ -153,14 +161,23 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         item.toCenter = true;
         item.input = item.output.getOpposite();
 
-        readjustSpeed(item);
-        readjustPosition(item);
+        PipeContents.Item contents = new PipeContents.Item(item.getItemStack());
+        PipeEventMovement.Enter enter = new PipeEventMovement.Enter(item.speed, contents, item.input);
+        container.pipe.eventBus.post(enter);
 
-        PipeEventItem.Entered event = new PipeEventItem.Entered(container.pipe, item);
-        container.pipe.eventBus.handleEvent(PipeEventItem.Entered.class, event);
-        if (event.cancelled) {
+        item.setItemStack(contents.item);
+
+        if (item.getItemStack() == null || item.getItemStack().stackSize <= 0) {
             return;
         }
+
+        if (enter.hasSetNewSpeed()) {
+            item.setSpeed(enter.getSpeed());
+        } else {
+            defaultReajustSpeed(item);
+        }
+
+        readjustPosition(item);
 
         if (!container.getWorld().isRemote) {
             item.output = resolveDestination(item);
@@ -186,33 +203,34 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
     /** Returns a list of all possible movements, that is to say adjacent implementers of IPipeEntry or
      * TileEntityChest. */
     public List<EnumFacing> getPossibleMovements(TravelingItem item) {
-        LinkedList<EnumFacing> result = new LinkedList<EnumFacing>();
+        Map<EnumFacing, TileEntity> potentialDestinations = Maps.newHashMap();
+        Set<EnumFacing> destinations = EnumSet.noneOf(EnumFacing.class);
 
-        item.blacklist.add(item.input.getOpposite());
-
-        EnumSet<EnumFacing> sides = EnumSet.complementOf(item.blacklist);
+        EnumSet<EnumFacing> sides = EnumSet.complementOf(EnumSet.of(item.input.getOpposite()));
         sides.remove(null);
 
         for (EnumFacing o : sides) {
             if (container.pipe.outputOpen(o) && canReceivePipeObjects(o, item)) {
-                result.add(o);
+                potentialDestinations.put(o, container.getNeighborTile(o));
+                destinations.add(o);
             }
         }
 
-        PipeEventItem.FindDest event = new PipeEventItem.FindDest(container.pipe, item, result);
-        container.pipe.eventBus.handleEvent(PipeEventItem.FindDest.class, event);
+        PipeContents.Item contents = new PipeContents.Item(item.getItemStack());
+        PipeEventFindDestination findDest = new PipeEventFindDestination(contents, item.input, potentialDestinations, destinations, 6);
+        container.pipe.eventBus.post(findDest);
 
-        if (allowBouncing && result.isEmpty()) {
+        if (allowBouncing && destinations.isEmpty()) {
             if (canReceivePipeObjects(item.input.getOpposite(), item)) {
-                result.add(item.input.getOpposite());
+                destinations.add(item.input.getOpposite());
             }
         }
 
-        if (event.shuffle) {
-            Collections.shuffle(result);
-        }
+        List<EnumFacing> result = Lists.newArrayList(destinations);
 
-        return result;
+        Collections.shuffle(result);
+
+        return Lists.newArrayList(destinations);
     }
 
     private boolean canReceivePipeObjects(EnumFacing o, TravelingItem item) {
@@ -277,10 +295,10 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
                         dropItem(item);
                     }
                 } else {
-                    PipeEventItem.ReachedCenter event = new PipeEventItem.ReachedCenter(container.pipe, item);
-                    container.pipe.eventBus.handleEvent(PipeEventItem.ReachedCenter.class, event);
+                    PipeContents.Item contents = new PipeContents.Item(item.getItemStack());
+                    PipeEventMovement.ReachCenter reachCenter = new PipeEventMovement.ReachCenter(item.speed, contents, item.input, item.output);
+                    container.pipe.eventBus.post(reachCenter);
                 }
-
             } else if (!item.toCenter && endReached(item)) {
                 if (item.isCorrupted()) {
                     items.remove(item);
@@ -289,9 +307,11 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
 
                 TileEntity tile = container.getTile(item.output, true);
 
-                PipeEventItem.ReachedEnd event = new PipeEventItem.ReachedEnd(container.pipe, item, tile);
-                container.pipe.eventBus.handleEvent(PipeEventItem.ReachedEnd.class, event);
-                boolean handleItem = !event.handled;
+                PipeContents.Item contents = new PipeContents.Item(item.getItemStack());
+                PipeEventMovement.Exit exit = new PipeEventMovement.Exit(item.speed, contents, item.output);
+                container.pipe.eventBus.post(exit);
+
+                boolean handleItem = !exit.handled;
 
                 // If the item has not been scheduled to removal by the hook
                 if (handleItem && items.scheduleRemoval(item)) {
@@ -339,14 +359,14 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
             return;
         }
 
-        PipeEventItem.DropItem event = new PipeEventItem.DropItem(container.pipe, item, item.toEntityItem());
-        container.pipe.eventBus.handleEvent(PipeEventItem.DropItem.class, event);
+        PipeEventDropItem dropItemEvent = new PipeEventDropItem(item.toEntityItem());
+        container.pipe.eventBus.post(dropItemEvent);
 
-        if (event.entity == null) {
+        if (dropItemEvent.droppingItem == null || dropItemEvent.droppingItem.getEntityItem().stackSize <= 0) {
             return;
         }
 
-        final EntityItem entity = event.entity;
+        final EntityItem entity = dropItemEvent.droppingItem;
         EnumFacing direction = item.input;
         entity.setPosition(entity.posX + direction.getFrontOffsetX() * 0.5d, entity.posY + direction.getFrontOffsetY() * 0.5d, entity.posZ + direction
                 .getFrontOffsetZ() * 0.5d);

@@ -65,11 +65,6 @@ public final class Pipe implements IDropControlInventory, IPipe {
         transport = getTransport(definition.type);
         eventBus.register(behaviour);
         eventBus.register(new LensFilterHandler());
-
-//        eventBus.registerHandler(this);
-        // TODO: Move to globalHandlers once a priority system is in place
-//        eventBus.registerHandler(new LensFilterHandler());
-        
     }
 
     private static PipeTransport getTransport(EnumPipeType type) {
@@ -113,46 +108,6 @@ public final class Pipe implements IDropControlInventory, IPipe {
     public void onNeighborBlockChange(int blockId) {
         transport.onNeighborBlockChange(blockId);
 
-    }
-
-    public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
-        Pipe otherPipe;
-
-        if (tile instanceof IPipeTile) {
-            otherPipe = (Pipe) ((IPipeTile) tile).getPipe();
-            if (!BlockGenericPipe.isFullyDefined(otherPipe)) {
-                return false;
-            }
-
-            if (!PipeConnectionBans.canPipesConnect(getClass(), otherPipe.getClass())) {
-                return false;
-            }
-        }
-
-        return transport.canPipeConnect(tile, side);
-    }
-
-    /** Should return the textureindex used by the Pipe Item Renderer, as this is done client-side the default
-     * implementation might not work if your getTextureIndex(null) has logic. Then override this */
-    public int getIconIndexForItem() {
-        return getIconIndex(null);
-    }
-
-    /** Should return the IIconProvider that provides icons for this pipe
-     *
-     * @return An array of icons */
-    @SideOnly(Side.CLIENT)
-    public IIconProvider getIconProvider() {
-        return null;
-    }
-
-    /** Should return the index in the array returned by GetTextureIcons() for a specified direction
-     *
-     * @param direction - The direction for which the indexed should be rendered. Unknown for pipe center
-     *
-     * @return An index valid in the array returned by getTextureIcons() */
-    public int getIconIndex(EnumFacing direction) {
-        return 0;
     }
 
     public void update() {

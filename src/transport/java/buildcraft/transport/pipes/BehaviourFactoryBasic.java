@@ -12,9 +12,9 @@ public class BehaviourFactoryBasic implements IBehaviourFactory {
         BLACKLIST
     }
 
-    private PipeDefinition definition;
-    private ImmutableList<PipeDefinition> connectionList = ImmutableList.of();
-    private EnumListStatus blacklist = EnumListStatus.BLACKLIST;
+    protected PipeDefinition definition;
+    protected ImmutableList<PipeDefinition> connectionList = ImmutableList.of();
+    protected EnumListStatus blacklist = EnumListStatus.BLACKLIST;
 
     public void setDefinition(PipeDefinition definition, EnumListStatus blacklist, PipeDefinition... connectionList) {
         if (this.definition == null) {

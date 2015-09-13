@@ -6,6 +6,7 @@ package buildcraft.transport;
 
 import net.minecraft.util.EnumFacing;
 
+@Deprecated
 public interface IPipeConnectionForced {
 
     /** Allows you to block connection overrides.

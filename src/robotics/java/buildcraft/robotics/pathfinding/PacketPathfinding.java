@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.utils.NetworkUtils;
@@ -76,5 +77,10 @@ public class PacketPathfinding extends Packet {
                 break;
             }
         }
+    }
+
+    @Override
+    public void applyData(World world) {
+        WorldNetworkManager.getForWorld(world).handlePacket(this);
     }
 }

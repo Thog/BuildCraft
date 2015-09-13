@@ -8,14 +8,13 @@ import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.event.PipeEventFindDestination;
 import buildcraft.api.transport.pluggable.PipePluggable;
-import buildcraft.transport.pipes.events.PipeEventItem;
 import buildcraft.transport.pluggable.LensPluggable;
 
-public class LensFilterHandler {
-
+public class LensFilterHandler {/*
     @Subscribe
-    public void eventHandler(PipeEventItem.FindDest event) {
+    public void findDestination(PipeEventFindDestination event) {
         IPipeTile container = event.pipe.getTile();
         LinkedList<EnumFacing> correctColored = new LinkedList<EnumFacing>();
         LinkedList<EnumFacing> notColored = new LinkedList<EnumFacing>();
@@ -61,4 +60,4 @@ public class LensFilterHandler {
         event.destinations.clear();
         event.destinations.addAll(encounteredColor ? correctColored : notColored);
     }
-}
+*/}

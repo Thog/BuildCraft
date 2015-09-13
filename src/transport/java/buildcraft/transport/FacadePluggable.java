@@ -148,7 +148,7 @@ public class FacadePluggable extends PipePluggable implements IFacadePluggable {
         }
     }
 
-    protected void setActiveState(int id) {
+    public void setActiveState(int id) {
         if (id >= 0 && id < states.length) {
             activeState = states[id];
         }

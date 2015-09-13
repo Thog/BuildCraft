@@ -5,9 +5,11 @@
 package buildcraft.transport;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -48,9 +50,12 @@ public final class PipeToolTipManager {
 //        toolTips.put(pipe, toolTip);
 //    }
 
-    public static List<String> getToolTip(Class<? extends Pipe> pipe, boolean advanced) {
-        List<String> tips = new ArrayList<String>();
-        addTipToList("tip." + pipe.getSimpleName(), tips);
+    public static List<String> getToolTip(PipeDefinition pipe, boolean advanced) {
+        if (pipe == null) {
+            return Collections.emptyList();
+        }
+        List<String> tips = Lists.newArrayList();
+        addTipToList("tip." + pipe.globalUniqueTag, tips);
 
         String tip = toolTips.get(pipe);
         if (tip != null) {
@@ -58,7 +63,7 @@ public final class PipeToolTipManager {
         }
 
         if (GuiScreen.isShiftKeyDown()) {
-            addTipToList("tip.shift." + pipe.getSimpleName(), tips);
+            addTipToList("tip.shift." + pipe.globalUniqueTag, tips);
         }
         return tips;
     }

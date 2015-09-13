@@ -39,7 +39,7 @@ public class DockingStationPipe extends DockingStation {
                 Vec3 vec = Utils.convertMiddle(getPos()).add(Utils.convert(side, 0.2));
                 TravelingItem item = TravelingItem.make(vec, stack);
 
-                ((PipeTransportItems) ((Pipe<?>) getPipe().getPipe()).transport).injectItem(item, from);
+                ((PipeTransportItems) ((Pipe) getPipe().getPipe()).transport).injectItem(item, from);
             }
             return stack.stackSize;
         }
@@ -133,7 +133,7 @@ public class DockingStationPipe extends DockingStation {
             return null;
         }
 
-        return (IFluidHandler) ((Pipe<?>) getPipe().getPipe()).transport;
+        return (IFluidHandler) ((Pipe) getPipe().getPipe()).transport;
     }
 
     @Override
@@ -157,7 +157,7 @@ public class DockingStationPipe extends DockingStation {
         if (getPipe() == null || getPipe().getPipe() == null) {
             return false;
         }
-        return ((Pipe<?>) getPipe().getPipe()).isInitialized();
+        return ((Pipe) getPipe().getPipe()).isInitialized();
     }
 
     @Override

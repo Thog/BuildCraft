@@ -91,7 +91,6 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
 
     public static final BuildCraftExtendedProperty<Pipe> PIPE_PIPE = BuildCraftExtendedProperty.createExtended("pipe_pipe", Pipe.class);
 
-    public static Map<ItemPipe, Class<? extends Pipe>> pipes = Maps.newHashMap();
     public static Map<BlockPos, Pipe> pipeRemoved = Maps.newHashMap();
 
     private static long lastRemovedDate = -1;
@@ -894,7 +893,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
             return false;
         }
 
-        TextureAtlasSprite icon = pipe.getIconProvider().getIcon(pipe.getIconIndexForItem());
+        TextureAtlasSprite icon = pipe.definition.getSprite(pipe.behaviour.getIconIndex(null));
 
         EnumFacing sideHit = target.sideHit;
 
@@ -957,7 +956,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
             return false;
         }
 
-        TextureAtlasSprite icon = pipe.getIconProvider().getIcon(pipe.getIconIndexForItem());
+        TextureAtlasSprite icon = pipe.definition.getSprite(pipe.behaviour.getIconIndex(null));
 
         byte its = 4;
         for (int i = 0; i < its; ++i) {

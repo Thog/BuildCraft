@@ -16,7 +16,7 @@ public abstract class PipeEventConnection extends PipeEvent {
      * </ul>
      * {@link #allow} will be set to false automatically if {@link #correctType} is false, however if the connecting
      * tile implements IPipeConnection and it returns ConnectionType.CONNECT then it will be set to true. */
-    public static class Connect extends PipeEventConnection {
+    public static abstract class Connect extends PipeEventConnection {
         /** Change this to false if the connection should be refused */
         public boolean allow;
         public final TileEntity with;
@@ -39,18 +39,24 @@ public abstract class PipeEventConnection extends PipeEvent {
 
     /** Exactly the same as Connect, but fired instead if the tile that could be connected to implements
      * {@link buildcraft.api.transport.IPipeTile} */
-    public static class PipeConnect extends Connect {
+    public static class ConnectPipe extends Connect {
         public final PipeBehaviour behaviour;
         public final IPipe pipe;
         public final IPipeTile pipeTile;
 
-        public PipeConnect(EnumFacing side, boolean allow, TileEntity with, boolean correctType, IPipeTile pipeTile) {
+        public ConnectPipe(EnumFacing side, boolean allow, TileEntity with, boolean correctType, IPipeTile pipeTile) {
             super(side, allow, with, correctType);
             this.behaviour = pipeTile.getPipe().getBehaviour();
             this.pipe = pipeTile.getPipe();
             this.pipeTile = pipeTile;
         }
+    }
 
+    /** Fired specifically whenever the block is NOT a pipe. */
+    public static class ConnectBlock extends Connect {
+        public ConnectBlock(EnumFacing side, boolean allow, TileEntity with, boolean correctType) {
+            super(side, allow, with, correctType);
+        }
     }
 
     /** Fired whenever a pipe has a connection removed. */

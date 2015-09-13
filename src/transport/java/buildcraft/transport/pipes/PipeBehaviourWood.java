@@ -59,7 +59,7 @@ public class PipeBehaviourWood extends PipeBehaviour {
     }
 
     @Subscribe
-    public void onPipeConnect(PipeEventConnection.PipeConnect connect) {
+    public void onPipeConnect(PipeEventConnection.ConnectPipe connect) {
         PipeBehaviour other = connect.behaviour;
         if (other instanceof PipeBehaviourWood) {
             // Emerald extends wood, so its fine.

@@ -27,7 +27,7 @@ public class PipeRegistry implements IPipeRegistry {
             throw new IllegalArgumentException("Tried to register with a null pipe definition!");
         }
         Item item = new ItemPipe(definition);
-        item.setUnlocalizedName(definition.modUniqueTag);
+        item.setUnlocalizedName("pipe_" + definition.modUniqueTag);
         pipeMap.put(definition.globalUniqueTag, Pair.of(definition, item));
         definitionItemMap.put(definition, item);
         return item;

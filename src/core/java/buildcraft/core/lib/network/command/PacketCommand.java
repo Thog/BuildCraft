@@ -7,6 +7,7 @@ package buildcraft.core.lib.network.command;
 import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import buildcraft.core.lib.network.Packet;
@@ -79,5 +80,10 @@ public class PacketCommand extends Packet {
     @Override
     public int getID() {
         return PacketIds.COMMAND;
+    }
+
+    @Override
+    public void applyData(World world) {
+
     }
 }
