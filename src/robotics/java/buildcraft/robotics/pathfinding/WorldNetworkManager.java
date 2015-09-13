@@ -100,4 +100,6 @@ public abstract class WorldNetworkManager {
     abstract void remove(BlockVolume volume);
 
     abstract void handlePacket(PacketPathfinding packet);
+
+    public void tick() {}
 }
