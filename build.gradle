@@ -1,305 +1,64 @@
-import net.minecraftforge.gradle.user.UserConstants
-import net.minecraftforge.gradle.common.Constants
-import net.minecraftforge.gradle.patcher.TaskReobfuscate
-import net.minecraftforge.gradle.util.delayed.DelayedFile
-import net.minecraftforge.gradle.util.delayed.DelayedString
-
-// THIS buildscript is needed to depend on the snapshot versions (from here...
 buildscript {
     repositories {
         mavenCentral()
         maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT"
+        classpath "gradle.plugin.net.minecraftforge.gradle:ForgeGradle:2.0.1"
     }
 }
 
-apply plugin: "net.minecraftforge.gradle.forge"
-// ...to here)
+ext.moduleDeps = [ "api":       [ ],
+               "core":      [ "api" ],
+               "builders":  [ "core" ],
+               "energy":    [ "core" ],
+               "factory":   [ "core" ],
+               "transport": [ "core" ],
+               "silicon":   [ "core" ],
+               "robotics":  [ "transport", "silicon" ]
+             ]
 
-// This buildscript is needed to depend on the full release versions (from here...
-//plugins {// Depend on forge gradle
-//    id "net.minecraftforge.gradle.forge" version "2.0.0"
-//}
+subprojects {
+    apply plugin: "net.minecraftforge.gradle.forge"
+    apply plugin: "maven" // for uploading to a maven repo
+    // apply plugin: "checkstyle" // Re-enable checkstyle after dev stuffs
 
-// ...to here)
+    version = "7.2.0"
+    group= "com.mod-buildcraft"
+    archivesBaseName = "buildcraft-$project.name" // the name that all artifacts will use as a base.
+    // Artifacts names follow this pattern: [baseName]-[appendix]-[version]-[classifier].[extension]
 
-apply plugin: "maven" // for uploading to a maven repo
-//apply plugin: "checkstyle"
+    minecraft {
+        mappings = "stable_16"
+        version = "1.8-11.14.3.1512" // McVersion-ForgeVersion     this variable is later changed to contain only the MC version, while the apiVersion variable is used for the forge version.  Yeah its stupid, and will be changed eventually.
 
-version = "7.2.0"
-group= "com.mod-buildcraft"
-archivesBaseName = "buildcraft" // the name that all artifacts will use as a base. artifacts names follow this pattern: [baseName]-[appendix]-[version]-[classifier].[extension]
+        runDir = "run" // the directory for ForgeGradle to run Minecraft in
 
-minecraft {
-    mappings = "stable_16"
-    version = "1.8-11.14.3.1512" // McVersion-ForgeVersion     this variable is later changed to contain only the MC version, while the apiVersion variable is used for the forge version.  Yeah its stupid, and will be changed eventually.
-
-    runDir = "run" // the directory for ForgeGradle to run Minecraft in
-
-    // replacing stuff in the source
-    replace "@VERSION@", project.version
-    replace "@MC_VERSION@", version
-}
-
-dependencies {
-    testCompile "junit:junit:4.12"
-}
-
-sourceSets {
-    core {
-        resources {
-            def l10n = file("../BuildCraft-Localization")
-            if(l10n.exists())
-                   srcDir l10n
-            exclude "**/.md" // exclude readme from localization repo
-        }
+        // replacing stuff in the source
+        replace "@VERSION@", project.version
+        replace "@MC_VERSION@", version
     }
-}
 
-// --------------------
-// extra jar section
-// --------------------
-
-// add a source jar
-//task sourceJar(type: Jar) {
-//    classifier = "sources"
-//}
-
-// because the normal output has been made to be obfuscated
-task deobfJar(type: Jar) {
-    classifier = "developer"
-
-// This makes the dev output work
-    doLast {
-        println "hi"
-        com.google.common.io.Files.copy(
-                new File("./build/libs/buildcraft-" + version + "-developer.jar"), 
-                new File("./build/libs/buildcraft-" + version + ".jar"))
-    }
-}
-
-// --------------------
-// module section
-// --------------------
-
-ext.modules = [ "api", "core", "builders", "energy", "factory", "transport", "silicon", "robotics" ]
-ext.moduleDependencies = [  
-                                "api":[],
-                                "core":["api"],
-                                "builders":["api", "core"],
-                                "energy": ["api", "core"],
-                                "factory": ["api", "core"],
-                                "transport": ["api", "core"],
-                                "silicon": ["api", "core"],
-                                "robotics": ["api", "core", "silicon", "transport"]
-                        ]
-
-println "modules:"
-modules.each { module ->
-    println "  " + module
-    if (sourceSets.findByName(module) == null) {
-           sourceSets.create("${module}") {
+    sourceSets {
+        main {
             java {
-                srcDir "src/${module}/java"
+                srcDir "java"
             }
             resources {
-                srcDir "src/${module}/resources"
+                srcDir "resources"
             }
         }
     }
-    sourceSets[module].compileClasspath += sourceSets["api"].compileClasspath
 
     dependencies {
-        testCompile sourceSets[module].output
-    }
-
-    moduleDependencies[module].each { dependant ->
-        sourceSets[module].compileClasspath += sourceSets[dependant].output
-        println "    depends on " + dependant
-    }
-    task (module + "SourceJar", type: Jar) {
-        from sourceSets[module].allSource
-        appendix = module
-        classifier = "source"
-    }
-
-    task (module + "DeobfJar", type: Jar) {
-        from sourceSets[module].output
-        appendix = module
-        classifier = "developer"
-    }
-
-    task (module + "ReobfJar", type: TaskReobfuscate, dependsOn: module + "DeobfJar") {
-        inJar = new File("./build/libs/buildcraft-" + module + "-" + version + "-developer.jar")
-        
-        outJar = new File("./build/libs/buildcraft-" + module + "-" + version + ".jar")
-        preFFJar = inJar
-        //addLibs(sourceSets["api"].compileClasspath)
-        addLibs(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS))
-
-        setSrg(new DelayedString(Constants.SRG_MCP_TO_SRG))
-        setExc(new DelayedFile(getProject(), Constants.EXC_SRG));
-        setFieldsCsv(new DelayedFile(getProject(), Constants.CSV_FIELD))
-        setMethodsCsv(new DelayedFile(getProject(), Constants.CSV_METHOD))
-    }
-  
-
-    tasks.sourceJar.from sourceSets[module].allSource
-    tasks.deobfJar.from sourceSets[module].output // TODO: Find out what to use instead of "output" for the full jar
-    //build.dependsOn tasks[module + "Jar"]
-    build.dependsOn tasks[module + "ReobfJar"]
-    build.dependsOn tasks[module + "SourceJar"]
-}
-
-task ("reobfFullJar", type: TaskReobfuscate, dependsOn: deobfJar) {
-        inJar = new File("./build/libs/buildcraft-" + version + "-developer.jar")
-        
-        outJar = new File("./build/libs/buildcraft-" + version + ".jar")
-        preFFJar = inJar
-        addLibs(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS))
-
-        setSrg(new DelayedString(Constants.SRG_MCP_TO_SRG))
-        setExc(new DelayedFile(getProject(), Constants.EXC_SRG));
-        setFieldsCsv(new DelayedFile(getProject(), Constants.CSV_FIELD))
-        setMethodsCsv(new DelayedFile(getProject(), Constants.CSV_METHOD))
-}
-
-build.dependsOn tasks["reobfFullJar"]
-
-processResources {
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        // ${version}   and    ${mcversion}    are the exact strings being replaced
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, that's not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        moduleDeps["$project.name"].each { dependency ->
+            compile project(":" + dependency)
+        }
     }
 }
 
-//checkstyle {
-//    configFile = file('guidelines/buildcraft.checkstyle')
+//dependencies {
+//    testCompile "junit:junit:4.12"
 //}
-
-// make sure all of these happen when we run build
-//build.dependsOn sourceJar, deobfJar
-
-// --------------------
-// maven section
-// -------------------
-
-// create the deployerJars dependency configuration
-configurations {
-    deployerJars
-}
-
-dependencies {
-    // dependency in deployerJars, for maven deployment. see definition in mavenDeployer{} below
-    deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
-}
-
-// specify artifacts to be uploaded
-artifacts {
-    // the default jar is already here by default
-//    archives sourceJar
-    // archives javadocJar
-//    archives deobfJar
-    // archives apiJar
-}
-
-uploadArchives {
-    // make sure this happens after reobfuscation
-    dependsOn "reobfFullJar"
-
-    repositories {
-        if (project.hasProperty("filesmaven")) { // if this is the Forge server, and this stuff is defined...
-            logger.info('Publishing to files server')
-
-            mavenDeployer {
-                // specify the jars that maven needs to deploy here
-                configuration = configurations.deployerJars
-
-                // authentication, again, specially set in the forge server environment
-                repository(url: project.filesmaven.url) {
-                    authentication(userName: project.filesmaven.username, privateKey: project.filesmaven.key)
-                }
-
-                // here you specify all your metadata
-                // this is the definition of the maven pom.xml. This is simply a DSL to define the XML. Not actual fields or things to set.
-                pom {
-                    groupId = project.group
-                    version = project.version
-                    artifactId = project.archivesBaseName
-                    project {
-                        name project.archivesBaseName
-                        packaging 'jar'
-                        description 'A Minecraft mod adding all sorts of machinery'
-                        url 'http://www.mod-buildcraft.com/'
-
-                        scm {
-                            url 'https://github.com/BuildCraft/BuildCraft'
-                            connection 'scm:git:git://github.com/BuildCraft/BuildCraft.git'
-                            developerConnection 'scm:git:git@github.com:BuildCraft/BuildCraft.git'
-                        }
-
-                        issueManagement {
-                            system 'github'
-                            url 'https://github.com/BuildCraft/BuildCraft/issues'
-                        }
-
-                        licenses {
-                            license {
-                                name 'Minecraft Mod Public License'
-                                url 'http://www.mod-buildcraft.com/MMPL-1.0.txt'
-                                distribution 'repo'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'SpaceToad'
-                                name 'SpaceToad'
-                                roles { role 'developer' }
-                            }
-                            developer {
-                                id 'CovertJaguar'
-                                name 'CovertJaguar'
-                                roles { role 'developer' }
-                            }
-                            developer {
-                                id 'SirSngir'
-                                name 'SirSengir'
-                                roles { role 'developer' }
-                            }   
-                            developer {
-                                id 'Krapht'
-                                name 'Krapht'
-                                roles { role 'developer' }
-                            }   
-
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            // otherwise publishing to the local repo in ~/.m2 is fine...
-            add project.repositories.mavenLocal()
-        }
-    }
-}
