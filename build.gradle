@@ -12,27 +12,24 @@ buildscript {
 
 ext.moduleDeps = [ "api":       [ ],
                "core":      [ "api" ],
-               "builders":  [ "core" ],
-               "energy":    [ "core" ],
-               "factory":   [ "core" ],
-               "transport": [ "core" ],
-               "silicon":   [ "core" ],
-               "robotics":  [ "transport", "silicon" ]
+               "builders":  [ "api", "core" ],
+               "energy":    [ "api", "core" ],
+               "factory":   [ "api", "core" ],
+               "transport": [ "api", "core" ],
+               "silicon":   [ "api", "core" ],
+               "robotics":  [ "api", "core", "transport", "silicon" ]
              ]
 
-subprojects {
+allprojects {
     apply plugin: "net.minecraftforge.gradle.forge"
-    apply plugin: "maven" // for uploading to a maven repo
-    // apply plugin: "checkstyle" // Re-enable checkstyle after dev stuffs
+    apply plugin: "maven"
 
     version = "7.2.0"
     group= "com.mod-buildcraft"
-    archivesBaseName = "buildcraft-$project.name" // the name that all artifacts will use as a base.
-    // Artifacts names follow this pattern: [baseName]-[appendix]-[version]-[classifier].[extension]
 
     minecraft {
         mappings = "stable_16"
-        version = "1.8-11.14.3.1512" // McVersion-ForgeVersion     this variable is later changed to contain only the MC version, while the apiVersion variable is used for the forge version.  Yeah its stupid, and will be changed eventually.
+        version = "1.8-11.14.3.1512" // McVersion-ForgeVersion this variable is later changed to contain only the MC version, while the apiVersion variable is used for the forge version.  Yeah its stupid, and will be changed eventually.
 
         runDir = "run" // the directory for ForgeGradle to run Minecraft in
 
@@ -40,7 +37,21 @@ subprojects {
         replace "@VERSION@", project.version
         replace "@MC_VERSION@", version
     }
+}
 
+// Only applied for the root buildcraft project
+archivesBaseName = "buildcraft-temp"
+
+// Applied for each module
+subprojects {
+    // Artifacts names follow this pattern: [baseName]-[appendix]-[version]-[classifier].[extension]
+    archivesBaseName = "buildcraft-" + project.name
+
+    // Build into the parents libs directory. 
+    // This keeps everything together, so we can almost pretend we don't have modules
+    buildDir = file "../build"
+
+    // Define a standard source set
     sourceSets {
         main {
             java {
@@ -52,12 +63,65 @@ subprojects {
         }
     }
 
-    dependencies {
-        moduleDeps["$project.name"].each { dependency ->
-            compile project(":" + dependency)
+    // Define the name of the subproject here, as inside of the classpath
+    // project.name referes to "buildcraft"
+    def thisName = project.name
+
+    project.parent.eclipse {
+        classpath {
+            file {
+                // After we merge the classpath add the java and resources folders for evrything
+                whenMerged { classpath ->
+                    boolean contains = false;
+                    classpath.entries.each { entry ->
+                        if (entry.getPath().contains(thisName + "/java")) {
+                            contains = true;
+                        }
+                    }
+                    if (!contains) {
+                        def srcJava = new org.gradle.plugins.ide.eclipse.model.SourceFolder(thisName + "/java", "")
+                        classpath.entries << srcJava
+                    }
+
+                    contains = false;
+                    classpath.entries.each { entry ->
+                        if (entry.getPath().contains(thisName + "/resources")) {
+                            contains = true;
+                        }
+                    }
+                    if (!contains) {
+                        def resources = new org.gradle.plugins.ide.eclipse.model.SourceFolder(thisName + "/resources", "")
+                        classpath.entries << resources
+                    }                
+                }
+            }
         }
     }
+
+    dependencies {
+        moduleDeps[project.name].each { dependency ->
+            compile project(":" + dependency)
+            compile files("build/libs/buildcraft-" + dependency + "-" + version + "-dev.jar")
+        }
+    }
+
+    // Don't let someone generate eclipse stuffs
+    tasks.remove tasks["eclipse"]
+
+    // Don't let someone generate IDEA stuffs
+    tasks.remove tasks["idea"]
+
+    task ("deobfJar", type: Jar) {
+        from sourceSets.main.allSource
+        archiveName = "buildcraft-" + project.name + "-" + project.version + "-dev.jar"
+       // destinationDir = file("../build/libs/")
+    }
+
+    build.dependsOn tasks["deobfJar"]
 }
+
+apply plugin: "java"
+apply plugin: "eclipse"
 
 //dependencies {
 //    testCompile "junit:junit:4.12"

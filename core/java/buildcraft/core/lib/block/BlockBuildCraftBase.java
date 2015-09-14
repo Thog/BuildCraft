@@ -121,7 +121,8 @@ public abstract class BlockBuildCraftBase extends Block {
 
             if (total > 16) {
                 nonMetas.add(prop);
-            } else {
+            }
+            else {
                 metas.add(prop);
             }
         }
@@ -231,7 +232,8 @@ public abstract class BlockBuildCraftBase extends Block {
             EntityLivingBase placer) {
         if (allRotatable) {// TODO (CHECK): Do we want to do this for all blocks that have 6 facing directions
             return getStateFromMeta(meta).withProperty(FACING_6_PROP, facing);
-        } else {
+        }
+        else {
             return getStateFromMeta(meta);
         }
     }
@@ -270,14 +272,16 @@ public abstract class BlockBuildCraftBase extends Block {
             if (mop != null) {
                 if (closest != null && mop.hitVec.distanceTo(origin) < closest.hitVec.distanceTo(origin)) {
                     closest = mop;
-                } else {
+                }
+                else {
                     closest = mop;
                 }
             }
         }
         if (closest == null) {
             return null;
-        } else {
+        }
+        else {
             return new MovingObjectPosition(closest.hitVec, closest.sideHit, pos);
         }
     }
@@ -287,7 +291,8 @@ public abstract class BlockBuildCraftBase extends Block {
     public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity par7Entity) {
         if (!isCollidable()) {
             return;
-        } else {
+        }
+        else {
             for (AxisAlignedBB bb : getBoxes(world, pos, state)) {
                 bb = bb.offset(pos.getX(), pos.getY(), pos.getZ());
                 if (mask.intersectsWith(bb)) {
@@ -305,7 +310,8 @@ public abstract class BlockBuildCraftBase extends Block {
     public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state) {
         if (isCollidable()) {
             return getBox(world, pos, state).offset(pos.getX(), pos.getY(), pos.getZ());
-        } else {
+        }
+        else {
             return null;
         }
     }

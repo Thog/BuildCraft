@@ -2,6 +2,7 @@
 .project
 .classpath
 .metadata
+*.launch
 org.*
 bin
 
@@ -21,6 +22,3 @@ run
 
 #mac
 .DS_Store
-
-#Personal code to inject into eclipse/idea in dev environment
-src/custom
