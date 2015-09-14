@@ -11,14 +11,14 @@ buildscript {
 }
 
 ext.moduleDeps = [ "api":       [ ],
-               "core":      [ "api" ],
-               "builders":  [ "api", "core" ],
-               "energy":    [ "api", "core" ],
-               "factory":   [ "api", "core" ],
-               "transport": [ "api", "core" ],
-               "silicon":   [ "api", "core" ],
-               "robotics":  [ "api", "core", "transport", "silicon" ]
-             ]
+                   "core":      [ "api" ],
+                   "builders":  [ "api", "core" ],
+                   "energy":    [ "api", "core" ],
+                   "factory":   [ "api", "core" ],
+                   "transport": [ "api", "core" ],
+                   "silicon":   [ "api", "core" ],
+                   "robotics":  [ "api", "core", "transport", "silicon" ]
+]
 
 allprojects {
     apply plugin: "net.minecraftforge.gradle.forge"
@@ -40,7 +40,7 @@ allprojects {
 }
 
 // Only applied for the root buildcraft project
-archivesBaseName = "buildcraft-temp"
+archivesBaseName = "buildcraft-all"
 
 // Applied for each module
 subprojects {
@@ -72,6 +72,7 @@ subprojects {
             file {
                 // After we merge the classpath add the java and resources folders for evrything
                 whenMerged { classpath ->
+                    // if it already contains this entry then don't add it again
                     boolean contains = false;
                     classpath.entries.each { entry ->
                         if (entry.getPath().contains(thisName + "/java")) {
@@ -98,10 +99,17 @@ subprojects {
         }
     }
 
+    task ("deobfJar", type: Jar) {
+        from sourceSets.main.allSource
+        archiveName = "buildcraft-" + project.name + "-" + project.version + "-dev.jar"
+    }
+
+    build.dependsOn tasks["deobfJar"]
+
     dependencies {
         moduleDeps[project.name].each { dependency ->
-            compile project(":" + dependency)
-            compile files("build/libs/buildcraft-" + dependency + "-" + version + "-dev.jar")
+            // Require the classes directly from the dependency
+            compile project(":" + dependency).sourceSets.main.output
         }
     }
 
@@ -110,14 +118,6 @@ subprojects {
 
     // Don't let someone generate IDEA stuffs
     tasks.remove tasks["idea"]
-
-    task ("deobfJar", type: Jar) {
-        from sourceSets.main.allSource
-        archiveName = "buildcraft-" + project.name + "-" + project.version + "-dev.jar"
-       // destinationDir = file("../build/libs/")
-    }
-
-    build.dependsOn tasks["deobfJar"]
 }
 
 apply plugin: "java"
