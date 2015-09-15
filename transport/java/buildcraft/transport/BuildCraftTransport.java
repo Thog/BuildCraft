@@ -220,7 +220,7 @@ public class BuildCraftTransport extends BuildCraftMod {
     public WireIconProvider wireIconProvider = new WireIconProvider();
 
     private static class PipeRecipe {
-        boolean isShapeless = false; // pipe recipes come shaped and unshaped.
+        boolean isShapeless = false;// pipe recipes come shaped and unshaped.
         ItemStack result;
         Object[] input;
     }
@@ -262,7 +262,8 @@ public class BuildCraftTransport extends BuildCraftMod {
             BuildCraftCore.mainConfigManager.register("general.pipes.facadeNoLaserRecipe", false,
                     "Should non-laser (crafting table) facade recipes be forced?", ConfigManager.RestartRequirement.GAME);
 
-        } finally {
+        }
+        finally {
             BuildCraftCore.mainConfiguration.save();
         }
 
@@ -559,7 +560,8 @@ public class BuildCraftTransport extends BuildCraftMod {
                     }
                 }
                 writer.close();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -576,11 +578,13 @@ public class BuildCraftTransport extends BuildCraftMod {
             facadeForceNonLaserRecipe = BuildCraftCore.mainConfigManager.get("general.pipes.facadeNoLaserRecipe").getBoolean();
 
             reloadConfig(ConfigManager.RestartRequirement.WORLD);
-        } else if (restartType == ConfigManager.RestartRequirement.WORLD) {
+        }
+        else if (restartType == ConfigManager.RestartRequirement.WORLD) {
             usePipeLoss = BuildCraftCore.mainConfigManager.get("experimental.kinesisPowerLossOnTravel").getBoolean();
 
             reloadConfig(ConfigManager.RestartRequirement.NONE);
-        } else {
+        }
+        else {
             pipeDurability = (float) BuildCraftCore.mainConfigManager.get("general.pipes.hardness").getDouble();
 
             if (BuildCraftCore.mainConfiguration.hasChanged()) {
@@ -648,7 +652,8 @@ public class BuildCraftTransport extends BuildCraftMod {
         for (PipeRecipe pipe : pipeRecipes) {
             if (pipe.isShapeless) {
                 CoreProxy.proxy.addShapelessRecipe(pipe.result, pipe.input);
-            } else {
+            }
+            else {
                 CoreProxy.proxy.addCraftingRecipe(pipe.result, pipe.input);
             }
         }
@@ -668,7 +673,8 @@ public class BuildCraftTransport extends BuildCraftMod {
 
         if (Loader.isModLoaded("BuildCraft|Silicon")) {
             TransportSiliconRecipes.loadSiliconRecipes();
-        } else {
+        }
+        else {
             BCLog.logger.warn("**********************************************");
             BCLog.logger.warn("*   You are using the BuildCraft Transport   *");
             BCLog.logger.warn("* module WITHOUT the Silicon module. Certain *");
@@ -708,6 +714,7 @@ public class BuildCraftTransport extends BuildCraftMod {
                 if (mapping.name.equals("BuildCraft|Transport:robotStation")) {
                     mapping.remap((Item) Item.itemRegistry.getObject("BuildCraft|Robotics:robotStation"));
                 }
+                // ALL of the pipes that were changed
             }
         }
     }

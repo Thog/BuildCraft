@@ -1,0 +1,2 @@
+This is just so that eclipse can use the api/resources folder and it doesn't put out an error.
+THIS SHOULD BE EXCLUDED FROM THE BUILT JARS!

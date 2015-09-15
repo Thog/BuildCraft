@@ -23,6 +23,7 @@ import buildcraft.api.blueprints.SchematicTile;
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.StatementManager;
+import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.Gate;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.block.BlockGenericPipe;
@@ -37,7 +38,7 @@ public class SchematicPipe extends SchematicTile {
         Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
-            return pipe.item == Item.getItemById(tileNBT.getInteger("pipeId"));
+            return pipe.definition == PipeAPI.registry.getDefinition(this.tileNBT.getString("pipeTag"));
         } else {
             return false;
         }
@@ -187,7 +188,8 @@ public class SchematicPipe extends SchematicTile {
             ArrayList<ItemStack> items = pipe.computeItemDrop();
             storedRequirements = new ItemStack[items.size() + 1];
             items.toArray(storedRequirements);
-            storedRequirements[storedRequirements.length - 1] = new ItemStack(pipe.item, 1, pipe.container.getItemMetadata());
+            Item pipeItem = PipeAPI.registry.getItem(pipe.definition);
+            storedRequirements[storedRequirements.length - 1] = new ItemStack(pipeItem, 1, pipe.container.getItemMetadata());
         }
     }
 
