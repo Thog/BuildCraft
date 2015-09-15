@@ -42,14 +42,32 @@ allprojects {
 // Only applied for the root buildcraft project
 archivesBaseName = "buildcraft-all"
 
+sourceSets {
+    main {
+        java {
+            subprojects.each { subproject -> 
+                srcDir subproject.name + "/java"
+            }
+        }
+        resources {
+            subprojects.each { subproject -> 
+                srcDir subproject.name + "/resources"
+            }
+        }
+    }
+}
+
+task ("deobfJar", type: Jar) {
+    from sourceSets.main.allSource
+    archiveName = "buildcraft-all-" + project.version + "-dev.jar"
+}
+
+build.dependsOn deobfJar
+
 // Applied for each module
 subprojects {
     // Artifacts names follow this pattern: [baseName]-[appendix]-[version]-[classifier].[extension]
     archivesBaseName = "buildcraft-" + project.name
-
-    // Build into the parents libs directory. 
-    // This keeps everything together, so we can almost pretend we don't have modules
-    buildDir = file "../build"
 
     // Define a standard source set
     sourceSets {
@@ -104,7 +122,14 @@ subprojects {
         archiveName = "buildcraft-" + project.name + "-" + project.version + "-dev.jar"
     }
 
-    build.dependsOn tasks["deobfJar"]
+    task ("copyOut", type: Copy) {
+        from "build/libs"
+        into "../build/libs"
+    }
+
+    copyOut.dependsOn deobfJar, jar, reobfJar
+
+    build.dependsOn copyOut
 
     dependencies {
         moduleDeps[project.name].each { dependency ->
@@ -122,6 +147,7 @@ subprojects {
 
 apply plugin: "java"
 apply plugin: "eclipse"
+apply plugin: "idea"
 
 //dependencies {
 //    testCompile "junit:junit:4.12"

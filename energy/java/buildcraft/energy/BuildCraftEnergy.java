@@ -141,7 +141,7 @@ public class BuildCraftEnergy extends BuildCraftMod {
                 RestartRequirement.GAME));
 
         setBiomeList(OilPopulate.INSTANCE.excludedBiomes, BuildCraftCore.mainConfigManager.register("worldgen.biomes", "excludeOilIDs", new String[] {
-            BiomeGenBase.sky.biomeName, BiomeGenBase.hell.biomeName },
+                BiomeGenBase.sky.biomeName, BiomeGenBase.hell.biomeName },
                 "IDs or Biome Types (e.g. SANDY,OCEAN) of biomes that are excluded from generating oil.", RestartRequirement.GAME));
 
         double fuelLavaMultiplier = BuildCraftCore.mainConfigManager.register("general", "fuel.lava.combustion", 1.0F,
@@ -185,19 +185,21 @@ public class BuildCraftEnergy extends BuildCraftMod {
         // Oil and fuel
         if (!FluidRegistry.isFluidRegistered("oil")) {
             buildcraftFluidOil = new Fluid("oil", new ResourceLocation(fluidTextureBase + "oil_still"), new ResourceLocation(fluidTextureBase
-                + "oil_flow"));
+                    + "oil_flow"));
             buildcraftFluidOil.setDensity(800).setViscosity(10000);
             FluidRegistry.registerFluid(buildcraftFluidOil);
-        } else {
+        }
+        else {
             BCLog.logger.warn("Not using BuildCraft oil - issues might occur!");
         }
         fluidOil = FluidRegistry.getFluid("oil");
 
         if (!FluidRegistry.isFluidRegistered("fuel")) {
             buildcraftFluidFuel = new Fluid("fuel", new ResourceLocation(fluidTextureBase + "fuel_still"), new ResourceLocation(fluidTextureBase
-                + "fuel_flow"));
+                    + "fuel_flow"));
             FluidRegistry.registerFluid(buildcraftFluidFuel);
-        } else {
+        }
+        else {
             BCLog.logger.warn("Not using BuildCraft fuel - issues might occur!");
         }
         fluidFuel = FluidRegistry.getFluid("fuel");
@@ -207,7 +209,8 @@ public class BuildCraftEnergy extends BuildCraftMod {
                     fluidTextureBase + "redplasma_flow"));
             buildcraftFluidRedPlasma.setDensity(10000).setViscosity(10000).setLuminosity(30);
             FluidRegistry.registerFluid(buildcraftFluidRedPlasma);
-        } else {
+        }
+        else {
             BCLog.logger.warn("Not using BuildCraft red plasma - issues might occur!");
         }
         fluidRedPlasma = FluidRegistry.getFluid("redplasma");
@@ -223,7 +226,8 @@ public class BuildCraftEnergy extends BuildCraftMod {
                     ConfigManager.RestartRequirement.NONE);
             BuildCraftCore.mainConfigManager.register("general.oilIsDense", true, "Should oil be dense and push enties up?",
                     ConfigManager.RestartRequirement.NONE);
-        } else {
+        }
+        else {
             blockOil = fluidOil.getBlock();
         }
 
@@ -241,7 +245,8 @@ public class BuildCraftEnergy extends BuildCraftMod {
             blockFuel.setUnlocalizedName("blockFuel").setLightOpacity(3);
             CoreProxy.proxy.registerBlock(blockFuel);
             fluidFuel.setBlock(blockFuel);
-        } else {
+        }
+        else {
             blockFuel = fluidFuel.getBlock();
         }
 
@@ -251,7 +256,8 @@ public class BuildCraftEnergy extends BuildCraftMod {
             blockRedPlasma.setUnlocalizedName("blockRedPlasma");
             CoreProxy.proxy.registerBlock(blockRedPlasma);
             fluidRedPlasma.setBlock(blockRedPlasma);
-        } else {
+        }
+        else {
             blockRedPlasma = fluidRedPlasma.getBlock();
         }
 
@@ -314,9 +320,11 @@ public class BuildCraftEnergy extends BuildCraftMod {
     public void reloadConfig(ConfigManager.RestartRequirement restartType) {
         if (restartType == ConfigManager.RestartRequirement.GAME) {
             reloadConfig(ConfigManager.RestartRequirement.WORLD);
-        } else if (restartType == ConfigManager.RestartRequirement.WORLD) {
+        }
+        else if (restartType == ConfigManager.RestartRequirement.WORLD) {
             reloadConfig(ConfigManager.RestartRequirement.NONE);
-        } else {
+        }
+        else {
             oilWellScalar = BuildCraftCore.mainConfigManager.get("worldgen.oilWellGenerationRate").getDouble();
 
             if (blockOil instanceof BlockBuildCraftFluid) {
@@ -346,10 +354,12 @@ public class BuildCraftEnergy extends BuildCraftMod {
                 if (strippedId.matches("-?\\d+(\\.\\d+)?")) {
                     try {
                         list.add(Integer.parseInt(strippedId));
-                    } catch (NumberFormatException ex) {
+                    }
+                    catch (NumberFormatException ex) {
                         BCLog.logger.log(Level.WARN, configuration.getName() + ": Could not find biome id: " + strippedId + " ; Skipping!");
                     }
-                } else {
+                }
+                else {
                     boolean found = false;
                     String biomeName = strippedId.toUpperCase();
 
@@ -417,16 +427,7 @@ public class BuildCraftEnergy extends BuildCraftMod {
                 return freeBiomeID;
             }
         }
-        // failed to find any free biome IDs
-        class BiomeIdLimitException extends RuntimeException {
-            private static final long serialVersionUID = 1L;
-
-            public BiomeIdLimitException(String biome) {
-                super(String.format("You have run out of free Biome ID spaces for %s", biome));
-            }
-        }
-
-        throw new BiomeIdLimitException(biomeName);
+        throw new RuntimeException(String.format("You have run out of free Biome ID spaces for %s", biomeName));
     }
 
     @Mod.EventHandler
@@ -445,7 +446,8 @@ public class BuildCraftEnergy extends BuildCraftMod {
             if (mapping.name.equals("BuildCraft|Energy:engineBlock")) {
                 if (mapping.type == GameRegistry.Type.BLOCK) {
                     mapping.remap(BuildCraftCore.engineBlock);
-                } else if (mapping.type == GameRegistry.Type.ITEM) {
+                }
+                else if (mapping.type == GameRegistry.Type.ITEM) {
                     mapping.remap(Item.getItemFromBlock(BuildCraftCore.engineBlock));
                 }
             }
