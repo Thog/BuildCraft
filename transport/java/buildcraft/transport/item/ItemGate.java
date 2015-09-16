@@ -33,12 +33,12 @@ import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.gates.GateDefinition;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.gates.GatePluggable;
+import buildcraft.transport.internal.pipes.Pipe;
 
 public class ItemGate extends ItemBuildCraft implements IPipePluggableItem {
 

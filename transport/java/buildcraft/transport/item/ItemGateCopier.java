@@ -17,12 +17,12 @@ import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.NBTUtils;
 import buildcraft.transport.Gate;
-import buildcraft.transport.block.BlockGenericPipe;
-import buildcraft.transport.block.BlockGenericPipe.Part;
-import buildcraft.transport.block.BlockGenericPipe.RaytraceResult;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.gates.GatePluggable;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe.Part;
+import buildcraft.transport.internal.pipes.BlockGenericPipe.RaytraceResult;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class ItemGateCopier extends ItemBuildCraft {
     // Item damages for what the gate copier holds

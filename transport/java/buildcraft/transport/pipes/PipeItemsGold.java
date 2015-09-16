@@ -12,12 +12,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.core.lib.utils.MathUtils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.pipes.events.PipeEventItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeItemsGold extends Pipe<PipeTransportItems> {
 

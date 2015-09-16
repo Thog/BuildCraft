@@ -18,7 +18,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
-import buildcraft.transport.pipes.PipeInfo;
 
 public class PipeIconProvider implements IIconProvider {
 

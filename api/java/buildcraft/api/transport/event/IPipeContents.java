@@ -4,32 +4,30 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
 
+import buildcraft.api.transport.EnumPipeType;
+
 public interface IPipeContents {
-    void removeAll();
+    /** @return The current type. Note that this will never be {@link EnumPipeType#STRUCTURE} */
+    EnumPipeType getType();
 
     public interface IPipeContentsItem extends IPipeContents {
+        /** @return A copy of the item stack. */
         ItemStack getStack();
 
-        void setStack();
-
+        /** @return The current colour. May be null if this is not coloured. */
         EnumDyeColor getColor();
-
-        void setColor(EnumDyeColor color);
     }
 
     public interface IPipeContentsFluid extends IPipeContents {
+        /** @return The amount of fluid. */
         int getAmount();
 
-        void setAmount(int amount);
-
+        /** @return The actual fluid type. May be null */
         Fluid getFluid();
-
-        void setFluid(Fluid fluid);
     }
 
     public interface IPipeContentsPower extends IPipeContents {
+        /** @return The amount of power. */
         double getPower();
-
-        void setPower(double mj);
     }
 }

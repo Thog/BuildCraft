@@ -2,12 +2,12 @@ package buildcraft.transport.pluggable;
 
 import com.google.common.eventbus.Subscribe;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.PipePluggable;
@@ -109,7 +109,7 @@ public class LensPluggable extends PipePluggable {
 
     private void color(TravelingItem item) {
         if ((item.toCenter && item.input.getOpposite() == side) || (!item.toCenter && item.output == side)) {
-            item.color = EnumColor.fromId(color);
+            item.color = EnumDyeColor.fromId(color);
         }
     }
 

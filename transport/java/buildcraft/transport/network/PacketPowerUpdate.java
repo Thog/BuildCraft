@@ -45,6 +45,6 @@ public class PacketPowerUpdate extends PacketCoordinates {
 
     @Override
     public void applyData(World world) {
-        
+
     }
 }

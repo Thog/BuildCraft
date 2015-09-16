@@ -1,4 +1,3 @@
 package buildcraft.api.transport.event;
 
-public interface IPipeEventDisconnect extends IPipeEventConnection {
-}
+public interface IPipeEventDisconnect extends IPipeEventConnection {}

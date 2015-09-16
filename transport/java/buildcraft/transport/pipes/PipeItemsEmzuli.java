@@ -11,13 +11,13 @@ import java.util.LinkedList;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
 import buildcraft.core.EnumGui;
@@ -28,7 +28,7 @@ import buildcraft.core.lib.network.IGuiReturnHandler;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
 import buildcraft.transport.statements.ActionExtractionPreset;
 
 import io.netty.buffer.ByteBuf;
@@ -73,7 +73,7 @@ public class PipeItemsEmzuli extends PipeItemsWood implements IGuiReturnHandler 
         TravelingItem item = super.makeItem(pos, stack);
         int color = slotColors[currentFilter % filterCount];
         if (color > 0) {
-            item.color = EnumColor.fromId(color - 1);
+            item.color = EnumDyeColor.fromId(color - 1);
         }
         return item;
     }
@@ -148,7 +148,7 @@ public class PipeItemsEmzuli extends PipeItemsWood implements IGuiReturnHandler 
         }
     }
 
-    private void setActivePreset(EnumColor color) {
+    private void setActivePreset(EnumDyeColor color) {
         switch (color) {
             case RED:
                 activeFlags.set(0);

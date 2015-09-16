@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import buildcraft.core.CompatHooks;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class TransportProxy {
     @SidedProxy(clientSide = "buildcraft.transport.TransportProxyClient", serverSide = "buildcraft.transport.TransportProxy")

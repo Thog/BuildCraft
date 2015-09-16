@@ -36,8 +36,8 @@ import buildcraft.core.lib.utils.NBTUtils;
 import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.EntityRobot;
 import buildcraft.robotics.RobotStationPluggable;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.Pipe;
 
 public class ItemRobot extends ItemBuildCraft implements IMjItemHandler {
 

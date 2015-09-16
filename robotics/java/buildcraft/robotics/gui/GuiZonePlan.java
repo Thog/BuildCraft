@@ -17,9 +17,9 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.ZonePlan;
@@ -77,9 +77,9 @@ public class GuiZonePlan extends GuiAdvancedInterface {
 
     private static class AreaSlot extends AdvancedSlot {
 
-        public EnumColor color;
+        public EnumDyeColor color;
 
-        public AreaSlot(GuiAdvancedInterface gui, int x, int y, EnumColor iColor) {
+        public AreaSlot(GuiAdvancedInterface gui, int x, int y, EnumDyeColor iColor) {
             super(gui, x, y);
 
             color = iColor;
@@ -119,7 +119,7 @@ public class GuiZonePlan extends GuiAdvancedInterface {
 
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                slots.set(i * 4 + j, new AreaSlot(this, 8 + 18 * i, 146 + 18 * j, EnumColor.values()[i * 4 + j]));
+                slots.set(i * 4 + j, new AreaSlot(this, 8 + 18 * i, 146 + 18 * j, EnumDyeColor.values()[i * 4 + j]));
             }
         }
 

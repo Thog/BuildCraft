@@ -38,8 +38,7 @@ public final class FacadePluggableRenderer extends BuildCraftBakedModel implemen
 
         // Use the particle texture for the block. Not ideal, but we have NO way of getting the actual
         // texture of the block without hackery...
-        TextureAtlasSprite sprite = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(facade
-                .getCurrentState());
+        TextureAtlasSprite sprite = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(facade.getCurrentState());
 
         // Render the actual facade
         Vec3 center = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 7 / 16d));
@@ -61,8 +60,7 @@ public final class FacadePluggableRenderer extends BuildCraftBakedModel implemen
             if (face.getAxis() == renderFace.getAxis()) {
                 radiusF = Utils.convertFloat(radius);
             } else {
-                radiusF = Utils.convertFloat(Utils.withValue(radius, renderFace.getAxis(), Utils.getValue(radius, renderFace.getAxis())
-                    * offset));
+                radiusF = Utils.convertFloat(Utils.withValue(radius, renderFace.getAxis(), Utils.getValue(radius, renderFace.getAxis()) * offset));
             }
 
             int uSize = 16;

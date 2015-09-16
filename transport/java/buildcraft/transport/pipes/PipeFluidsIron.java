@@ -24,11 +24,11 @@ import buildcraft.api.statements.StatementSlot;
 import buildcraft.api.transport.ICustomPipeConnection;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.statements.ActionPipeDirection;
-import buildcraft.transport.tile.TileGenericPipe;
 
 public class PipeFluidsIron extends Pipe<PipeTransportFluids>implements ICustomPipeConnection {
 

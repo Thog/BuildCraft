@@ -13,7 +13,7 @@ import net.minecraft.util.EnumFacing;
 import buildcraft.api.properties.BuildCraftProperties;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.core.lib.TileBuffer;
-import buildcraft.transport.Pipe;
+import buildcraft.transport.internal.pipes.Pipe;
 
 public abstract class PipeLogicWood {
 

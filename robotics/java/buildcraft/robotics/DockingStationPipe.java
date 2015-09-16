@@ -1,6 +1,7 @@
 package buildcraft.robotics;
 
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -8,7 +9,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.robots.DockingStation;
 import buildcraft.api.robots.EntityRobotBase;
 import buildcraft.api.robots.IRequestProvider;
@@ -18,10 +18,10 @@ import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IInjectable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.gates.ActionIterator;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.pipes.PipeFluidsWood;
 import buildcraft.transport.pipes.PipeItemsWood;
 
@@ -34,7 +34,7 @@ public class DockingStationPipe extends DockingStation {
         }
 
         @Override
-        public int injectItem(ItemStack stack, boolean doAdd, EnumFacing from, EnumColor color) {
+        public int injectItem(ItemStack stack, boolean doAdd, EnumFacing from, EnumDyeColor color) {
             if (doAdd) {
                 Vec3 vec = Utils.convertMiddle(getPos()).add(Utils.convert(side, 0.2));
                 TravelingItem item = TravelingItem.make(vec, stack);

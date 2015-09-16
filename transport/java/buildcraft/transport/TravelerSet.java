@@ -11,6 +11,8 @@ import java.util.Set;
 import com.google.common.collect.ForwardingSet;
 import com.google.common.collect.Sets;
 
+import buildcraft.transport.internal.pipes.PipeTransportItems;
+
 public class TravelerSet extends ForwardingSet<TravelingItem> {
 
     public boolean iterating;

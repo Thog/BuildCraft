@@ -25,8 +25,8 @@ import buildcraft.core.lib.render.FluidRenderer;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportFluids;
 import buildcraft.transport.utils.FluidRenderData;
 
 public class PipeRendererFluids {

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -19,19 +20,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.utils.ColorUtils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.pipes.events.PipeEventItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.statements.ActionPipeColor;
 import buildcraft.transport.statements.ActionPipeDirection;
 
@@ -41,7 +40,7 @@ public class PipeItemsDaizuli extends Pipe<PipeTransportItems>implements ISerial
 
     private int standardIconIndex = PipeIconProvider.TYPE.PipeItemsDaizuli_Black.ordinal();
     private int solidIconIndex = PipeIconProvider.TYPE.PipeAllDaizuli_Solid.ordinal();
-    private int color = EnumColor.BLACK.ordinal();
+    private int color = EnumDyeColor.BLACK.ordinal();
     private PipeLogicIron logic = new PipeLogicIron(this) {
         @Override
         protected boolean isValidConnectingTile(TileEntity tile, EnumFacing face) {
@@ -68,11 +67,11 @@ public class PipeItemsDaizuli extends Pipe<PipeTransportItems>implements ISerial
         transport.allowBouncing = true;
     }
 
-    public EnumColor getColor() {
-        return EnumColor.fromId(color);
+    public EnumDyeColor getColor() {
+        return EnumDyeColor.fromId(color);
     }
 
-    public void setColor(EnumColor c) {
+    public void setColor(EnumDyeColor c) {
         if (color != c.ordinal()) {
             this.color = c.ordinal();
             container.scheduleRenderUpdate();
@@ -92,7 +91,7 @@ public class PipeItemsDaizuli extends Pipe<PipeTransportItems>implements ISerial
 
         int newColor = ColorUtils.getColorIDFromDye(player.getCurrentEquippedItem());
         if (newColor >= 0 && newColor < 16) {
-            setColor(EnumColor.fromId(15 - newColor));
+            setColor(EnumDyeColor.fromId(15 - newColor));
             return true;
         }
 

@@ -3,22 +3,13 @@ package buildcraft.api.transport;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
-/** An instance is created per pipe block in world, and is registered with the pipe event bus to listen and respond to
- * events. */
+/** An instance is created by instance of IBehaviourFactory per pipe block in world, and is registered with the pipe
+ * event bus to listen and respond to events. */
 public abstract class PipeBehaviour {
     public final PipeDefinition definition;
 
-    /** NEVER SET THIS YOURSELF! This will be null if the pipe has not been properly added to the world yet, however it
-     * is GUARRENTEED to not be null for all events fired. (This will always be null for getIconSuffix) */
-    public IPipe owner;
-
     public PipeBehaviour(PipeDefinition definition) {
         this.definition = definition;
-    }
-
-    /** Only called instances of IPipe! */
-    public void setOwner(IPipe pipe) {
-        owner = pipe;
     }
 
     public abstract NBTTagCompound writeToNBT();

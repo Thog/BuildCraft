@@ -25,9 +25,9 @@ import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.StatementManager;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.Gate;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.block.BlockGenericPipe;
-import buildcraft.transport.tile.SideProperties;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.SideProperties;
 
 public class SchematicPipe extends SchematicTile {
 

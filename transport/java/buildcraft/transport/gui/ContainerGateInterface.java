@@ -30,8 +30,8 @@ import buildcraft.core.lib.network.command.PacketCommand;
 import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.transport.ActionActiveState;
 import buildcraft.transport.Gate;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.gates.GateDefinition;
+import buildcraft.transport.internal.pipes.Pipe;
 
 import io.netty.buffer.ByteBuf;
 

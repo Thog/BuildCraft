@@ -19,7 +19,7 @@ import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.render.BuildCraftBakedModel;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.tile.PipeRenderState;
+import buildcraft.transport.internal.pipes.PipeRenderState;
 
 public class PipeRendererWires {
     private static EnumMap<PipeWire, Vec3> wirePosMap = Maps.newEnumMap(PipeWire.class);

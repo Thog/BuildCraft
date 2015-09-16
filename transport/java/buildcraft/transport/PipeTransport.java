@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.lib.utils.BitSetUtils;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public abstract class PipeTransport {
 

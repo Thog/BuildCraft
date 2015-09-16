@@ -14,9 +14,9 @@ import buildcraft.api.gates.GateExpansionController;
 import buildcraft.api.gates.GateExpansions;
 import buildcraft.api.gates.IGateExpansion;
 import buildcraft.transport.Gate;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
+import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.item.ItemGate;
 
 public final class GateFactory {

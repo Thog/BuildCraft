@@ -27,10 +27,10 @@ import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.InventoryWrapper;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeItemsWood extends Pipe<PipeTransportItems>implements IMjExternalStorage {
 

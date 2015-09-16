@@ -16,7 +16,7 @@ import buildcraft.api.core.BCLog;
 import buildcraft.core.EnumGui;
 import buildcraft.transport.gui.ContainerFilteredBuffer;
 import buildcraft.transport.gui.GuiFilteredBuffer;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class TransportGuiHandler implements IGuiHandler {
 

@@ -20,7 +20,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.blocks.IColorRemovable;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.NBTUtils;
@@ -37,7 +36,7 @@ public class ItemPaintbrush extends ItemBuildCraft {
     }
 
     /** @param color The colour of the paintbrush. Can be null. */
-    public ItemStack getItemStack(EnumColor color) {
+    public ItemStack getItemStack(EnumDyeColor color) {
         ItemStack stack = new ItemStack(this, 1, color == null ? 0 : color.ordinal() + 1);
         NBTTagCompound nbt = NBTUtils.getItemData(stack);
 
@@ -91,7 +90,7 @@ public class ItemPaintbrush extends ItemBuildCraft {
         String base = super.getItemStackDisplayName(stack);
         int dye = getColor(stack);
         if (dye >= 0) {
-            return base + " (" + EnumColor.fromId(dye).getLocalizedName() + ")";
+            return base + " (" + EnumDyeColor.fromId(dye).getLocalizedName() + ")";
         } else {
             return base;
         }
@@ -132,7 +131,7 @@ public class ItemPaintbrush extends ItemBuildCraft {
     @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tab, List itemList) {
         for (int i = 0; i < 17; i++) {
-            EnumColor color = i == 0 ? null : EnumColor.VALUES[i - 1];
+            EnumDyeColor color = i == 0 ? null : EnumDyeColor.VALUES[i - 1];
             itemList.add(this.getItemStack(color));
         }
     }
@@ -155,7 +154,7 @@ public class ItemPaintbrush extends ItemBuildCraft {
     public void registerModels() {
         ModelHelper.registerItemModel(this, 0, "/Clean");
         int i = 1;
-        for (EnumColor colour : EnumColor.values()) {
+        for (EnumDyeColor colour : EnumDyeColor.values()) {
             ModelHelper.registerItemModel(this, i, "/" + colour.getName());
             i++;
         }

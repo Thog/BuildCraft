@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
@@ -68,7 +69,6 @@ import buildcraft.api.core.ConfigAccessor;
 import buildcraft.api.core.ConfigAccessor.EMod;
 import buildcraft.api.core.IWorldProperty;
 import buildcraft.api.crops.CropManager;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.enums.EnumSpring;
 import buildcraft.api.recipes.BuildcraftRecipeRegistry;
 import buildcraft.api.statements.IActionExternal;
@@ -552,8 +552,8 @@ public class BuildCraftCore extends BuildCraftMod {
         CoreProxy.proxy.addCraftingRecipe(new ItemStack(guideBook), " G ", "SBS", 'B', Items.book, 'S', Items.stick, 'G', woodenGearItem);
 
         for (int i = 0; i < 16; i++) {
-            ItemStack outputStack = paintbrushItem.getItemStack(EnumColor.VALUES[i]);
-            CoreProxy.proxy.addShapelessRecipe(outputStack, paintbrushItem, EnumColor.fromId(i).getDye());
+            ItemStack outputStack = paintbrushItem.getItemStack(EnumDyeColor.VALUES[i]);
+            CoreProxy.proxy.addShapelessRecipe(outputStack, paintbrushItem, EnumDyeColor.fromId(i).getDye());
         }
     }
 
@@ -678,11 +678,11 @@ public class BuildCraftCore extends BuildCraftMod {
     public void loadTextures(TextureStitchEvent.Post evt) {
         FluidRenderer.initFluidTextures(evt.map);
         TextureAtlasSprite[] array = new TextureAtlasSprite[16];
-        for (EnumColor color : EnumColor.values()) {
+        for (EnumDyeColor color : EnumDyeColor.values()) {
             array[color.ordinal()] = evt.map.registerSprite(new ResourceLocation("buildcraftcore:textures/items/paintbrush/" + color.getName()
-                    .toLowerCase(Locale.ENGLISH)));
+                    .toLowerCase(Locale.ROOT)));
         }
-        EnumColor.registerSprites(array);
+        EnumDyeColor.registerSprites(array);
     }
 
     @SubscribeEvent

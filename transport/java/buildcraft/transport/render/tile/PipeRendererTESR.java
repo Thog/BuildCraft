@@ -25,10 +25,10 @@ import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.MatrixTranformations;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.gates.GatePluggable;
-import buildcraft.transport.tile.PipeRenderState;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeRenderState;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
     public PipeRendererTESR() {}

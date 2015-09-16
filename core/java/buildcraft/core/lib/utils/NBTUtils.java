@@ -144,13 +144,21 @@ public final class NBTUtils {
         return new Vec3(list.getDoubleAt(0), list.getDoubleAt(1), list.getDoubleAt(2));
     }
 
+    private static final String NULL_ENUM = "_NULL";
+
     public static <E extends Enum<E>> NBTBase writeEnum(E value) {
+        if (value == null) {
+            return new NBTTagString(NULL_ENUM);
+        }
         return new NBTTagString(value.name());
     }
 
     public static <E extends Enum<E>> E readEnum(NBTBase nbt, Class<E> clazz) {
         if (nbt instanceof NBTTagString) {
             String value = ((NBTTagString) nbt).getString();
+            if (NULL_ENUM.equals(value)) {
+                return null;
+            }
             try {
                 return Enum.valueOf(clazz, value);
             } catch (Throwable t) {

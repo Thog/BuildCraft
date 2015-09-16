@@ -20,11 +20,11 @@ import buildcraft.api.statements.StatementParameterItemStack;
 import buildcraft.core.lib.inventory.StackHelper;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.core.statements.BCStatement;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportFluids;
-import buildcraft.transport.PipeTransportItems;
-import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
+import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 public class TriggerPipeContents extends BCStatement implements ITriggerInternal {
 

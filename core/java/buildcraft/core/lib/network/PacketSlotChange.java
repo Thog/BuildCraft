@@ -44,6 +44,6 @@ public class PacketSlotChange extends PacketCoordinates {
     @Override
     public void applyData(World world) {
         // TODO Auto-generated method stub
-        
+
     }
 }

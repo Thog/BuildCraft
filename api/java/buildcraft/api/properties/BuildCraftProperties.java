@@ -4,10 +4,10 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.enums.EnumBlueprintType;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.enums.EnumEnergyStage;
 import buildcraft.api.enums.EnumEngineType;
 import buildcraft.api.enums.EnumFillerPattern;
@@ -19,7 +19,7 @@ public final class BuildCraftProperties {
     public static final BuildCraftProperty<EnumFacing> BLOCK_FACING = BuildCraftProperty.create("facing", EnumFacing.Plane.HORIZONTAL.facings());
     public static final BuildCraftProperty<EnumFacing> BLOCK_FACING_6 = BuildCraftProperty.create("facing", EnumFacing.class);
 
-    public static final BuildCraftProperty<EnumColor> BLOCK_COLOR = BuildCraftProperty.create("color", EnumColor.class);
+    public static final BuildCraftProperty<EnumDyeColor> BLOCK_COLOR = BuildCraftProperty.create("color", EnumDyeColor.class);
     public static final BuildCraftProperty<EnumSpring> SPRING_TYPE = BuildCraftProperty.create("type", EnumSpring.class);
     public static final BuildCraftProperty<EnumEngineType> ENGINE_TYPE = BuildCraftProperty.create("type", EnumEngineType.class);
     public static final BuildCraftProperty<EnumLaserTableType> LASER_TABLE_TYPE = BuildCraftProperty.create("type", EnumLaserTableType.class);

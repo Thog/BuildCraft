@@ -6,9 +6,9 @@ package buildcraft.transport.statements;
 
 import java.util.Locale;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.IStatementParameter;
@@ -17,9 +17,9 @@ import buildcraft.core.statements.BCStatement;
 
 public class ActionPipeColor extends BCStatement implements IActionInternal {
 
-    public final EnumColor color;
+    public final EnumDyeColor color;
 
-    public ActionPipeColor(EnumColor color) {
+    public ActionPipeColor(EnumDyeColor color) {
         super(new ResourceLocation("buildcraftcore:paintbrush/" + color.name().toLowerCase(Locale.ENGLISH)), "buildcraft:pipe.color." + color
                 .getTag(), "buildcraft.pipe." + color.getTag());
 

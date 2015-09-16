@@ -5,9 +5,9 @@ import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.core.IIconProvider;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeItemsBase extends Pipe {
     public final PipeInfo info;

@@ -23,7 +23,7 @@ import buildcraft.core.lib.network.IGuiReturnHandler;
 import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
 
 import io.netty.buffer.ByteBuf;
 

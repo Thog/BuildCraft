@@ -7,9 +7,7 @@ package buildcraft.api.transport;
 import net.minecraft.util.EnumFacing;
 
 public interface IPipeConnection {
-
     enum ConnectOverride {
-
         CONNECT,
         DISCONNECT,
         DEFAULT

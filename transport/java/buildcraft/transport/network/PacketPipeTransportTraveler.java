@@ -4,11 +4,11 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.network;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.network.PacketIds;
@@ -25,7 +25,7 @@ public class PacketPipeTransportTraveler extends Packet {
     private int entityId;
     private EnumFacing input;
     private EnumFacing output;
-    private EnumColor color;
+    private EnumDyeColor color;
     private Vec3 itemPos;
     private float speed;
 
@@ -81,7 +81,7 @@ public class PacketPipeTransportTraveler extends Packet {
 
         byte c = data.readByte();
         if (c != -1) {
-            this.color = EnumColor.fromId(c);
+            this.color = EnumDyeColor.fromId(c);
         }
 
         this.speed = data.readFloat();
@@ -101,7 +101,7 @@ public class PacketPipeTransportTraveler extends Packet {
         return output;
     }
 
-    public EnumColor getColor() {
+    public EnumDyeColor getColor() {
         return color;
     }
 

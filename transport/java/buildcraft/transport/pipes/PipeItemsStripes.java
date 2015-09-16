@@ -35,13 +35,12 @@ import buildcraft.core.lib.utils.BlockUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.pipes.events.PipeEventItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.statements.ActionPipeDirection;
-import buildcraft.transport.tile.TileGenericPipe;
 import buildcraft.transport.utils.TransportUtils;
 
 public class PipeItemsStripes extends Pipe<PipeTransportItems>implements IMjExternalStorage, IStripesPipe {

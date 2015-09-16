@@ -30,10 +30,9 @@ import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.ColorUtils;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeToolTipManager;
-import buildcraft.transport.block.BlockGenericPipe;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class ItemPipe extends ItemBuildCraft implements IItemPipe {
 
@@ -72,9 +71,7 @@ public class ItemPipe extends ItemBuildCraft implements IItemPipe {
                 return true;
             }
 
-            Pipe pipe = new Pipe(definition);
-
-            if (BlockGenericPipe.placePipe(pipe, world, pos, block.getDefaultState(), entityplayer)) {
+            if (BlockGenericPipe.placePipe(definition, world, pos, block.getDefaultState(), entityplayer)) {
                 block.onBlockPlacedBy(world, pos, block.getDefaultState(), entityplayer, itemstack);
 
                 if (!world.isRemote) {

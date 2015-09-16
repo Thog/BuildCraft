@@ -15,7 +15,7 @@ import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.core.statements.BCStatement;
-import buildcraft.transport.Pipe;
+import buildcraft.transport.internal.pipes.Pipe;
 
 public class TriggerPipeSignal extends BCStatement implements ITriggerInternal {
 

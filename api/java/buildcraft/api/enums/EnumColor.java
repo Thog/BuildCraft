@@ -14,7 +14,9 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public enum EnumColor implements IStringSerializable {
+@Deprecated
+/** In favour of minecraft's EnumDyeColor. */
+enum EnumColor implements IStringSerializable {
 
     BLACK,
     RED,

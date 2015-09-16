@@ -17,9 +17,9 @@ import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportPower;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 public class PipeRendererPower {
     public static final double FLOW_MULTIPLIER = 1 / 64d;

@@ -9,7 +9,8 @@ import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.Pipe;
 
 public class PipeTransportStructure extends PipeTransport {
 

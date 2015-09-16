@@ -96,6 +96,6 @@ public class PacketGuiReturn extends Packet {
     @Override
     public void applyData(World world) {
         // TODO Auto-generated method stub
-        
+
     }
 }

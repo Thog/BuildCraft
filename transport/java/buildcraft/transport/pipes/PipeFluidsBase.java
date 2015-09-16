@@ -8,9 +8,9 @@ import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeFactory;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportFluids;
 
 public class PipeFluidsBase extends Pipe<PipeTransportFluids> {
     private final PipeInfo info;

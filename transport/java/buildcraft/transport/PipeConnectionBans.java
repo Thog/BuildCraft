@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport;
 
+import buildcraft.transport.internal.pipes.Pipe;
+
 /** Controls whether one type of pipe can connect to another. */
 // TODO (PASS 0): Change this to use EnumPipeMaterial as then we can get rid of the silly classes
 // EVEN BETTER REMOVE IT ENTIRELY! YAAAAAAAAAY!

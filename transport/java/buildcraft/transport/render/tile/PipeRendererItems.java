@@ -8,19 +8,19 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.items.IItemCustomPipeRender;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeRendererItems {
     private static final int MAX_ITEMS_TO_RENDER = 10;
@@ -70,7 +70,7 @@ public class PipeRendererItems {
         GL11.glPopMatrix();
     }
 
-    public static void doRenderItem(TravelingItem travellingItem, double x, double y, double z, float light, EnumColor color) {
+    public static void doRenderItem(TravelingItem travellingItem, double x, double y, double z, float light, EnumDyeColor color) {
 
         if (travellingItem == null || travellingItem.getItemStack() == null) {
             return;

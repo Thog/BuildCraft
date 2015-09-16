@@ -13,8 +13,9 @@ import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.ITriggerExternal;
 import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.statements.ITriggerProvider;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.statements.TriggerPipeContents;
-import buildcraft.transport.tile.TileGenericPipe;
 
 public class PipeTriggerProvider implements ITriggerProvider {
     @Override

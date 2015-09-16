@@ -5,13 +5,11 @@
 package buildcraft.api.transport;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.transport.pluggable.PipePluggable;
 
 public interface IPipeTile extends IInjectable {
@@ -55,11 +53,4 @@ public interface IPipeTile extends IInjectable {
     void scheduleNeighborChange();
 
     void scheduleRenderUpdate();
-
-    // For compatibility with BC 6.2.x and below
-    int injectItem(ItemStack stack, boolean doAdd, EnumFacing from, EnumColor color);
-
-    @Deprecated
-    // Now in IInjectable
-    int injectItem(ItemStack stack, boolean doAdd, EnumFacing from);
 }

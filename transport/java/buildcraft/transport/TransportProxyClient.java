@@ -10,9 +10,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.render.TileEntityPickupFX;
 import buildcraft.transport.render.tile.PipeRendererTESR;
-import buildcraft.transport.tile.TileGenericPipe;
 
 public class TransportProxyClient extends TransportProxy {
 

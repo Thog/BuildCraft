@@ -16,6 +16,7 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -29,7 +30,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.enums.EnumBlueprintType;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.enums.EnumEnergyStage;
 import buildcraft.api.enums.EnumEngineType;
 import buildcraft.api.enums.EnumFillerPattern;
@@ -46,7 +46,7 @@ public abstract class BlockBuildCraftBase extends Block {
     public static final BuildCraftProperty<EnumFacing> FACING_6_PROP = BuildCraftProperties.BLOCK_FACING_6;
 
     public static final BuildCraftProperty<EnumEngineType> ENGINE_TYPE = BuildCraftProperties.ENGINE_TYPE;
-    public static final BuildCraftProperty<EnumColor> COLOR_PROP = BuildCraftProperties.BLOCK_COLOR;
+    public static final BuildCraftProperty<EnumDyeColor> COLOR_PROP = BuildCraftProperties.BLOCK_COLOR;
     public static final BuildCraftProperty<EnumSpring> SPRING_TYPE = BuildCraftProperties.SPRING_TYPE;
     public static final BuildCraftProperty<EnumEnergyStage> ENERGY_STAGE = BuildCraftProperties.ENERGY_STAGE;
     public static final BuildCraftProperty<EnumFillerPattern> FILLER_PATTERN = BuildCraftProperties.FILLER_PATTERN;
@@ -121,8 +121,7 @@ public abstract class BlockBuildCraftBase extends Block {
 
             if (total > 16) {
                 nonMetas.add(prop);
-            }
-            else {
+            } else {
                 metas.add(prop);
             }
         }
@@ -232,8 +231,7 @@ public abstract class BlockBuildCraftBase extends Block {
             EntityLivingBase placer) {
         if (allRotatable) {// TODO (CHECK): Do we want to do this for all blocks that have 6 facing directions
             return getStateFromMeta(meta).withProperty(FACING_6_PROP, facing);
-        }
-        else {
+        } else {
             return getStateFromMeta(meta);
         }
     }
@@ -272,16 +270,14 @@ public abstract class BlockBuildCraftBase extends Block {
             if (mop != null) {
                 if (closest != null && mop.hitVec.distanceTo(origin) < closest.hitVec.distanceTo(origin)) {
                     closest = mop;
-                }
-                else {
+                } else {
                     closest = mop;
                 }
             }
         }
         if (closest == null) {
             return null;
-        }
-        else {
+        } else {
             return new MovingObjectPosition(closest.hitVec, closest.sideHit, pos);
         }
     }
@@ -291,8 +287,7 @@ public abstract class BlockBuildCraftBase extends Block {
     public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity par7Entity) {
         if (!isCollidable()) {
             return;
-        }
-        else {
+        } else {
             for (AxisAlignedBB bb : getBoxes(world, pos, state)) {
                 bb = bb.offset(pos.getX(), pos.getY(), pos.getZ());
                 if (mask.intersectsWith(bb)) {
@@ -310,8 +305,7 @@ public abstract class BlockBuildCraftBase extends Block {
     public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state) {
         if (isCollidable()) {
             return getBox(world, pos, state).offset(pos.getX(), pos.getY(), pos.getZ());
-        }
-        else {
+        } else {
             return null;
         }
     }

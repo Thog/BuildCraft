@@ -19,6 +19,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.ISmartBlockModel;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
+import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.CoreConstants;
@@ -26,12 +27,11 @@ import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.BuildCraftBakedModel;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipePluggableState;
-import buildcraft.transport.block.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.CoreState;
+import buildcraft.transport.internal.pipes.PipeRenderState;
 import buildcraft.transport.render.tile.PipeRendererWires;
-import buildcraft.transport.tile.CoreState;
-import buildcraft.transport.tile.PipeRenderState;
 
 public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockModel {
     public PipeBlockModel() {
@@ -60,7 +60,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
         CoreState core = BlockGenericPipe.PIPE_CORE_STATE.getUnlistedValue(state);// Not required... :P
         PipeRenderState render = BlockGenericPipe.PIPE_RENDER_STATE.getUnlistedValue(state);
         PipePluggableState pluggable = BlockGenericPipe.PIPE_PLUGGABLE_STATE.getUnlistedValue(state);
-        Pipe pipe = BlockGenericPipe.PIPE_PIPE.getUnlistedValue(state);
+        IPipe pipe = BlockGenericPipe.PIPE_PIPE.getUnlistedValue(state);
 
         if (core == null || render == null || pluggable == null || pipe == null) {
             return defaultModel();// Thats not good. Just return a cobblestone structure pipe centre model
@@ -76,7 +76,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
 
         // Center bit
         {
-            TextureAtlasSprite sprite = pipe.definition.getSprite(render.textureMatrix.getTextureIndex(null));
+            TextureAtlasSprite sprite = pipe.getBehaviour().definition.getSprite(render.textureMatrix.getTextureIndex(null));
 
             float[] uvs = new float[4];
             uvs[U_MIN] = sprite.getInterpolatedU(minUV);
@@ -95,7 +95,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
         for (EnumFacing connect : EnumFacing.VALUES) {
             if (render.pipeConnectionMatrix.isConnected(connect) && render.pipeConnectionBanned.isConnected(connect)) {
                 float extension = render.customConnections[connect.ordinal()];
-                TextureAtlasSprite sprite = pipe.definition.getSprite(render.textureMatrix.getTextureIndex(connect));
+                TextureAtlasSprite sprite = pipe.getBehaviour().definition.getSprite(render.textureMatrix.getTextureIndex(connect));
 
                 Vec3 actualCenter = Utils.convert(connect, 0.375f + extension / 2).addVector(0.5, 0.5, 0.5);
 
@@ -152,7 +152,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
             }
         }
 
-        TextureAtlasSprite particle = pipe.definition.getSprite(pipe.behaviour.getIconIndex(null));
+        TextureAtlasSprite particle = pipe.getBehaviour().definition.getSprite(pipe.getBehaviour().getIconIndex(null));
 
         return new PipeBlockModel(ImmutableList.copyOf(quads), particle, DefaultVertexFormats.BLOCK);
     }

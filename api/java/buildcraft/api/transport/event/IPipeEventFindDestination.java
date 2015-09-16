@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 public interface IPipeEventFindDestination extends IPipeEvent {
+    /** @return The current contents of the pipe */
     IPipeContents getContents();
 
     /** @return Where the contents came from. Note that {@link #getPotentialDestinations()} will never contain this as a
@@ -33,10 +34,20 @@ public interface IPipeEventFindDestination extends IPipeEvent {
      * @throws IllegalArgumentException if the destination violated any of the above rules */
     void addDestination(EnumFacing destination) throws IllegalArgumentException;
 
+    /** Add all the destinations according to rules given by {@link #addDestination(EnumFacing)}.
+     * 
+     * @param destinations The destinations to add
+     * @throws IllegalArgumentException if any of the destinations violated any of the given rules */
     void addDestinations(EnumFacing... destinations) throws IllegalArgumentException;
 
+    /** Add all the destinations according to the rules given by {@link #addDestination(EnumFacing)}
+     * 
+     * @param destinations The destinations to add
+     * @throws IllegalArgumentException if any of the destinations violated any of the given rules */
     void addDestinations(Iterable<EnumFacing> destinations) throws IllegalArgumentException;
 
+    /** Add all of the possible destinations that fit the rules given by {@link #addDestination(EnumFacing)}. Note that
+     * the resulting set of destinations will equal the key set given by {@link #getPotentialDestinations()} */
     void addAllPossibleDestinations();
 
     /** Removes a possible destination if it is in the {@link #getDestinations()} set
@@ -44,10 +55,18 @@ public interface IPipeEventFindDestination extends IPipeEvent {
      * @param destination The destination to remove */
     void removeDestination(EnumFacing destination);
 
+    /** Removes all of the destinations if it is in the {@link #getDestinations()} set
+     * 
+     * @param destinations The destinations to remove */
     void removeDestinations(EnumFacing... destinations);
 
+    /** Removes all of the destinations if it is in the {@link #getDestinations()} set
+     * 
+     * @param destinations The destinations to remove */
     void removeDestinations(Iterable<EnumFacing> destinations);
 
+    /** Removes all of the destinations currently contained within {@link #getDestinations()}. Note that if no other
+     * destinations are added then the item (if it is an item) will be dropped, power or fluids will stop flowing */
     void clearDestinations();
 
     /** @return The maximum possible number of destinations that can be accessed. */

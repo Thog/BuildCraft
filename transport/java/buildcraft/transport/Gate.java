@@ -32,6 +32,7 @@ import buildcraft.core.EnumGui;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.gui.ContainerGateInterface;
+import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.statements.ActionValve;
 

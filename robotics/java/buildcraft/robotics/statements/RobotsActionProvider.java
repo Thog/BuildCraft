@@ -21,7 +21,7 @@ import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.RobotUtils;
-import buildcraft.transport.tile.TileGenericPipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class RobotsActionProvider implements IActionProvider {
 

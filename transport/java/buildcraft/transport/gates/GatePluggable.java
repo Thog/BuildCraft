@@ -26,10 +26,10 @@ import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.Gate;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.render.tile.PipeRendererGates;
 import buildcraft.transport.render.tile.PipeRendererTESR;
-import buildcraft.transport.tile.TileGenericPipe;
 
 import io.netty.buffer.ByteBuf;
 

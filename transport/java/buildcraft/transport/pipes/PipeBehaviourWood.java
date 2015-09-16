@@ -10,10 +10,11 @@ import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
-import buildcraft.api.transport.event.PipeEventConnection;
-import buildcraft.api.transport.event.PipeEventPlayerInteract;
-import buildcraft.api.transport.event.PipeEventPowered;
-import buildcraft.api.transport.event.PipeEventTick;
+import buildcraft.api.transport.event.IPipeEvent;
+import buildcraft.api.transport.event.IPipeEventConnectPipe;
+import buildcraft.api.transport.event.IPipeEventPlayerUseItem;
+import buildcraft.api.transport.event.IPipeEventPowered;
+import buildcraft.api.transport.event.IPipeEventTick;
 import buildcraft.core.lib.utils.NBTUtils;
 
 public class PipeBehaviourWood extends PipeBehaviour {
@@ -59,51 +60,52 @@ public class PipeBehaviourWood extends PipeBehaviour {
     }
 
     @Subscribe
-    public void onPipeConnect(PipeEventConnection.ConnectPipe connect) {
-        PipeBehaviour other = connect.behaviour;
+    public void onPipeConnect(IPipeEventConnectPipe connect) {
+        PipeBehaviour other = connect.getConnectingPipe().getBehaviour();
         if (other instanceof PipeBehaviourWood) {
             // Emerald extends wood, so its fine.
-            connect.allow = false;
+            connect.setAllowed(false);
         }
     }
 
     @Subscribe
-    public void onRecievePower(PipeEventPowered powered) {
-        double excess = internalStorage.insertPower(owner.getTile().getWorld(), powered.mj, false);
-        powered.used = powered.mj - excess;
+    public void onRecievePower(IPipeEventPowered powered) {
+        double excess = internalStorage.insertPower(powered.getPipe().getTile().getWorld(), powered.getMj(), false);
+        powered.useMj(powered.getMj() - excess, false);
     }
 
     @Subscribe
-    public void onTick(PipeEventTick tick) {
-        internalStorage.tick(owner.getTile().getWorld());
+    public void onTick(IPipeEventTick tick) {
+        internalStorage.tick(tick.getPipe().getTile().getWorld());
         if (internalStorage.hasActivated()) {
-            double power = internalStorage.extractPower(owner.getTile().getWorld(), POWER_EXTRACT_SINGLE, MAX_POWER, false);
+            double power = internalStorage.extractPower(tick.getPipe().getTile().getWorld(), POWER_EXTRACT_SINGLE, MAX_POWER, false);
             // TODO (PASS 0): Make wooden pipes extract!
         }
     }
 
     @Subscribe
-    public void onWrench(PipeEventPlayerInteract.WrenchUsed interact) {
-        selectNewDirection();
+    public void onWrench(IPipeEventPlayerUseItem wrench) {
+        selectNewDirection(wrench);
     }
 
-    private void selectNewDirection() {
+    private void selectNewDirection(IPipeEvent event) {
         int currentIndex = extractionDirection.getIndex();
         for (int i = 1; i < 7; i++) {
             EnumFacing toTest = EnumFacing.values()[(currentIndex + i) % 6];
-            if (isValidExtraction(toTest)) {
+            if (isValidExtraction(event, toTest)) {
                 extractionDirection = toTest;
-                owner.getTile().scheduleRenderUpdate();
+
+                event.getPipe().getTile().scheduleRenderUpdate();
                 break;
             }
         }
     }
 
-    protected boolean isValidExtraction(EnumFacing face) {
-        if (!owner.getTile().isPipeConnected(face)) {
+    protected boolean isValidExtraction(IPipeEvent event, EnumFacing face) {
+        if (!event.getPipe().getTile().isPipeConnected(face)) {
             return false;
         }
-        TileEntity tile = owner.getTile().getWorld().getTileEntity(owner.getTile().getPos());
+        TileEntity tile = event.getPipe().getTile().getWorld().getTileEntity(event.getPipe().getTile().getPos());
         if (tile instanceof IPipeTile) {
             return false;
         }

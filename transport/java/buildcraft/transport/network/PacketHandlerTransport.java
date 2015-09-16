@@ -16,11 +16,11 @@ import buildcraft.core.lib.network.PacketHandler;
 import buildcraft.core.lib.network.PacketSlotChange;
 import buildcraft.core.network.PacketIds;
 import buildcraft.core.proxy.CoreProxy;
-import buildcraft.transport.PipeTransportItems;
-import buildcraft.transport.PipeTransportPower;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
+import buildcraft.transport.internal.pipes.PipeTransportPower;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.pipes.PipeItemsDiamond;
 import buildcraft.transport.pipes.PipeItemsEmerald;
-import buildcraft.transport.tile.TileGenericPipe;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;

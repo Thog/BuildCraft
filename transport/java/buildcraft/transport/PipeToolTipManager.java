@@ -4,7 +4,6 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +26,9 @@ public final class PipeToolTipManager {
 
     static {
         if (!BuildCraftCore.hideFluidNumbers) {
-//            for (Map.Entry<Class<? extends Pipe>, Integer> pipe : PipeTransportFluids.fluidCapacities.entrySet()) {
-//                PipeToolTipManager.addToolTip(pipe.getKey(), String.format("%d mB/t", pipe.getValue()));
-//            }
+            // for (Map.Entry<Class<? extends Pipe>, Integer> pipe : PipeTransportFluids.fluidCapacities.entrySet()) {
+            // PipeToolTipManager.addToolTip(pipe.getKey(), String.format("%d mB/t", pipe.getValue()));
+            // }
         }
     }
 
@@ -46,9 +45,9 @@ public final class PipeToolTipManager {
         }
     }
 
-//    public static void addToolTip(Class<? extends Pipe<?>> pipe, String toolTip) {
-//        toolTips.put(pipe, toolTip);
-//    }
+    // public static void addToolTip(Class<? extends Pipe<?>> pipe, String toolTip) {
+    // toolTips.put(pipe, toolTip);
+    // }
 
     public static List<String> getToolTip(PipeDefinition pipe, boolean advanced) {
         if (pipe == null) {

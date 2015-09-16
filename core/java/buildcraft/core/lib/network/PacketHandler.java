@@ -12,9 +12,11 @@ import net.minecraft.world.World;
 
 import buildcraft.core.TickHandlerCore;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+@Sharable
 public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
     private final Queue<Packet> packets = Queues.newConcurrentLinkedQueue();
 

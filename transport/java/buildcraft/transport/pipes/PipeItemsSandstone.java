@@ -14,9 +14,9 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.IPipeConnectionForced;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeItemsSandstone extends Pipe<PipeTransportItems>implements IPipeConnectionForced {
 

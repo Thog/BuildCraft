@@ -33,12 +33,11 @@ import buildcraft.core.lib.inventory.filters.StackFilter;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TransportProxy;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.pipes.events.PipeEventItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.utils.TransportUtils;
 
 public class PipeItemsObsidian extends Pipe<PipeTransportItems>implements IMjExternalStorage {

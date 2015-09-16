@@ -14,6 +14,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemMinecart;
@@ -49,7 +50,6 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.BCLog;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.facades.FacadeAPI;
 import buildcraft.api.gates.GateExpansions;
 import buildcraft.api.gates.IGateExpansion;
@@ -78,7 +78,6 @@ import buildcraft.core.lib.utils.ModelHelper;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.block.BlockFilteredBuffer;
-import buildcraft.transport.block.BlockGenericPipe;
 import buildcraft.transport.gates.GateDefinition;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
@@ -87,6 +86,8 @@ import buildcraft.transport.gates.GateExpansionPulsar;
 import buildcraft.transport.gates.GateExpansionRedstoneFader;
 import buildcraft.transport.gates.GateExpansionTimer;
 import buildcraft.transport.gates.GatePluggable;
+import buildcraft.transport.internal.pipes.BlockGenericPipe;
+import buildcraft.transport.internal.pipes.TileGenericPipe;
 import buildcraft.transport.item.ItemFacade;
 import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.item.ItemGateCopier;
@@ -115,7 +116,6 @@ import buildcraft.transport.statements.ActionValve.ValveState;
 import buildcraft.transport.statements.TriggerClockTimer.Time;
 import buildcraft.transport.statements.TriggerPipeContents.PipeContents;
 import buildcraft.transport.stripes.*;
-import buildcraft.transport.tile.TileGenericPipe;
 
 @Mod(version = Version.VERSION, modid = "BuildCraft|Transport", name = "Buildcraft Transport", dependencies = DefaultProps.DEPENDENCY_CORE)
 public class BuildCraftTransport extends BuildCraftMod {
@@ -200,10 +200,10 @@ public class BuildCraftTransport extends BuildCraftMod {
     public static IActionInternal[] actionPipeDirection = new IActionInternal[16];
     public static IActionInternal[] actionPowerLimiter = new IActionInternal[7];
     public static IActionInternal[] actionRedstoneLevel = new IActionInternal[15];
-    public static IActionInternal actionExtractionPresetRed = new ActionExtractionPreset(EnumColor.RED);
-    public static IActionInternal actionExtractionPresetBlue = new ActionExtractionPreset(EnumColor.BLUE);
-    public static IActionInternal actionExtractionPresetGreen = new ActionExtractionPreset(EnumColor.GREEN);
-    public static IActionInternal actionExtractionPresetYellow = new ActionExtractionPreset(EnumColor.YELLOW);
+    public static IActionInternal actionExtractionPresetRed = new ActionExtractionPreset(EnumDyeColor.RED);
+    public static IActionInternal actionExtractionPresetBlue = new ActionExtractionPreset(EnumDyeColor.BLUE);
+    public static IActionInternal actionExtractionPresetGreen = new ActionExtractionPreset(EnumDyeColor.GREEN);
+    public static IActionInternal actionExtractionPresetYellow = new ActionExtractionPreset(EnumDyeColor.YELLOW);
     public static IActionInternal[] actionValve = new IActionInternal[4];
 
     public static boolean debugPrintFacadeList = false;
@@ -262,8 +262,7 @@ public class BuildCraftTransport extends BuildCraftMod {
             BuildCraftCore.mainConfigManager.register("general.pipes.facadeNoLaserRecipe", false,
                     "Should non-laser (crafting table) facade recipes be forced?", ConfigManager.RestartRequirement.GAME);
 
-        }
-        finally {
+        } finally {
             BuildCraftCore.mainConfiguration.save();
         }
 
@@ -429,7 +428,7 @@ public class BuildCraftTransport extends BuildCraftMod {
             actionRedstoneLevel[level] = new ActionRedstoneFaderOutput(level + 1);
         }
 
-        for (EnumColor color : EnumColor.VALUES) {
+        for (EnumDyeColor color : EnumDyeColor.VALUES) {
             actionPipeColor[color.ordinal()] = new ActionPipeColor(color);
         }
 
@@ -560,8 +559,7 @@ public class BuildCraftTransport extends BuildCraftMod {
                     }
                 }
                 writer.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -578,13 +576,11 @@ public class BuildCraftTransport extends BuildCraftMod {
             facadeForceNonLaserRecipe = BuildCraftCore.mainConfigManager.get("general.pipes.facadeNoLaserRecipe").getBoolean();
 
             reloadConfig(ConfigManager.RestartRequirement.WORLD);
-        }
-        else if (restartType == ConfigManager.RestartRequirement.WORLD) {
+        } else if (restartType == ConfigManager.RestartRequirement.WORLD) {
             usePipeLoss = BuildCraftCore.mainConfigManager.get("experimental.kinesisPowerLossOnTravel").getBoolean();
 
             reloadConfig(ConfigManager.RestartRequirement.NONE);
-        }
-        else {
+        } else {
             pipeDurability = (float) BuildCraftCore.mainConfigManager.get("general.pipes.hardness").getDouble();
 
             if (BuildCraftCore.mainConfiguration.hasChanged()) {
@@ -652,8 +648,7 @@ public class BuildCraftTransport extends BuildCraftMod {
         for (PipeRecipe pipe : pipeRecipes) {
             if (pipe.isShapeless) {
                 CoreProxy.proxy.addShapelessRecipe(pipe.result, pipe.input);
-            }
-            else {
+            } else {
                 CoreProxy.proxy.addCraftingRecipe(pipe.result, pipe.input);
             }
         }
@@ -673,8 +668,7 @@ public class BuildCraftTransport extends BuildCraftMod {
 
         if (Loader.isModLoaded("BuildCraft|Silicon")) {
             TransportSiliconRecipes.loadSiliconRecipes();
-        }
-        else {
+        } else {
             BCLog.logger.warn("**********************************************");
             BCLog.logger.warn("*   You are using the BuildCraft Transport   *");
             BCLog.logger.warn("* module WITHOUT the Silicon module. Certain *");

@@ -10,25 +10,24 @@ import java.util.LinkedList;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
-import buildcraft.api.enums.EnumColor;
 import buildcraft.api.properties.BuildCraftProperties;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.core.lib.utils.ColorUtils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.pipes.events.PipeEventItem;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.statements.ActionPipeColor;
 
 public class PipeItemsLapis extends Pipe<PipeTransportItems> {
@@ -66,18 +65,18 @@ public class PipeItemsLapis extends Pipe<PipeTransportItems> {
         } else {
             int color = ColorUtils.getColorIDFromDye(player.getCurrentEquippedItem());
             if (color >= 0 && color < 16) {
-                setColor(EnumColor.fromId(15 - color));
+                setColor(EnumDyeColor.fromId(15 - color));
             }
         }
 
         return false;
     }
 
-    public EnumColor getColor() {
-        return EnumColor.fromId(container.getBlockMetadata());
+    public EnumDyeColor getColor() {
+        return EnumDyeColor.fromId(container.getBlockMetadata());
     }
 
-    public void setColor(EnumColor color) {
+    public void setColor(EnumDyeColor color) {
         IBlockState state = container.getWorld().getBlockState(container.getPos());
         if (color.ordinal() != BuildCraftProperties.GENERIC_PIPE_DATA.getValue(state).intValue()) {
             container.getWorld().setBlockState(container.getPos(), state.withProperty(BuildCraftProperties.GENERIC_PIPE_DATA, color.ordinal()));

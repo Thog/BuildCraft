@@ -22,8 +22,8 @@ import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.core.lib.utils.Average;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportPower;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 import io.netty.buffer.ByteBuf;
 

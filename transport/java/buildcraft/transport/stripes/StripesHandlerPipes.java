@@ -12,6 +12,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
+import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IStripesActivator;
 import buildcraft.api.transport.IStripesHandler;
 import buildcraft.api.transport.PipeAPI;
@@ -19,8 +20,6 @@ import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.proxy.CoreProxy;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.item.ItemPipe;
 
 public class StripesHandlerPipes implements IStripesHandler {
@@ -48,8 +47,7 @@ public class StripesHandlerPipes implements IStripesHandler {
             return false;
         }
 
-        Pipe pipe = new Pipe(definition);
-        if (pipe.transport instanceof PipeTransportItems) {
+        if (definition.type == EnumPipeType.ITEM) {
             // Checks done, request extension
             BuildCraftTransport.pipeExtensionListener.requestPipeExtension(stack, world, Utils.convertFloor(p), direction, activator);
         } else {

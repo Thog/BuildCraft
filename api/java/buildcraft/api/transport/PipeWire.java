@@ -10,7 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public enum PipeWire {
-
     RED,
     BLUE,
     GREEN,

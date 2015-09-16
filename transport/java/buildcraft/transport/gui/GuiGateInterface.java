@@ -23,8 +23,8 @@ import buildcraft.core.lib.gui.StatementSlot;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.ActionActiveState;
 import buildcraft.transport.Gate;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
+import buildcraft.transport.internal.pipes.Pipe;
 
 public class GuiGateInterface extends GuiAdvancedInterface {
     IInventory playerInventory;

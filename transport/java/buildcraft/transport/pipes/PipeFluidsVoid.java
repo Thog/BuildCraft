@@ -13,9 +13,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.IPipeTransportFluidsHook;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.Pipe;
+import buildcraft.transport.internal.pipes.PipeTransportFluids;
 
 public class PipeFluidsVoid extends Pipe<PipeTransportFluids>implements IPipeTransportFluidsHook {
 

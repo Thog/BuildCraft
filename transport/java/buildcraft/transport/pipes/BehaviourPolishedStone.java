@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 
 import buildcraft.api.transport.PipeDefinition;
-import buildcraft.api.transport.event.PipeEventConnection;
+import buildcraft.api.transport.event.IPipeEventConnectBlock;
 import buildcraft.transport.pipes.BehaviourFactoryBasic.EnumListStatus;
 
 public class BehaviourPolishedStone extends BehaviourBasic {
@@ -13,7 +13,7 @@ public class BehaviourPolishedStone extends BehaviourBasic {
     }
 
     @Subscribe
-    public void connectBlockEvent(PipeEventConnection.ConnectBlock connect) {
-        connect.allow = false;
+    public void connectBlockEvent(IPipeEventConnectBlock connect) {
+        connect.setAllowed(false);
     }
 }
