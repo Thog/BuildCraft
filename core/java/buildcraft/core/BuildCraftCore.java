@@ -552,7 +552,7 @@ public class BuildCraftCore extends BuildCraftMod {
         CoreProxy.proxy.addCraftingRecipe(new ItemStack(guideBook), " G ", "SBS", 'B', Items.book, 'S', Items.stick, 'G', woodenGearItem);
 
         for (int i = 0; i < 16; i++) {
-            ItemStack outputStack = paintbrushItem.getItemStack(EnumDyeColor.VALUES[i]);
+            ItemStack outputStack = paintbrushItem.getItemStack(EnumDyeColor.values()[i]);
             CoreProxy.proxy.addShapelessRecipe(outputStack, paintbrushItem, EnumDyeColor.fromId(i).getDye());
         }
     }

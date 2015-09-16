@@ -94,7 +94,7 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         item.reset();
         item.input = inputOrientation;
 
-        PipeContents.Item contents = new PipeContents.Item(item.itemStack);
+        PipeContentsItem contents = new PipeContentsItem(item.getItemStack(), item.color);
         PipeEventMovement.Enter enter = new PipeEventMovement.Enter(item.speed, contents, inputOrientation);
         container.pipe.eventBus.post(enter);
 
