@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -90,7 +91,7 @@ public class ItemPaintbrush extends ItemBuildCraft {
         String base = super.getItemStackDisplayName(stack);
         int dye = getColor(stack);
         if (dye >= 0) {
-            return base + " (" + EnumDyeColor.fromId(dye).getLocalizedName() + ")";
+            return base + " (" + StatCollector.translateToLocal(EnumDyeColor.byMetadata(dye).getUnlocalizedName()) + ")";
         } else {
             return base;
         }
@@ -129,9 +130,10 @@ public class ItemPaintbrush extends ItemBuildCraft {
 
     @Override
     @SideOnly(Side.CLIENT)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void getSubItems(Item item, CreativeTabs tab, List itemList) {
-        for (int i = 0; i < 17; i++) {
-            EnumDyeColor color = i == 0 ? null : EnumDyeColor.VALUES[i - 1];
+        itemList.add(this.getItemStack(null));
+        for (EnumDyeColor color : EnumDyeColor.values()) {
             itemList.add(this.getItemStack(color));
         }
     }

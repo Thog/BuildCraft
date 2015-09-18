@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
 import buildcraft.api.core.BCLog;
+import buildcraft.core.guide.block.IBlockGuidePageMapper;
 import buildcraft.core.lib.utils.Utils;
 
 public class GuideManager {
@@ -24,8 +25,11 @@ public class GuideManager {
     private final Map<ResourceLocation, GuidePartFactory<?>> guideMap = Maps.newHashMap();
     /** All of the guide pages that have been registered to appear in this guide manager */
     final Map<ResourceLocation, GuidePartFactory<GuidePage>> registeredPages = Maps.newHashMap();
+    final Map<ResourceLocation, PageMeta> pageMetas = Maps.newHashMap();
     /** Base locations for generic chapters */
     private final String locationBase, locationBlock, locationItem, locationEntity, locationMechanic;
+
+    final Map<Block, IBlockGuidePageMapper> customMappers = Maps.newHashMap();
 
     public GuideManager(String assetBase) {
         locationBase = assetBase + ":guide/";
@@ -54,6 +58,7 @@ public class GuideManager {
     public void registerCustomPage(ResourceLocation location, GuidePartFactory<GuidePage> page) {
         registeredPages.put(location, page);
         guideMap.put(location, page);
+        BCLog.logger.info("Registered " + location + " for " + locationBase);
     }
 
     public void registerPage(ResourceLocation location) {
@@ -62,8 +67,22 @@ public class GuideManager {
 
     // Registration
 
+    public void registerPageWithTitle(ResourceLocation location, PageMeta meta) {
+        registerPage(location);
+        pageMetas.put(location, meta);
+    }
+
     public void registerBlock(Block block) {
-        registerPage(new ResourceLocation(locationBlock + Utils.getModSpecificNameForBlock(block) + ".md"));
+        ResourceLocation location = new ResourceLocation(locationBlock + Utils.getModSpecificNameForBlock(block) + ".md");
+        PageMeta meta = new PageMeta(block.getLocalizedName(), "");
+        registerPageWithTitle(location, meta);
+    }
+
+    public void registerCustomBlock(Block block, IBlockGuidePageMapper mapper) {
+        customMappers.put(block, mapper);
+        for (String page : mapper.getAllPossiblePages()) {
+            registerPage(new ResourceLocation(locationBlock + page + ".md"));
+        }
     }
 
     /** Automatically registers all blocks that the calling mod has registered. Use {@link #unregisterBlock(Block)} to
@@ -84,6 +103,36 @@ public class GuideManager {
                     BCLog.logger.info("Automatically added " + location + " as a block for " + prefix);
                 } else {
                     // BCLog.logger.info("Skiped " + location + " as it was not a block for " + prefix);
+                }
+            } else {
+                BCLog.logger.info("Found a different key! (" + key.getClass() + ")");
+            }
+        }
+    }
+
+    public void registerItem(Item item) {
+        ResourceLocation location = new ResourceLocation(locationItem + Utils.getModSpecificNameForItem(item) + ".md");
+        PageMeta meta = new PageMeta(new ItemStack(item).getDisplayName(), "");
+        registerPageWithTitle(location, meta);
+    }
+
+    public void registerAllItems(boolean andItemBlocks) {
+        ModContainer container = Loader.instance().activeModContainer();
+        if (container == null) {
+            // This is a definite coding error, so crash in the dev environment rather than putting up a warning
+            throw new IllegalStateException("Was called outside the scope of an active mod! This is not how this is meant to be used!");
+        }
+        String prefix = container.getModId();
+        for (Object key : Item.itemRegistry.getKeys()) {
+            if (Block.getBlockFromItem((Item) Item.itemRegistry.getObject(key)) != null && !andItemBlocks) {
+                continue;
+            }
+            if (key instanceof ResourceLocation) {
+                ResourceLocation location = (ResourceLocation) key;
+                String domain = location.getResourceDomain();
+                if (domain.equalsIgnoreCase(prefix)) {
+                    registerItem((Item) Item.itemRegistry.getObject(key));
+                    BCLog.logger.info("Automatically added " + location + " as an item for " + prefix);
                 }
             } else {
                 BCLog.logger.info("Found a different key! (" + key.getClass() + ")");
@@ -131,6 +180,16 @@ public class GuideManager {
         BCLog.logger.info("Getting " + location + " for the first time...");
         guideMap.put(location, part);
         return part;
+    }
+
+    public PageMeta getPageMeta(ResourceLocation location) {
+        if (pageMetas.containsKey(location)) {
+            return pageMetas.get(location);
+        }
+        ResourceLocation metaLoc = new ResourceLocation(location + ".json");
+        PageMeta meta = PageMetaLoader.load(metaLoc);
+        pageMetas.put(location, meta);
+        return meta;
     }
 
     private GuidePart getPart(ResourceLocation location) {

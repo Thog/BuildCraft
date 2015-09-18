@@ -348,6 +348,14 @@ public final class Utils {
         return ((ResourceLocation) obj).getResourcePath();
     }
 
+    public static String getModSpecificNameForItem(Item item) {
+        Object obj = Item.itemRegistry.getNameForObject(item);
+        if (obj == null) {
+            return null;
+        }
+        return ((ResourceLocation) obj).getResourcePath();
+    }
+
     /** Checks between a min and max all the chunks inbetween actually exist. Args: world, minX, minY, minZ, maxX, maxY,
      * maxZ */
     public static boolean checkChunksExist(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {

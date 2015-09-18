@@ -92,6 +92,7 @@ import buildcraft.core.config.ConfigManager;
 import buildcraft.core.crops.CropHandlerPlantable;
 import buildcraft.core.crops.CropHandlerReeds;
 import buildcraft.core.guide.GuideManager;
+import buildcraft.core.guide.block.EngineBlockMapper;
 import buildcraft.core.item.ItemGuide;
 import buildcraft.core.item.ItemList;
 import buildcraft.core.item.ItemMapLocation;
@@ -372,10 +373,6 @@ public class BuildCraftCore extends BuildCraftMod {
         engineRedstoneAchievement = BuildCraftCore.achievementManager.registerAchievement(new Achievement("achievement.redstoneEngine",
                 "engineAchievement1", 1, -2, new ItemStack(engineBlock, 1, 0), BuildCraftCore.woodenGearAchievement));
 
-        // BuildCraft 6.1.4 and below - migration only
-        StatementManager.registerParameterClass("buildcraft:stackTrigger", StatementParameterItemStack.class);
-        StatementManager.registerParameterClass("buildcraft:stackAction", StatementParameterItemStack.class);
-
         StatementManager.registerParameterClass(StatementParameterItemStack.class);
         StatementManager.registerParameterClass(StatementParameterDirection.class);
         StatementManager.registerParameterClass(StatementParameterRedstoneGateSideOnly.class);
@@ -416,8 +413,8 @@ public class BuildCraftCore extends BuildCraftMod {
         // Guide book setup
         GuideManager coreGuideManager = new GuideManager("buildcraftcore");
         GuideManager.registerManager(coreGuideManager);
-        coreGuideManager.registerAllBlocks();
-        // coreGuideManager.registerAllItems();
+        coreGuideManager.registerCustomBlock(engineBlock, new EngineBlockMapper());
+        coreGuideManager.registerAllItems(false);
     }
 
     @Mod.EventHandler
@@ -553,7 +550,7 @@ public class BuildCraftCore extends BuildCraftMod {
 
         for (int i = 0; i < 16; i++) {
             ItemStack outputStack = paintbrushItem.getItemStack(EnumDyeColor.values()[i]);
-            CoreProxy.proxy.addShapelessRecipe(outputStack, paintbrushItem, EnumDyeColor.fromId(i).getDye());
+            CoreProxy.proxy.addShapelessRecipe(outputStack, paintbrushItem, EnumDyeColor.values()[i].getUnlocalizedName());
         }
     }
 
@@ -567,7 +564,7 @@ public class BuildCraftCore extends BuildCraftMod {
     public void renderLast(RenderWorldLastEvent evt) {
         // TODO: while the urbanist is deactivated, this code can be dormant.
         // it happens to be very expensive at run time, so we need some way
-        // to operate it only when releval (e.g. in the cycle following a
+        // to operate it only when revealed (e.g. in the cycle following a
         // click request).
         if (NONRELEASED_BLOCKS) {
             return;
@@ -682,7 +679,6 @@ public class BuildCraftCore extends BuildCraftMod {
             array[color.ordinal()] = evt.map.registerSprite(new ResourceLocation("buildcraftcore:textures/items/paintbrush/" + color.getName()
                     .toLowerCase(Locale.ROOT)));
         }
-        EnumDyeColor.registerSprites(array);
     }
 
     @SubscribeEvent

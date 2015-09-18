@@ -117,7 +117,7 @@ import buildcraft.transport.statements.TriggerClockTimer.Time;
 import buildcraft.transport.statements.TriggerPipeContents.PipeContents;
 import buildcraft.transport.stripes.*;
 
-@Mod(version = Version.VERSION, modid = "BuildCraft|Transport", name = "Buildcraft Transport", dependencies = DefaultProps.DEPENDENCY_CORE)
+//@Mod(version = Version.VERSION, modid = "BuildCraft|Transport", name = "Buildcraft Transport", dependencies = DefaultProps.DEPENDENCY_CORE)
 public class BuildCraftTransport extends BuildCraftMod {
     @Mod.Instance("BuildCraft|Transport")
     public static BuildCraftTransport instance;
@@ -428,7 +428,7 @@ public class BuildCraftTransport extends BuildCraftMod {
             actionRedstoneLevel[level] = new ActionRedstoneFaderOutput(level + 1);
         }
 
-        for (EnumDyeColor color : EnumDyeColor.VALUES) {
+        for (EnumDyeColor color : EnumDyeColor.values()) {
             actionPipeColor[color.ordinal()] = new ActionPipeColor(color);
         }
 

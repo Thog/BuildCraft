@@ -167,13 +167,13 @@ public class GuiGuide extends GuiScreen {
             mc.renderEngine.bindTexture(COVER);
             BOOK_COVER.draw(minX, minY);
         } else if (openingAngle > 0) {
-            int pageWidth = (int) (sin * PAGE_LEFT_WIDTH);
-            int bindingWidth = (int) ((1 - sin) * BOOK_BINDING_WIDTH);
+            int pageWidth = (int) (sin * PAGE_LEFT.width);
+            int bindingWidth = (int) ((1 - sin) * BOOK_BINDING.width);
 
             int penHeight = (int) (sin * PEN_HIDDEN_HEIGHT_MIN);
 
-            minX = (width - BOOK_COVER_WIDTH - pageWidth) / 2;
-            minY = (height - BOOK_COVER_HEIGHT) / 2;
+            minX = (width - BOOK_COVER.width - pageWidth) / 2;
+            minY = (height - BOOK_COVER.height) / 2;
 
             mc.renderEngine.bindTexture(RIGHT_PAGE);
             PAGE_RIGHT.draw(minX + pageWidth + bindingWidth, minY);

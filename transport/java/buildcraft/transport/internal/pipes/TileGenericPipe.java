@@ -477,11 +477,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     @Override
-    public int injectItem(ItemStack payload, boolean doAdd, EnumFacing from) {
-        return injectItem(payload, doAdd, from, null);
-    }
-
-    @Override
     public EnumPipeType getPipeType() {
         if (BlockGenericPipe.isValid(pipe)) {
             return pipe.transport.getPipeType();

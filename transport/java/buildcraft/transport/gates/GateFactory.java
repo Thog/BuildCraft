@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.gates;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -13,10 +15,10 @@ import net.minecraftforge.common.util.Constants;
 import buildcraft.api.gates.GateExpansionController;
 import buildcraft.api.gates.GateExpansions;
 import buildcraft.api.gates.IGateExpansion;
+import buildcraft.api.transport.IPipe;
 import buildcraft.transport.Gate;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.item.ItemGate;
 
 public final class GateFactory {
@@ -24,11 +26,11 @@ public final class GateFactory {
     /** Deactivate constructor */
     private GateFactory() {}
 
-    public static Gate makeGate(Pipe pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
+    public static Gate makeGate(IPipe pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
         return new Gate(pipe, material, logic, direction);
     }
 
-    public static Gate makeGate(Pipe pipe, ItemStack stack, EnumFacing direction) {
+    public static Gate makeGate(IPipe pipe, ItemStack stack, EnumFacing direction) {
         if (stack == null || stack.stackSize <= 0 || !(stack.getItem() instanceof ItemGate)) {
             return null;
         }
@@ -42,7 +44,7 @@ public final class GateFactory {
         return gate;
     }
 
-    public static Gate makeGate(Pipe pipe, NBTTagCompound nbt) {
+    public static Gate makeGate(IPipe pipe, NBTTagCompound nbt) {
         GateMaterial material = GateMaterial.REDSTONE;
         GateLogic logic = GateLogic.AND;
         EnumFacing direction = null;

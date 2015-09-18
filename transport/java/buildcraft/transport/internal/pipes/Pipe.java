@@ -8,8 +8,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 
 import net.minecraft.entity.Entity;
@@ -30,6 +34,7 @@ import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
+import buildcraft.api.transport.PipeProperty;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.internal.IDropControlInventory;
 import buildcraft.core.lib.inventory.InvUtils;
@@ -42,8 +47,7 @@ import buildcraft.transport.PipeTransportStructure;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.statements.ActionValve.ValveState;
 
-// TODO: Make this package-private (Use IPipe everywhere)!
-public final class Pipe implements IDropControlInventory, IPipe {
+final class Pipe implements IDropControlInventory, IPipe {
     public final PipeDefinition definition;
     public final PipeBehaviour behaviour;
     public final PipeTransport transport;
@@ -58,12 +62,20 @@ public final class Pipe implements IDropControlInventory, IPipe {
     private boolean initialized = false;
 
     private ArrayList<ActionState> actionStates = new ArrayList<ActionState>();
+    Map<PipeProperty<Object>, Object> properties = Maps.newHashMap();
+    Set<PipeProperty<Object>> dirtyProperties = Sets.newHashSet();
 
     public Pipe(PipeDefinition definition) {
         this.definition = definition;
         behaviour = definition.behaviourFactory.createNew();
         transport = getTransport(definition.type);
+        for (PipeProperty<Object> property : transport.getAllProperties()) {
+            dirtyProperties.add(property);
+            properties.put(property, property.getDefault());
+        }
         eventBus.register(behaviour);
+
+        // TODO (PASS 0: Move this into the lens + filter gates!
         eventBus.register(new LensFilterHandler());
     }
 
@@ -541,5 +553,36 @@ public final class Pipe implements IDropControlInventory, IPipe {
     @Override
     public PipeBehaviour getBehaviour() {
         return behaviour;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getProperty(PipeProperty<T> property) {
+        if (!hasProperty(property)) {
+            return property.getDefault();
+        }
+        T value = (T) properties.get(property);
+        if (dirtyProperties.contains(property)) {
+            PipeEventUpdateProperty<T> update = new PipeEventUpdateProperty<T>(this, property, value);
+            eventBus.post(update);
+            value = update.getValue();
+            properties.put((PipeProperty<Object>) property, value);
+            if (!update.redirty) {
+                dirtyProperties.remove(property);
+            }
+        }
+        return value;
+    }
+
+    @Override
+    public <T> boolean hasProperty(PipeProperty<T> property) {
+        return properties.containsKey(property);
+    }
+
+    @Override
+    public void dirtyProperty(PipeProperty<Object> property) {
+        if (properties.containsKey(property)) {
+            dirtyProperties.add(property);
+        }
     }
 }

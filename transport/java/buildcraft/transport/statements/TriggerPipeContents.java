@@ -6,25 +6,24 @@ package buildcraft.transport.statements;
 
 import java.util.Locale;
 
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTankInfo;
 
 import buildcraft.api.gates.IGate;
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.statements.StatementParameterItemStack;
+import buildcraft.api.transport.EnumPipeType;
+import buildcraft.api.transport.IPipe;
+import buildcraft.api.transport.PipeAPI;
+import buildcraft.api.transport.event.IPipeContents;
+import buildcraft.api.transport.event.IPipeContents.IPipeContentsItem;
 import buildcraft.core.lib.inventory.StackHelper;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.core.statements.BCStatement;
-import buildcraft.transport.TravelingItem;
-import buildcraft.transport.internal.pipes.Pipe;
-import buildcraft.transport.internal.pipes.PipeTransportFluids;
-import buildcraft.transport.internal.pipes.PipeTransportItems;
-import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 public class TriggerPipeContents extends BCStatement implements ITriggerInternal {
 
@@ -68,79 +67,61 @@ public class TriggerPipeContents extends BCStatement implements ITriggerInternal
             return false;
         }
 
-        Pipe pipe = (Pipe) ((IGate) container).getPipe();
+        IPipe pipe = (IPipe) ((IGate) container).getPipe();
         IStatementParameter parameter = parameters[0];
 
-        if (pipe.transport instanceof PipeTransportItems) {
-            PipeTransportItems transportItems = (PipeTransportItems) pipe.transport;
+        if (pipe.getBehaviour().definition.type == EnumPipeType.ITEM) {
             if (kind == PipeContents.empty) {
-                return transportItems.items.isEmpty();
+                return pipe.getProperty(PipeAPI.STACK_COUNT) == 0;
             } else if (kind == PipeContents.containsItems) {
                 if (parameter != null && parameter.getItemStack() != null) {
-                    for (TravelingItem item : transportItems.items) {
-                        if (StackHelper.isMatchingItemOrList(parameter.getItemStack(), item.getItemStack())) {
-                            return true;
+                    for (IPipeContents contents : pipe.getProperty(PipeAPI.CONTENTS)) {
+                        if (contents instanceof IPipeContentsItem) {
+                            IPipeContentsItem items = (IPipeContentsItem) contents;
+                            if (StackHelper.isMatchingItemOrList(parameter.getItemStack(), items.getStack())) {
+                                return true;
+                            }
                         }
                     }
                 } else {
-                    return !transportItems.items.isEmpty();
+                    return pipe.getProperty(PipeAPI.STACK_COUNT) > 0;
                 }
             }
-        } else if (pipe.transport instanceof PipeTransportFluids) {
-            PipeTransportFluids transportFluids = (PipeTransportFluids) pipe.transport;
+        } else if (pipe.getBehaviour().definition.type == EnumPipeType.FLUID) {
+            int amount = pipe.getProperty(PipeAPI.FLUID_AMOUNT);
+            Fluid fluid = pipe.getProperty(PipeAPI.FLUID_TYPE);
 
-            FluidStack searchedFluid = null;
+            Fluid searchedFluid = null;
 
             if (parameter != null && parameter.getItemStack() != null) {
-                searchedFluid = FluidContainerRegistry.getFluidForFilledItem(parameter.getItemStack());
+                FluidStack itemFluid = FluidContainerRegistry.getFluidForFilledItem(parameter.getItemStack());
+                if (itemFluid != null) {
+                    searchedFluid = itemFluid.getFluid();
+                }
             }
 
             if (kind == PipeContents.empty) {
-                for (FluidTankInfo b : transportFluids.getTankInfo(null)) {
-                    if (b.fluid != null && b.fluid.amount != 0) {
-                        return false;
-                    }
-                }
-
-                return true;
+                return amount == 0;
             } else {
-                for (FluidTankInfo b : transportFluids.getTankInfo(null)) {
-                    if (b.fluid != null && b.fluid.amount != 0) {
-                        if (searchedFluid == null || searchedFluid.isFluidEqual(b.fluid)) {
-                            return true;
-                        }
-                    }
+                if (amount == 0) {
+                    return false;
                 }
-
-                return false;
+                if (searchedFluid != null) {
+                    return fluid == searchedFluid;
+                }
+                return true;
             }
-        } else if (pipe.transport instanceof PipeTransportPower) {
-            PipeTransportPower pipePower = (PipeTransportPower) pipe.transport;
-
+        } else if (pipe.getBehaviour().definition.type == EnumPipeType.POWER) {
+            double power = pipe.getProperty(PipeAPI.POWER);
+            int percentFull = pipe.getProperty(PipeAPI.PERCENT_FULL);
             switch (kind) {
                 case empty:
-                    for (EnumFacing face : EnumFacing.values()) {
-                        if (pipePower.currentPower(face) > 1e-4) {
-                            return false;
-                        }
-                    }
-
-                    return true;
+                    return power < 1e-4;
                 case containsEnergy:
-                    for (EnumFacing face : EnumFacing.values()) {
-                        if (pipePower.currentPower(face) > 1e-4) {
-                            return true;
-                        }
-                    }
-                    return false;
+                    return power > 1e-4;
                 default:
                 case tooMuchEnergy: {
-                    for (EnumFacing face : EnumFacing.values()) {
-                        if (pipePower.maxPower(face) - pipePower.currentPower(face) > 1e-4) {
-                            return false;
-                        }
-                    }
-                    return true;
+                    return percentFull == 100;
                 }
             }
         }

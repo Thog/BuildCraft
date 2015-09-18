@@ -32,7 +32,6 @@ import buildcraft.core.EnumGui;
 import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.gui.ContainerGateInterface;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.statements.ActionValve;
 
@@ -41,7 +40,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     public static int MAX_STATEMENTS = 8;
     public static int MAX_PARAMETERS = 3;
 
-    public final Pipe pipe;
+    public final IPipe pipe;
     public final GateMaterial material;
     public final GateLogic logic;
     public final BiMap<IGateExpansion, GateExpansionController> expansions = HashBiMap.create();
@@ -69,7 +68,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     private int[] actionGroups = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
     // / CONSTRUCTOR
-    public Gate(Pipe pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
+    public Gate(IPipe pipe, GateMaterial material, GateLogic logic, EnumFacing direction) {
         this.pipe = pipe;
         this.material = material;
         this.logic = logic;
@@ -146,7 +145,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
 
     public void addGateExpansion(IGateExpansion expansion) {
         if (!expansions.containsKey(expansion)) {
-            expansions.put(expansion, expansion.makeController(pipe != null ? pipe.container : null));
+            expansions.put(expansion, expansion.makeController(pipe != null ? (TileEntity) pipe.getTile() : null));
         }
     }
 
@@ -302,8 +301,7 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     // GUI
     public void openGui(EntityPlayer player) {
         if (!player.worldObj.isRemote) {
-            player.openGui(BuildCraftTransport.instance, EnumGui.GATES.ID, pipe.container.getWorld(), pipe.container.x(), pipe.container.y(),
-                    pipe.container.z());
+            player.openGui(BuildCraftTransport.instance, EnumGui.GATES.ID, pipe.getTile().getWorld(), 0, 0, 0);
             ((ContainerGateInterface) player.openContainer).setGate(direction.ordinal());
         }
     }

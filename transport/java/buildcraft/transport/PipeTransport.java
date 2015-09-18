@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.PipeDefinition;
+import buildcraft.api.transport.PipeProperty;
 import buildcraft.core.lib.utils.BitSetUtils;
 import buildcraft.transport.internal.pipes.TileGenericPipe;
 
@@ -122,4 +123,6 @@ public abstract class PipeTransport {
     public boolean delveIntoUnloadedChunks() {
         return false;
     }
+
+    public abstract List<PipeProperty<Object>> getAllProperties();
 }

@@ -17,6 +17,7 @@ import buildcraft.api.core.BCLog;
 public class GuideMenu extends GuidePage {
     /** Map of type (block, item, etc) -> List of pages for each (Quarry, Paintbrush, etc...) */
     private final Map<String, List<ResourceLocation>> contents = Maps.newHashMap();
+    private final Map<ResourceLocation, PageMeta> metaMap = Maps.newHashMap();
 
     // TODO: Allow for expansions (plus-minus box to exapnd like a folder)
     private final List<PageLine> lines = Lists.newArrayList();
@@ -38,28 +39,30 @@ public class GuideMenu extends GuidePage {
                         contents.put(type, new ArrayList<ResourceLocation>());
                     }
                     contents.get(type).add(location);
+                    metaMap.put(location, guide.getPageMeta(location));
                 }
             }
         }
 
         for (Entry<String, List<ResourceLocation>> entry : contents.entrySet()) {
-            BCLog.logger.info("  " + entry.getKey());
+            String key = entry.getKey();
             lines.add(new PageLine(null, 0, entry.getKey()));
             for (ResourceLocation location : entry.getValue()) {
-                BCLog.logger.info("   - " + location);
-                lines.add(new PageLine(null, 1, location + ""));
-                // lines.add(new PageLine(null, 2, "domain = " + location.getResourceDomain()));
-                // lines.add(new PageLine(null, 2, "path = " + location.getResourcePath()));
-                // lines.add(new PageLine(null, 2, "length = " + location.toString().length()));
+                PageMeta meta = metaMap.get(location);
+                String text = (meta == null) ? location.getResourcePath() : meta.title;
+                lines.add(new PageLine(null, 1, text));
             }
         }
     }
 
     @Override
     protected void renderPage(int x, int y, int width, int height, int index) {
-        PagePart part = new PagePart(index, 0);
+        PagePart part = new PagePart(0, 0);
         for (PageLine pageLine : lines) {
-            part = renderLine(part, part, pageLine, x, y, width, height, false);
+            part = renderLine(part, part, pageLine, x, y, width, height, part.page != index);
+            if (part.page > index) {
+                return;
+            }
         }
 
         // PagePart part = new PagePart(0, 0);
@@ -78,5 +81,10 @@ public class GuideMenu extends GuidePage {
         // part = renderLine(part, part, line, x, y, width, height, false);
         // lineIndex++;
         // }
+    }
+
+    @Override
+    public void handleMouseClick(int x, int y, int button, int[] arguments) {
+
     }
 }

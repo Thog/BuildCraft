@@ -145,22 +145,22 @@ public final class NetworkUtils {
         return new BlockPos(x, y, z);
     }
 
+    private static final byte NULL_ENUM = -1;
+
     public static <E extends Enum<E>> void writeEnum(ByteBuf stream, E value) {
-        E[] values = value.getDeclaringClass().getEnumConstants();
-        if (values.length <= Byte.MAX_VALUE) {
-            stream.writeByte(value.ordinal());
-        } else {
-            stream.writeShort(value.ordinal());
+        if (value == null) {
+            stream.writeByte(NULL_ENUM);
+            return;
         }
+        stream.writeByte(value.ordinal());
     }
 
     public static <E extends Enum<E>> E readEnum(ByteBuf stream, Class<E> clazz) {
         E[] values = clazz.getEnumConstants();
         short ordinal;
-        if (values.length <= Byte.MAX_VALUE) {
-            ordinal = stream.readUnsignedByte();
-        } else {
-            ordinal = stream.readShort();
+        ordinal = stream.readByte();
+        if (ordinal == NULL_ENUM) {
+            return null;
         }
         if (ordinal < 0 || ordinal >= values.length) {
             BCLog.logger.warn("Read an incorrect ordinal(" + ordinal + ") while trying to read the class " + clazz.getSimpleName(), new Throwable(

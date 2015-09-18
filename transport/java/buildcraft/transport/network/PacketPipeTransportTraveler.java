@@ -8,8 +8,10 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
 import buildcraft.core.lib.network.Packet;
+import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.core.network.PacketIds;
 import buildcraft.transport.TravelingItem;
@@ -50,6 +52,7 @@ public class PacketPipeTransportTraveler extends Packet {
         byte flags = (byte) ((out & 7) | ((in & 7) << 3) | (forceStackRefresh ? 64 : 0));
         data.writeByte(flags);
 
+        NetworkUtils.writeEnum(data, color);
         data.writeByte(item.color != null ? item.color.ordinal() : -1);
 
         data.writeFloat(item.getSpeed());
@@ -79,10 +82,7 @@ public class PacketPipeTransportTraveler extends Packet {
             this.output = EnumFacing.getFront(out);
         }
 
-        byte c = data.readByte();
-        if (c != -1) {
-            this.color = EnumDyeColor.fromId(c);
-        }
+        this.color = NetworkUtils.readEnum(data, EnumDyeColor.class);
 
         this.speed = data.readFloat();
 
@@ -120,5 +120,11 @@ public class PacketPipeTransportTraveler extends Packet {
     @Override
     public int getID() {
         return PacketIds.PIPE_TRAVELER;
+    }
+
+    @Override
+    public void applyData(World world) {
+        // TODO Auto-generated method stub
+
     }
 }

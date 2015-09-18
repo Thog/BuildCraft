@@ -32,6 +32,8 @@ import buildcraft.api.core.BCLog;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.PipeAPI;
+import buildcraft.api.transport.PipeProperty;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.inventory.Transactor;
 import buildcraft.core.lib.utils.BlockUtils;
@@ -94,21 +96,20 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         item.reset();
         item.input = inputOrientation;
 
-        PipeContentsItem contents = new PipeContentsItem(item.getItemStack(), item.color);
-        PipeEventMovement.Enter enter = new PipeEventMovement.Enter(item.speed, contents, inputOrientation);
+        PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
+        PipeEventMovementEnter enter = new PipeEventMovementEnter(container.pipe, contents, inputOrientation);
         container.pipe.eventBus.post(enter);
 
-        item.setItemStack(contents.item);
+        item.setItemStack(contents.stack);
 
         if (item.getItemStack() == null || item.getItemStack().stackSize <= 0) {
             return;
         }
 
-        if (enter.hasSetNewSpeed()) {
-            item.setSpeed(enter.getSpeed());
-        } else {
-            defaultReajustSpeed(item);
-        }
+        PipeEventAdjustSpeed speed = new PipeEventAdjustSpeed(container.pipe, contents.uneditable(), item.getSpeed());
+        container.pipe.eventBus.post(speed);
+
+        item.setSpeed(item.getSpeed());
 
         readjustPosition(item);
 
@@ -162,21 +163,20 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         item.toCenter = true;
         item.input = item.output.getOpposite();
 
-        PipeContentsItem contents = new PipeContentsItem(item.getItemStack(), item.color);
-        PipeEventMovementEnter enter = new PipeEventMovementEnter(item.speed, contents, item.input);
+        PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
+        PipeEventMovementEnter enter = new PipeEventMovementEnter(container.pipe, contents, item.input);
         container.pipe.eventBus.post(enter);
 
-        item.setItemStack(contents.item);
+        item.setItemStack(contents.stack);
+        item.color = contents.colour;
 
         if (item.getItemStack() == null || item.getItemStack().stackSize <= 0) {
             return;
         }
 
-        if (enter.hasSetNewSpeed()) {
-            item.setSpeed(enter.getSpeed());
-        } else {
-            defaultReajustSpeed(item);
-        }
+        PipeEventAdjustSpeed speed = new PipeEventAdjustSpeed(container.pipe, contents.uneditable(), item.getSpeed());
+        container.pipe.eventBus.post(speed);
+        item.setSpeed(speed.speed);
 
         readjustPosition(item);
 
@@ -217,7 +217,7 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
             }
         }
 
-        PipeContents.Item contents = new PipeContents.Item(item.getItemStack());
+        PipeContentsItem contents = new PipeContentsItem(item.getItemStack(), item.color);
         PipeEventFindDestination findDest = new PipeEventFindDestination(contents, item.input, potentialDestinations, destinations, 6);
         container.pipe.eventBus.post(findDest);
 
@@ -576,5 +576,14 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
             left.add("    - end = " + endReached(item));
             left.add("    - out of boounds = " + outOfBounds(item));
         }
+    }
+
+    @Override
+    public List<PipeProperty<?>> getAllProperties() {
+        List<PipeProperty<?>> list = Lists.newArrayList();
+        list.add(PipeAPI.ITEM_COUNT);
+        list.add(PipeAPI.STACK_COUNT);
+        list.add(PipeAPI.CONTENTS);
+        return list;
     }
 }

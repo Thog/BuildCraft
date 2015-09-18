@@ -5,8 +5,8 @@ import net.minecraft.item.ItemStack;
 
 import buildcraft.api.transport.event.IPipeContentsEditable.IPipeContentsEditableItem;
 
-class PipeContentsEditiableItem extends PipeContentsItem implements IPipeContentsEditableItem {
-    PipeContentsEditiableItem(ItemStack stack, EnumDyeColor colour) {
+class PipeContentsEditableItem extends PipeContentsItem implements IPipeContentsEditableItem {
+    PipeContentsEditableItem(ItemStack stack, EnumDyeColor colour) {
         super(stack, colour);
     }
 
@@ -23,5 +23,9 @@ class PipeContentsEditiableItem extends PipeContentsItem implements IPipeContent
     @Override
     public void setColor(EnumDyeColor color) {
         this.colour = color;
+    }
+
+    PipeContentsItem uneditable() {
+        return new PipeContentsItem(stack, colour);
     }
 }

@@ -20,4 +20,10 @@ public interface IPipe {
     boolean isWired(PipeWire wire);
 
     boolean isWireActive(PipeWire wire);
+
+    <T> T getProperty(PipeProperty<T> property);
+
+    <T> boolean hasProperty(PipeProperty<T> property);
+
+    void dirtyProperty(PipeProperty<Object> property);
 }

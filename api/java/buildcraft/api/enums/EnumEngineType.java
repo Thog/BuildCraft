@@ -15,7 +15,7 @@ public enum EnumEngineType implements IStringSerializable {
         return name();
     }
 
-    public String getModelName() {
+    public String getLowercaseName() {
         return getName().toLowerCase(Locale.ROOT);
     }
 }

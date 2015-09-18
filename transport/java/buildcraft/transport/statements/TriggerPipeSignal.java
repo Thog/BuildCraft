@@ -12,10 +12,10 @@ import buildcraft.api.gates.IGate;
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.ITriggerInternal;
+import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.core.statements.BCStatement;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class TriggerPipeSignal extends BCStatement implements ITriggerInternal {
 
@@ -50,14 +50,14 @@ public class TriggerPipeSignal extends BCStatement implements ITriggerInternal {
             return false;
         }
 
-        Pipe pipe = (Pipe) ((IGate) container).getPipe();
+        IPipe pipe = (IPipe) ((IGate) container).getPipe();
 
         if (active) {
-            if (pipe.signalStrength[color.ordinal()] == 0) {
+            if (!pipe.isWireActive(color)) {
                 return false;
             }
         } else {
-            if (pipe.signalStrength[color.ordinal()] > 0) {
+            if (pipe.isWireActive(color)) {
                 return false;
             }
         }
@@ -68,11 +68,11 @@ public class TriggerPipeSignal extends BCStatement implements ITriggerInternal {
 
                 if (signal.color != null) {
                     if (signal.active) {
-                        if (pipe.signalStrength[signal.color.ordinal()] == 0) {
+                        if (!pipe.isWireActive(color)) {
                             return false;
                         }
                     } else {
-                        if (pipe.signalStrength[signal.color.ordinal()] > 0) {
+                        if (pipe.isWireActive(color)) {
                             return false;
                         }
                     }
