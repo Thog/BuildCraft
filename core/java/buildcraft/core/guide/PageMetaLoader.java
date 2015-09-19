@@ -11,13 +11,13 @@ public class PageMetaLoader extends LocationLoader {
     public static PageMeta load(ResourceLocation location) {
         String text = asString(location);
         if (text.length() == 0) {
-            return new PageMeta(location.toString(), "");
+            return new PageMeta(location.toString(), "", "");
         }
         try {
             return new Gson().fromJson(text, PageMeta.class);
         } catch (JsonSyntaxException ex) {
             BCLog.logger.warn("Could not load the resource location " + location + " because an exception was thrown!", ex);
-            return new PageMeta(location.toString(), "");
+            return new PageMeta(location.toString(), "", "");
         }
     }
 }

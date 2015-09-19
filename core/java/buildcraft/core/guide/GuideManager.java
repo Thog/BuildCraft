@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -22,10 +24,10 @@ public class GuideManager {
     static final Map<ModContainer, GuideManager> managers = Maps.newHashMap();
 
     /** A cache of what has been loaded so far by this guide. */
-    private final Map<ResourceLocation, GuidePartFactory<?>> guideMap = Maps.newHashMap();
+    static private final Map<ResourceLocation, GuidePartFactory<?>> guideMap = Maps.newHashMap();
     /** All of the guide pages that have been registered to appear in this guide manager */
-    final Map<ResourceLocation, GuidePartFactory<GuidePage>> registeredPages = Maps.newHashMap();
-    final Map<ResourceLocation, PageMeta> pageMetas = Maps.newHashMap();
+    static final Map<ResourceLocation, GuidePartFactory<GuidePage>> registeredPages = Maps.newHashMap();
+    static final Map<ResourceLocation, PageMeta> pageMetas = Maps.newHashMap();
     /** Base locations for generic chapters */
     private final String locationBase, locationBlock, locationItem, locationEntity, locationMechanic;
 
@@ -74,7 +76,7 @@ public class GuideManager {
 
     public void registerBlock(Block block) {
         ResourceLocation location = new ResourceLocation(locationBlock + Utils.getModSpecificNameForBlock(block) + ".md");
-        PageMeta meta = new PageMeta(block.getLocalizedName(), "");
+        PageMeta meta = new PageMeta(block.getLocalizedName(), "", "");
         registerPageWithTitle(location, meta);
     }
 
@@ -100,19 +102,19 @@ public class GuideManager {
                 String domain = location.getResourceDomain();
                 if (domain.equalsIgnoreCase(prefix)) {
                     registerBlock((Block) Block.blockRegistry.getObject(key));
-                    BCLog.logger.info("Automatically added " + location + " as a block for " + prefix);
-                } else {
-                    // BCLog.logger.info("Skiped " + location + " as it was not a block for " + prefix);
                 }
-            } else {
-                BCLog.logger.info("Found a different key! (" + key.getClass() + ")");
             }
         }
     }
 
     public void registerItem(Item item) {
         ResourceLocation location = new ResourceLocation(locationItem + Utils.getModSpecificNameForItem(item) + ".md");
-        PageMeta meta = new PageMeta(new ItemStack(item).getDisplayName(), "");
+        PageMeta meta = getPageMeta(location);
+        if (meta == null) {
+            meta = new PageMeta(new ItemStack(item).getDisplayName(), "", "");
+        } else if (StringUtils.isEmpty(meta.title) || meta.title.contains(location.toString())) {
+            meta = new PageMeta(new ItemStack(item).getDisplayName(), meta.customLocation, meta.customImageLocation);
+        }
         registerPageWithTitle(location, meta);
     }
 
@@ -132,10 +134,7 @@ public class GuideManager {
                 String domain = location.getResourceDomain();
                 if (domain.equalsIgnoreCase(prefix)) {
                     registerItem((Item) Item.itemRegistry.getObject(key));
-                    BCLog.logger.info("Automatically added " + location + " as an item for " + prefix);
                 }
-            } else {
-                BCLog.logger.info("Found a different key! (" + key.getClass() + ")");
             }
         }
     }
@@ -165,13 +164,13 @@ public class GuideManager {
 
     // Part getters
 
-    GuidePartFactory<?> getPartFactory(ResourceLocation location) {
+    static GuidePartFactory<?> getPartFactory(ResourceLocation location) {
         if (guideMap.containsKey(location)) {
             return guideMap.get(location);
         }
         GuidePartFactory<?> part = null;
         if (location.getResourcePath().endsWith("md")) {// Wiki info page (Markdown)
-            part = MarkdownLoader.loadMarkdown(location, this);
+            part = MarkdownLoader.loadMarkdown(location);
         } else if (location.getResourcePath().endsWith("png")) { // Image
             part = ImageLoader.loadImage(location);
         } else {
@@ -182,7 +181,7 @@ public class GuideManager {
         return part;
     }
 
-    public PageMeta getPageMeta(ResourceLocation location) {
+    public static PageMeta getPageMeta(ResourceLocation location) {
         if (pageMetas.containsKey(location)) {
             return pageMetas.get(location);
         }
@@ -192,33 +191,37 @@ public class GuideManager {
         return meta;
     }
 
-    private GuidePart getPart(ResourceLocation location) {
-        return getPartFactory(location).createNew();
+    private static GuidePart getPart(ResourceLocation location, GuiGuide gui) {
+        return getPartFactory(location).createNew(gui);
     }
 
-    private GuidePage getPage(String locationBase) {
-        return (GuidePage) getPart(new ResourceLocation(locationBase + ".md"));
+    public static GuidePage getPage(ResourceLocation location, GuiGuide gui) {
+        return (GuidePage) getPart(location, gui);
     }
 
-    public GuidePage getItemPage(Item item) {
-        return getPage(locationItem + Utils.getNameForItem(item));
+    private GuidePage getPage(String locationBase, GuiGuide gui) {
+        return (GuidePage) getPart(new ResourceLocation(locationBase + ".md"), gui);
     }
 
-    public GuidePage getBlockPage(Block block) {
-        return getPage(locationBlock + Utils.getNameForBlock(block));
+    public GuidePage getItemPage(Item item, GuiGuide gui) {
+        return getPage(locationItem + Utils.getNameForItem(item), gui);
     }
 
-    public GuidePage getEntityPage(Entity entity) {
-        return getPage(locationEntity + EntityList.getEntityString(entity));
+    public GuidePage getBlockPage(Block block, GuiGuide gui) {
+        return getPage(locationBlock + Utils.getNameForBlock(block), gui);
     }
 
-    public GuidePage getMechanicPage(String mechanic) {
-        return getPage(locationMechanic + mechanic);
+    public GuidePage getEntityPage(Entity entity, GuiGuide gui) {
+        return getPage(locationEntity + EntityList.getEntityString(entity), gui);
     }
 
-    /** Gets an image for display that */
-    public GuideImage getImage(String imageLocation) {
-        return (GuideImage) getPart(new ResourceLocation(locationBase, imageLocation + ".png"));
+    public GuidePage getMechanicPage(String mechanic, GuiGuide gui) {
+        return getPage(locationMechanic + mechanic, gui);
+    }
+
+    /** Gets an image for display that location */
+    public GuideImage getImage(String imageLocation, GuiGuide gui) {
+        return (GuideImage) getPart(new ResourceLocation(locationBase, imageLocation + ".png"), gui);
     }
 
     public GuideRenderedBlock getBlockImage(IBlockState state) {

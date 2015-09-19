@@ -1,5 +1,7 @@
 package buildcraft.core.guide;
 
+import net.minecraft.client.gui.Gui;
+
 import buildcraft.core.gui.GuiTexture.GuiIcon;
 
 public class GuidePage extends GuidePart {
@@ -8,21 +10,7 @@ public class GuidePage extends GuidePart {
 
     /** The current page that is being rendered */
     private int index = 0;
-
-    /** Stores information about a single line of text. This may be displayed as more than a single line though. */
-    public class PageLine {
-        /** Can be any of the boxes, any icon with dimensions different to these will render incorrectly */
-        public final GuiIcon startIcon;
-        public final int indent;
-        /** This will be wrapped automatically when it is rendered. */
-        public final String text;
-
-        public PageLine(GuiIcon startIcon, int indent, String text) {
-            this.startIcon = startIcon;
-            this.indent = indent;
-            this.text = text;
-        }
-    }
+    protected int numPages = -1;
 
     /** Stores information about the current rendering position */
     public static class PagePart {
@@ -46,6 +34,31 @@ public class GuidePage extends GuidePart {
         }
     }
 
+    GuidePage(GuiGuide gui) {
+        super(gui);
+    }
+
+    protected final int getIndex() {
+        return index;
+    }
+
+    protected final void nextPage() {
+        if (index + 1 < numPages) {
+            index += 2;
+        }
+    }
+
+    protected final void backPage() {
+        index -= 2;
+        if (index < 0) {
+            index = 0;
+        }
+    }
+
+    public int getPage() {
+        return index;
+    }
+
     public void tick(float elapsedTime) {}
 
     @Override
@@ -53,6 +66,8 @@ public class GuidePage extends GuidePart {
         // NO-OP
         // Instead render pages like below
     }
+
+    private boolean wasHovered = false;
 
     /** @param start Where to start the rendering from.
      * @param current The current location of the rendering. This will be different from start if this line needed to
@@ -64,7 +79,8 @@ public class GuidePage extends GuidePart {
      * @param height The height of rendering space available
      * @param simulate If true, this will just calculate the positions and return without rendering.
      * @return The position for the next line to render at. Will automatically be the next page or line if necessary. */
-    protected PagePart renderLine(PagePart start, PagePart current, PageLine line, int x, int y, int width, int height, boolean simulate) {
+    protected PagePart renderLine(PagePart start, PagePart current, PageLine line, int x, int y, int width, int height, int pageRenderIndex) {
+        wasHovered = false;
         // Firstly break off the last chunk if the total length is greater than the width allows
         int allowedWidth = width - INDENT_WIDTH * line.indent;
         if (allowedWidth <= 0) {
@@ -78,8 +94,6 @@ public class GuidePage extends GuidePart {
             if (toRender.length() == 0) {
                 break;
             }
-
-            int page = current.page - start.page;
 
             // Find out the longest string we can render
             int textLength = 1;
@@ -95,13 +109,48 @@ public class GuidePage extends GuidePart {
 
             String thisLine = toRender.substring(0, textLength);
             toRender = toRender.substring(textLength);
-            if (page == 0 && !simulate) {
-                fontRenderer.drawString(thisLine, x + INDENT_WIDTH * line.indent, y + current.line * LINE_HEIGHT, 0);
+            boolean render = pageRenderIndex == current.page;
+            int stringWidth = fontRenderer.getStringWidth(thisLine);
+            int linkX = x + INDENT_WIDTH * line.indent;
+            int linkY = y + current.line * LINE_HEIGHT;
+            int linkXEnd = linkX + stringWidth + 2;
+            int linkYEnd = linkY + fontRenderer.FONT_HEIGHT + 2;
+            if (line.link && mouseX >= linkX && mouseX <= linkXEnd && mouseY >= linkY && mouseY <= linkYEnd) {
+                wasHovered = true;
+                if (render) {
+                    Gui.drawRect(linkX - 2, linkY - 2, linkXEnd, linkYEnd, 0xFFD3AD6C);
+                }
+            }
+            if (render) {
+                fontRenderer.drawString(thisLine, linkX, linkY, 0);
             }
             current = current.nextLine(1, allowedLines);
         }
-
         return current;
+    }
+
+    protected void renderLines(Iterable<PageLine> lines, int x, int y, int width, int height, int index) {
+        PagePart part = new PagePart(0, 0);
+        for (PageLine line : lines) {
+            part = renderLine(part, part, line, x, y, width, height, index);
+            if (part.page > index) {
+                return;
+            }
+        }
+    }
+
+    protected PageLine getClicked(Iterable<PageLine> lines, int x, int y, int width, int height, int mouseX, int mouseY, int index) {
+        PagePart part = new PagePart(0, 0);
+        for (PageLine line : lines) {
+            part = renderLine(part, part, line, x, y, width, height, -1);
+            if (wasHovered) {
+                return line;
+            }
+            if (part.page > index) {
+                return null;
+            }
+        }
+        return null;
     }
 
     public void renderFirstPage(int x, int y, int width, int height) {
@@ -113,6 +162,71 @@ public class GuidePage extends GuidePart {
     }
 
     protected void renderPage(int x, int y, int width, int height, int index) {
+        // Even => first page, draw page back button and first page index
+        if (index % 2 == 0) {
+            // Back page button
+            if (index != 0) {
+                GuiIcon icon = GuiGuide.TURN_BACK;
+                if (icon.isMouseInside(x, y + height, mouseX, mouseY)) {
+                    icon = GuiGuide.TURN_BACK_HOVERED;
+                }
+                icon.draw(x, y + height);
+            }
+            // Page index
+            String text = (index + 1) + " / " + numPages;
+            fontRenderer.drawString(text, x + GuiGuide.PAGE_LEFT_TEXT.width / 2 - fontRenderer.getStringWidth(text) / 2, y + height, 0);
+        }
+        // Odd => second page, draw forward button and second page index
+        else {
+            // Back page button
+            if (index + 1 < numPages) {
+                GuiIcon icon = GuiGuide.TURN_FORWARDS;
+                if (icon.isMouseInside(x + width - icon.width, y + height, mouseX, mouseY)) {
+                    icon = GuiGuide.TURN_FORWARDS_HOVERED;
+                }
+                icon.draw(x + width - icon.width, y + height);
+            }
+            // Page index
+            if (index + 1 <= numPages) {
+                String text = (index + 1) + " / " + numPages;
+                fontRenderer.drawString(text, x + (GuiGuide.PAGE_RIGHT_TEXT.width - fontRenderer.getStringWidth(text)) / 2, y + height, 0);
+            }
+        }
+    }
+
+    @Override
+    public final void handleMouseClick(int x, int y, int button, int... arguments) {
+        // NO-OP, use the below!
+    }
+
+    protected void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
+        // Even => first page, test page back button
+        if (index % 2 == 0) {
+            if (index != 0) {
+                GuiIcon icon = GuiGuide.TURN_BACK;
+                if (icon.isMouseInside(x, y + height, mouseX, mouseY)) {
+                    backPage();
+                }
+            }
+        }
+        // Odd => second page, test forward page button
+        else {
+            if (index + 1 < numPages) {
+                GuiIcon icon = GuiGuide.TURN_FORWARDS;
+                if (icon.isMouseInside(x + width - icon.width, y + height, mouseX, mouseY)) {
+                    nextPage();
+                }
+            }
+        }
+    }
+
+    @Override
+    public final void handleMouseDragPartial(int startX, int startY, int currentX, int currentY, int button) {
+
+    }
+
+    @Override
+    public final void handleMouseDragFinish(int startX, int startY, int endX, int endY, int button) {
 
     }
 }

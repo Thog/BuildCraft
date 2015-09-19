@@ -1,10 +1,8 @@
 package buildcraft.core.guide;
 
 public class GuidePageFactory extends GuidePartFactory<GuidePage> {
-
     @Override
-    public GuidePage createNew() {
-        return new GuidePage();
+    public GuidePage createNew(GuiGuide gui) {
+        return new GuidePage(gui);
     }
-
 }

@@ -2,6 +2,7 @@ package buildcraft.core.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiTexture {
@@ -13,6 +14,15 @@ public class GuiTexture {
             this.y = y;
             this.width = width;
             this.height = height;
+        }
+
+        public boolean isMouseInside(int x, int y, int mouseX, int mouseY) {
+            return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+        }
+
+        @Override
+        public String toString() {
+            return "Rectangle [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + "]";
         }
     }
 
@@ -26,6 +36,7 @@ public class GuiTexture {
 
         private void bindTexture() {
             Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+            GlStateManager.color(1, 1, 1);
         }
 
         public void draw(int x, int y) {
