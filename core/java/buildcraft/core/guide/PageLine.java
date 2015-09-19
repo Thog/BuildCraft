@@ -4,15 +4,21 @@ import buildcraft.core.gui.GuiTexture.GuiIcon;
 
 /** Stores information about a single line of text. This may be displayed as more than a single line though. */
 public class PageLine {
-    /** Can be any of the boxes, any icon with dimensions different to these will render incorrectly */
-    public final GuiIcon startIcon;
+    /** Can be any of the boxes, any icon with dimensions different to these will render incorrectly. */
+    public GuiIcon startIcon;
+    public GuiIcon startIconHovered;
     public final int indent;
     /** This will be wrapped automatically when it is rendered. */
     public final String text;
     public final boolean link;
 
-    public PageLine(GuiIcon startIcon, int indent, String text, boolean isLink) {
+    public PageLine(int indent, String text, boolean isLink) {
+        this(null, null, indent, text, isLink);
+    }
+
+    public PageLine(GuiIcon startIcon, GuiIcon startIconHovered, int indent, String text, boolean isLink) {
         this.startIcon = startIcon;
+        this.startIconHovered = startIconHovered;
         this.indent = indent;
         this.text = text;
         this.link = isLink;

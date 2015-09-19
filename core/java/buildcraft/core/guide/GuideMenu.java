@@ -37,7 +37,8 @@ public class GuideMenu extends GuidePage {
                 type = type.substring(0, type.indexOf("/"));
                 if (!chapterNodeMap.containsKey(type)) {
                     String translated = I18n.format("buildcraft.guide.chapter." + type);
-                    chapterNodeMap.put(type, parentNode.addChild(new PageLine(null, 0, translated, false)));
+                    PageLine line = new PageLine(GuiGuide.BOX_MINUS, GuiGuide.BOX_SELECTED_MINUS, 0, translated, false);
+                    chapterNodeMap.put(type, parentNode.addChild(line));
                 }
                 PageMeta meta = GuideManager.getPageMeta(location);
                 String[] locations = meta.getLocationArray();
@@ -58,12 +59,12 @@ public class GuideMenu extends GuidePage {
                         }
                     }
                     if (notFound) {
-                        node = node.addChild(new PageLine(null, indent, translated, false));
+                        node = node.addChild(new PageLine(GuiGuide.BOX_MINUS, GuiGuide.BOX_SELECTED_MINUS, indent, translated, false));
                     }
                     indent++;
                 }
                 String translated = meta.title;
-                PageLine line = new PageLine(null, indent, translated, true);
+                PageLine line = new PageLine(indent, translated, true);
                 node.addChild(line);
                 metaMap.put(location, meta);
                 pageLinks.put(line, location);

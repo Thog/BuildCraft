@@ -90,6 +90,8 @@ public class GuidePage extends GuidePart {
         int allowedLines = height / LINE_HEIGHT;
 
         String toRender = line.text;
+        GuiIcon icon = line.startIcon;
+        boolean firstLine = true;
         while (current.line <= allowedLines) {
             if (toRender.length() == 0) {
                 break;
@@ -106,7 +108,6 @@ public class GuidePage extends GuidePart {
                 }
                 textLength++;
             }
-
             String thisLine = toRender.substring(0, textLength);
             toRender = toRender.substring(textLength);
             boolean render = pageRenderIndex == current.page;
@@ -123,8 +124,18 @@ public class GuidePage extends GuidePart {
             }
             if (render) {
                 fontRenderer.drawString(thisLine, linkX, linkY, 0);
+                if (firstLine && icon != null) {
+                    int iconX = linkX - icon.width;
+                    int iconY = linkY + (fontRenderer.FONT_HEIGHT - 3 - icon.height) / 2;
+                    boolean hover = icon.isMouseInside(iconX, iconY, mouseX, mouseY);
+                    if (hover && line.startIconHovered != null) {
+                        icon = line.startIconHovered;
+                    }
+                    icon.draw(iconX, iconY);
+                }
             }
             current = current.nextLine(1, allowedLines);
+            firstLine = false;
         }
         return current;
     }
