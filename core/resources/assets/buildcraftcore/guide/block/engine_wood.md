@@ -1,3 +1,1 @@
-A wooden engine!
-
-Does stuff!
+A WOODEN ENGINE!

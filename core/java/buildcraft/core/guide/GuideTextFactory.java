@@ -1,16 +1,16 @@
 package buildcraft.core.guide;
 
-import buildcraft.core.guide.node.TextNode;
+import buildcraft.core.guide.node.NodePageLine;
 
 public class GuideTextFactory extends GuidePartFactory<GuideText> {
-    private final TextNode text;
+    private final NodePageLine text;
 
-    public GuideTextFactory(TextNode text) {
+    public GuideTextFactory(NodePageLine text) {
         this.text = text;
     }
 
     @Override
-    public GuideText createNew() {
-        return new GuideText(text);
+    public GuideText createNew(GuiGuide gui) {
+        return new GuideText(gui, text);
     }
 }

@@ -409,12 +409,6 @@ public class BuildCraftCore extends BuildCraftMod {
         MinecraftForge.EVENT_BUS.register(TabletManagerServer.INSTANCE);
 
         TabletAPI.registerProgram(new TabletProgramMenuFactory());
-
-        // Guide book setup
-        GuideManager coreGuideManager = new GuideManager("buildcraftcore");
-        GuideManager.registerManager(coreGuideManager);
-        coreGuideManager.registerCustomBlock(engineBlock, new EngineBlockMapper());
-        coreGuideManager.registerAllItems(false);
     }
 
     @Mod.EventHandler
@@ -459,6 +453,12 @@ public class BuildCraftCore extends BuildCraftMod {
                 actionControl[mode.ordinal()] = new ActionMachineControl(mode);
             }
         }
+
+        // Guide book setup
+        GuideManager coreGuideManager = new GuideManager("buildcraftcore");
+        GuideManager.registerManager(coreGuideManager);
+        coreGuideManager.registerCustomBlock(engineBlock, new EngineBlockMapper());
+        coreGuideManager.registerAllItems(false);
     }
 
     @Mod.EventHandler

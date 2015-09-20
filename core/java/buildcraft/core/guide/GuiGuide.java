@@ -8,6 +8,7 @@ import com.google.common.collect.Queues;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
@@ -15,10 +16,10 @@ import buildcraft.core.gui.GuiTexture.GuiIcon;
 import buildcraft.core.gui.GuiTexture.Rectangle;
 
 public class GuiGuide extends GuiScreen {
-    private static final ResourceLocation ICONS = new ResourceLocation("buildcraftcore:textures/gui/guide/icons.png");
-    private static final ResourceLocation COVER = new ResourceLocation("buildcraftcore:textures/gui/guide/cover.png");
-    private static final ResourceLocation LEFT_PAGE = new ResourceLocation("buildcraftcore:textures/gui/guide/left_page.png");
-    private static final ResourceLocation RIGHT_PAGE = new ResourceLocation("buildcraftcore:textures/gui/guide/right_page.png");
+    public static final ResourceLocation ICONS = new ResourceLocation("buildcraftcore:textures/gui/guide/icons.png");
+    public static final ResourceLocation COVER = new ResourceLocation("buildcraftcore:textures/gui/guide/cover.png");
+    public static final ResourceLocation LEFT_PAGE = new ResourceLocation("buildcraftcore:textures/gui/guide/left_page.png");
+    public static final ResourceLocation RIGHT_PAGE = new ResourceLocation("buildcraftcore:textures/gui/guide/right_page.png");
 
     public static final GuiIcon BOOK_COVER = new GuiIcon(COVER, 0, 0, 202, 248);
     public static final GuiIcon BOOK_BINDING = new GuiIcon(COVER, 204, 0, 11, 248);
@@ -90,14 +91,14 @@ public class GuiGuide extends GuiScreen {
     /** The current mouse positions. Used by the GuideFontRenderer */
     public int mouseX, mouseY;
 
-    private Deque<GuidePage> pages = Queues.newArrayDeque();
-    private GuidePage currentPage;
+    private Deque<GuidePageBase> pages = Queues.newArrayDeque();
+    private GuidePageBase currentPage;
 
     public GuiGuide() {
         openPage(new GuideMenu(this));
     }
 
-    public void openPage(GuidePage page) {
+    public void openPage(GuidePageBase page) {
         if (currentPage != null) {
             pages.push(currentPage);
         }
@@ -132,6 +133,10 @@ public class GuiGuide extends GuiScreen {
             t.printStackTrace();
             throw Throwables.propagate(t);
         }
+    }
+
+    public void drawTooltip(ItemStack stack, int x, int y) {
+        renderToolTip(stack, x, y);
     }
 
     private void drawCover() {
@@ -215,9 +220,7 @@ public class GuiGuide extends GuiScreen {
             && mouseY <= minY + PEN_HIDDEN_BOX_Y_MAX;
 
         // Now draw the actual contents of the book
-        currentPage.fontRenderer = fontRendererObj;
-        currentPage.mouseX = mouseX;
-        currentPage.mouseY = mouseY;
+        currentPage.setSpecifics(fontRendererObj, mouseX, mouseY);
         currentPage.tick(diff);
         currentPage.renderFirstPage(minX + PAGE_LEFT_TEXT.x, minY + PAGE_LEFT_TEXT.y, PAGE_LEFT_TEXT.width, PAGE_LEFT_TEXT.height);
         currentPage.renderSecondPage(minX + PAGE_LEFT.width + PAGE_RIGHT_TEXT.x, minY + PAGE_RIGHT_TEXT.y, PAGE_RIGHT_TEXT.width,
@@ -279,7 +282,7 @@ public class GuiGuide extends GuiScreen {
             if (isOpen) {
                 int page0xMin = this.minX + PAGE_LEFT_TEXT.x;
                 int page0xMax = page0xMin + PAGE_LEFT_TEXT.width;
-                int page1xMin = page0xMax + PAGE_RIGHT_TEXT.x;
+                int page1xMin = this.minX + PAGE_LEFT.width + PAGE_RIGHT_TEXT.x;
                 int page1xMax = page1xMin + PAGE_RIGHT_TEXT.width;
                 int pageYMin = this.minY + PAGE_RIGHT_TEXT.y;
                 int pageYMax = pageYMin + PAGE_RIGHT_TEXT.height;

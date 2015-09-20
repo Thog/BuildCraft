@@ -1,16 +1,17 @@
 package buildcraft.core.guide;
 
-import buildcraft.core.guide.node.TextNode;
+import buildcraft.core.guide.node.NodePageLine;
 
 public class GuideText extends GuidePart {
-    private final TextNode text;
+    private final NodePageLine text;
 
-    public GuideText(TextNode text) {
+    public GuideText(GuiGuide gui, NodePageLine text) {
+        super(gui);
         this.text = text;
     }
 
     @Override
-    public void renderIntoArea(int x, int y, int width, int height) {
-
+    public PagePart renderIntoArea(int x, int y, int width, int height, PagePart current, int index) {
+        return renderLines(text.iterateOnlyExpandedLines(), current, x, y, width, height, index);
     }
 }

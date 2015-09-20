@@ -14,7 +14,7 @@ import buildcraft.core.guide.node.NodePageLine;
 
 /** The base menu for showing all the locations. Should never be registered with and guide managers, this is special and
  * controls them all. */
-public class GuideMenu extends GuidePage {
+public class GuideMenu extends GuidePageBase {
     /** Map of type (block, item, etc) -> List of pages for each (Quarry, Paintbrush, etc...) */
     private final Map<ResourceLocation, PageMeta> metaMap = Maps.newHashMap();
     private final Map<PageLine, ResourceLocation> pageLinks = Maps.newHashMap();

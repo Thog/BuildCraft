@@ -26,7 +26,7 @@ public class GuideManager {
     /** A cache of what has been loaded so far by this guide. */
     static private final Map<ResourceLocation, GuidePartFactory<?>> guideMap = Maps.newHashMap();
     /** All of the guide pages that have been registered to appear in this guide manager */
-    static final Map<ResourceLocation, GuidePartFactory<GuidePage>> registeredPages = Maps.newHashMap();
+    static final Map<ResourceLocation, GuidePartFactory<GuidePageBase>> registeredPages = Maps.newHashMap();
     static final Map<ResourceLocation, PageMeta> pageMetas = Maps.newHashMap();
     /** Base locations for generic chapters */
     private final String locationBase, locationBlock, locationItem, locationEntity, locationMechanic;
@@ -57,14 +57,14 @@ public class GuideManager {
 
     // Page Registration
 
-    public void registerCustomPage(ResourceLocation location, GuidePartFactory<GuidePage> page) {
+    public void registerCustomPage(ResourceLocation location, GuidePartFactory<GuidePageBase> page) {
         registeredPages.put(location, page);
         guideMap.put(location, page);
         BCLog.logger.info("Registered " + location + " for " + locationBase);
     }
 
     public void registerPage(ResourceLocation location) {
-        registerCustomPage(location, (GuidePartFactory<GuidePage>) getPartFactory(location));
+        registerCustomPage(location, (GuidePartFactory<GuidePageBase>) getPartFactory(location));
     }
 
     // Registration
@@ -195,27 +195,27 @@ public class GuideManager {
         return getPartFactory(location).createNew(gui);
     }
 
-    public static GuidePage getPage(ResourceLocation location, GuiGuide gui) {
-        return (GuidePage) getPart(location, gui);
+    public static GuidePageBase getPage(ResourceLocation location, GuiGuide gui) {
+        return (GuidePageBase) getPart(location, gui);
     }
 
-    private GuidePage getPage(String locationBase, GuiGuide gui) {
-        return (GuidePage) getPart(new ResourceLocation(locationBase + ".md"), gui);
+    private GuidePageBase getPage(String locationBase, GuiGuide gui) {
+        return (GuidePageBase) getPart(new ResourceLocation(locationBase + ".md"), gui);
     }
 
-    public GuidePage getItemPage(Item item, GuiGuide gui) {
+    public GuidePageBase getItemPage(Item item, GuiGuide gui) {
         return getPage(locationItem + Utils.getNameForItem(item), gui);
     }
 
-    public GuidePage getBlockPage(Block block, GuiGuide gui) {
+    public GuidePageBase getBlockPage(Block block, GuiGuide gui) {
         return getPage(locationBlock + Utils.getNameForBlock(block), gui);
     }
 
-    public GuidePage getEntityPage(Entity entity, GuiGuide gui) {
+    public GuidePageBase getEntityPage(Entity entity, GuiGuide gui) {
         return getPage(locationEntity + EntityList.getEntityString(entity), gui);
     }
 
-    public GuidePage getMechanicPage(String mechanic, GuiGuide gui) {
+    public GuidePageBase getMechanicPage(String mechanic, GuiGuide gui) {
         return getPage(locationMechanic + mechanic, gui);
     }
 
