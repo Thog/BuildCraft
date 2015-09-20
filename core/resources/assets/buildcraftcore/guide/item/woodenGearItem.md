@@ -1,5 +1,5 @@
-A gear made of wood. The most basic gear available, this is used only for making other machines.
-
+# Wooden Gear
+The most basic gear available, this is used only for making machines.
 $[special.crafting](buildcraft|core:woodenGearItem)
 $[special.new_page]
 Upgrade:

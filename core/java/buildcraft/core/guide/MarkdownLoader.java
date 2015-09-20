@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
 import buildcraft.api.core.BCLog;
@@ -69,6 +70,11 @@ public class MarkdownLoader extends LocationLoader {
             }
             if (line.length() == 0) {
                 line = " ";
+            }
+
+            // Make the entire line have an underline, like a title
+            if (line.startsWith("# ")) {
+                line = EnumChatFormatting.UNDERLINE + line.substring(2);
             }
 
             // Just use it as a normal text line
