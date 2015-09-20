@@ -60,6 +60,9 @@ public class MarkdownLoader extends LocationLoader {
                         // Unwrap back what was there before.
                         line = "crafting](" + line;
                     }
+                } else if (line.equals("new_page]")) {
+                    parts.add(new GuidePartNewLineFactory());
+                    continue;
                 } else {
                     line = "$[special." + line;
                 }
