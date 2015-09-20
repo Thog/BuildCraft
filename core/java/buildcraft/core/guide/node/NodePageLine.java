@@ -25,20 +25,38 @@ public class NodePageLine {
         return node;
     }
 
-    public Iterable<PageLine> iterateNonNull() {
-        return new Iterable<PageLine>() {
+    public Iterable<NodePageLine> iterateNonNullNodes() {
+        return new Iterable<NodePageLine>() {
             @Override
-            public Iterator<PageLine> iterator() {
+            public Iterator<NodePageLine> iterator() {
                 return new NodeIterator(false);
             }
         };
     }
 
-    public Iterable<PageLine> iterateOnlyExpanded() {
+    public Iterable<NodePageLine> iterateOnlyExpandedNodes() {
+        return new Iterable<NodePageLine>() {
+            @Override
+            public Iterator<NodePageLine> iterator() {
+                return new NodeIterator(true);
+            }
+        };
+    }
+
+    public Iterable<PageLine> iterateNonNullLines() {
         return new Iterable<PageLine>() {
             @Override
             public Iterator<PageLine> iterator() {
-                return new NodeIterator(true);
+                return new NodePageLineIterator(false);
+            }
+        };
+    }
+
+    public Iterable<PageLine> iterateOnlyExpandedLines() {
+        return new Iterable<PageLine>() {
+            @Override
+            public Iterator<PageLine> iterator() {
+                return new NodePageLineIterator(true);
             }
         };
     }
@@ -48,13 +66,22 @@ public class NodePageLine {
     }
 
     private List<NodePageLine> getChildren(boolean skipIfNonExpanded) {
-        if (skipIfNonExpanded || expanded) {
+        if (expanded || !skipIfNonExpanded) {
             return children;
         }
         return Collections.emptyList();
     }
 
-    private class NodeIterator implements Iterator<PageLine> {
+    public NodePageLine getChildNode(PageLine line) {
+        for (NodePageLine node : iterateNonNullNodes()) {
+            if (node.pageLine == line) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    private class NodeIterator implements Iterator<NodePageLine> {
         private final boolean skipNonExpanded;
         private NodePageLine current;
         private int childrenDone = 0;
@@ -70,11 +97,11 @@ public class NodePageLine {
         }
 
         @Override
-        public PageLine next() {
+        public NodePageLine next() {
             return next(false);
         }
 
-        private PageLine next(boolean simulate) {
+        private NodePageLine next(boolean simulate) {
             NodePageLine current = this.current;
             int childrenDone = this.childrenDone;
             while (childrenDone == current.getChildren(skipNonExpanded).size()) {
@@ -93,8 +120,26 @@ public class NodePageLine {
                 this.current = current;
                 this.childrenDone = childrenDone;
             }
-            return current.pageLine;
+            return current;
 
+        }
+    }
+
+    private class NodePageLineIterator implements Iterator<PageLine> {
+        private final NodeIterator iterator;
+
+        private NodePageLineIterator(boolean skipNonExpanded) {
+            iterator = new NodeIterator(skipNonExpanded);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        @Override
+        public PageLine next() {
+            return iterator.next().pageLine;
         }
     }
 }

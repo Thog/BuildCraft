@@ -278,21 +278,16 @@ public class GuiGuide extends GuiScreen {
         if (mouseButton == 0) {
             if (isOpen) {
                 int page0xMin = this.minX + PAGE_LEFT_TEXT.x;
-                int page0xMax = page0xMin + PAGE_LEFT.width;
+                int page0xMax = page0xMin + PAGE_LEFT_TEXT.width;
                 int page1xMin = page0xMax + PAGE_RIGHT_TEXT.x;
                 int page1xMax = page1xMin + PAGE_RIGHT_TEXT.width;
                 int pageYMin = this.minY + PAGE_RIGHT_TEXT.y;
                 int pageYMax = pageYMin + PAGE_RIGHT_TEXT.height;
 
-                if (mouseY >= pageYMin && mouseY <= pageYMax) {
-                    if (mouseX >= page0xMin && mouseX <= page0xMax) {
-                        currentPage.handleMouseClick(page0xMin, pageYMin, page0xMax - page0xMin, pageYMax - pageYMin, mouseX, mouseY, mouseButton,
-                                currentPage.getPage(), isEditing);
-                    } else if (mouseX >= page1xMin && mouseX <= page1xMax) {
-                        currentPage.handleMouseClick(page1xMin, pageYMin, page1xMax - page1xMin, pageYMax - pageYMin, mouseX, mouseY, mouseButton,
-                                currentPage.getPage() + 1, isEditing);
-                    }
-                }
+                currentPage.handleMouseClick(page0xMin, pageYMin, page0xMax - page0xMin, pageYMax - pageYMin, mouseX, mouseY, mouseButton, currentPage
+                        .getPage(), isEditing);
+                currentPage.handleMouseClick(page1xMin, pageYMin, page1xMax - page1xMin, pageYMax - pageYMin, mouseX, mouseY, mouseButton, currentPage
+                        .getPage() + 1, isEditing);
 
                 if ((!pages.isEmpty()) && BACK_POSITION.isMouseInside(minX + BACK_POSITION.x, minY + BACK_POSITION.y, mouseX, mouseY)) {
                     closePage();

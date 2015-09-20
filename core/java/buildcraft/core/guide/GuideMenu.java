@@ -74,10 +74,10 @@ public class GuideMenu extends GuidePage {
 
     @Override
     protected void renderPage(int x, int y, int width, int height, int index) {
-        renderLines(parentNode.iterateOnlyExpanded(), x, y, width, height, index);
+        renderLines(parentNode.iterateOnlyExpandedLines(), x, y, width, height, index);
         if (numPages == -1) {
             PagePart part = new PagePart(0, 0);
-            for (PageLine line : parentNode.iterateOnlyExpanded()) {
+            for (PageLine line : parentNode.iterateOnlyExpandedLines()) {
                 part = renderLine(part, part, line, x, y, width, height, index);
             }
             numPages = part.page + 1;
@@ -88,13 +88,33 @@ public class GuideMenu extends GuidePage {
     @Override
     protected void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
         super.handleMouseClick(x, y, width, height, mouseX, mouseY, mouseButton, index, isEditing);
-        PageLine line = getClicked(parentNode.iterateOnlyExpanded(), x, y, width, height, mouseX, mouseY, index);
+        PageLine line = getClicked(parentNode.iterateOnlyExpandedLines(), x, y, width, height, mouseX, mouseY, index);
         if (line != null) {
             ResourceLocation location = pageLinks.get(line);
             if (location != null) {
+                BCLog.logger.info("Opening " + location);
                 gui.openPage(GuideManager.getPage(location, gui));
             } else {
                 BCLog.logger.warn("Somehow encountered a null link! (line = " + line + ")");
+            }
+        }
+        // because its impossible to click both the text and the icon
+        else {
+            PageLine iconLine = getIconClicked(parentNode.iterateOnlyExpandedLines(), x, y, width, height, mouseX, mouseY, index);
+            if (iconLine != null) {
+                NodePageLine node = parentNode.getChildNode(iconLine);
+                if (node != null) {
+                    if (node.expanded) {
+                        iconLine.startIcon = GuiGuide.BOX_PLUS;
+                        iconLine.startIconHovered = GuiGuide.BOX_SELECTED_PLUS;
+                    } else {
+                        iconLine.startIcon = GuiGuide.BOX_MINUS;
+                        iconLine.startIconHovered = GuiGuide.BOX_SELECTED_MINUS;
+                    }
+                    // Make it recalculate the number of pages
+                    numPages = -1;
+                    node.expanded = !node.expanded;
+                }
             }
         }
     }

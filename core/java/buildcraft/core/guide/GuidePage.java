@@ -2,6 +2,7 @@ package buildcraft.core.guide;
 
 import net.minecraft.client.gui.Gui;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.core.gui.GuiTexture.GuiIcon;
 
 public class GuidePage extends GuidePart {
@@ -68,6 +69,7 @@ public class GuidePage extends GuidePart {
     }
 
     private boolean wasHovered = false;
+    private boolean wasIconHovered = false;
 
     /** @param start Where to start the rendering from.
      * @param current The current location of the rendering. This will be different from start if this line needed to
@@ -81,6 +83,7 @@ public class GuidePage extends GuidePart {
      * @return The position for the next line to render at. Will automatically be the next page or line if necessary. */
     protected PagePart renderLine(PagePart start, PagePart current, PageLine line, int x, int y, int width, int height, int pageRenderIndex) {
         wasHovered = false;
+        wasIconHovered = false;
         // Firstly break off the last chunk if the total length is greater than the width allows
         int allowedWidth = width - INDENT_WIDTH * line.indent;
         if (allowedWidth <= 0) {
@@ -124,13 +127,17 @@ public class GuidePage extends GuidePart {
             }
             if (render) {
                 fontRenderer.drawString(thisLine, linkX, linkY, 0);
-                if (firstLine && icon != null) {
-                    int iconX = linkX - icon.width;
-                    int iconY = linkY + (fontRenderer.FONT_HEIGHT - 3 - icon.height) / 2;
-                    boolean hover = icon.isMouseInside(iconX, iconY, mouseX, mouseY);
-                    if (hover && line.startIconHovered != null) {
-                        icon = line.startIconHovered;
-                    }
+            }
+            if (firstLine && icon != null) {
+                int iconX = linkX - icon.width;
+                /* Ok this is because minecraft default font size (The actual pixels) is 6, but fontRenderer.FONT_HEIGHT
+                 * is 9. */
+                int iconY = linkY + (6 - icon.height) / 2;
+                wasIconHovered = icon.isMouseInside(iconX, iconY, mouseX, mouseY);
+                if (wasIconHovered && line.startIconHovered != null) {
+                    icon = line.startIconHovered;
+                }
+                if (render) {
                     icon.draw(iconX, iconY);
                 }
             }
@@ -155,6 +162,20 @@ public class GuidePage extends GuidePart {
         for (PageLine line : lines) {
             part = renderLine(part, part, line, x, y, width, height, -1);
             if (wasHovered) {
+                return line;
+            }
+            if (part.page > index) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    protected PageLine getIconClicked(Iterable<PageLine> lines, int x, int y, int width, int height, int mouseX, int mouseY, int index) {
+        PagePart part = new PagePart(0, 0);
+        for (PageLine line : lines) {
+            part = renderLine(part, part, line, x, y, width, height, -1);
+            if (wasIconHovered) {
                 return line;
             }
             if (part.page > index) {
@@ -211,7 +232,7 @@ public class GuidePage extends GuidePart {
     }
 
     protected void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
-        // Even => first page, test page back button
+        // Even => first page, test page back button and first page text clicks
         if (index % 2 == 0) {
             if (index != 0) {
                 GuiIcon icon = GuiGuide.TURN_BACK;
