@@ -1,13 +1,15 @@
-package buildcraft.core.guide;
+package buildcraft.core.guide.parts;
 
 import buildcraft.core.gui.GuiTexture.GuiIcon;
+import buildcraft.core.guide.GuiGuide;
+import buildcraft.core.guide.PageLine;
 
 public abstract class GuidePageBase extends GuidePart {
     /** The current page that is being rendered */
     private int index = 0;
     protected int numPages = -1;
 
-    GuidePageBase(GuiGuide gui) {
+    public GuidePageBase(GuiGuide gui) {
         super(gui);
     }
 
@@ -114,7 +116,7 @@ public abstract class GuidePageBase extends GuidePart {
         // NO-OP, use the below!
     }
 
-    protected void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
+    public void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
         // Even => first page, test page back button and first page text clicks
         if (index % 2 == 0) {
             if (index != 0) {

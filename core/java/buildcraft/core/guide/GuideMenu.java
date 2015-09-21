@@ -11,6 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.core.guide.node.NodePageLine;
+import buildcraft.core.guide.parts.GuidePageBase;
 
 /** The base menu for showing all the locations. Should never be registered with and guide managers, this is special and
  * controls them all. */
@@ -86,7 +87,7 @@ public class GuideMenu extends GuidePageBase {
     }
 
     @Override
-    protected void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
+    public void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
         super.handleMouseClick(x, y, width, height, mouseX, mouseY, mouseButton, index, isEditing);
         PageLine line = getClicked(parentNode.iterateOnlyExpandedLines(), x, y, width, height, mouseX, mouseY, index);
         if (line != null) {

@@ -7,9 +7,6 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -17,7 +14,13 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
 import buildcraft.api.core.BCLog;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.guide.block.IBlockGuidePageMapper;
+import buildcraft.core.guide.parts.GuideImage;
+import buildcraft.core.guide.parts.GuideImageFactory;
+import buildcraft.core.guide.parts.GuidePageBase;
+import buildcraft.core.guide.parts.GuidePart;
+import buildcraft.core.guide.parts.GuidePartFactory;
 import buildcraft.core.lib.utils.Utils;
 
 public class GuideManager {
@@ -29,7 +32,7 @@ public class GuideManager {
     static final Map<ResourceLocation, GuidePartFactory<GuidePageBase>> registeredPages = Maps.newHashMap();
     static final Map<ResourceLocation, PageMeta> pageMetas = Maps.newHashMap();
     /** Base locations for generic chapters */
-    private final String locationBase, locationBlock, locationItem, locationEntity, locationMechanic;
+    private final String locationBase, locationBlock, locationItem, locationPipe, locationRobot;
 
     final Map<Block, IBlockGuidePageMapper> customMappers = Maps.newHashMap();
 
@@ -37,8 +40,8 @@ public class GuideManager {
         locationBase = assetBase + ":guide/";
         locationBlock = locationBase + "block/";
         locationItem = locationBase + "item/";
-        locationEntity = locationBase + "entity/";
-        locationMechanic = locationBase + "mechanic/";
+        locationPipe = locationBase + "pipe/";
+        locationRobot = locationBase + "robot/";
     }
 
     public static void registerManager(GuideManager manager) {
@@ -60,7 +63,6 @@ public class GuideManager {
     public void registerCustomPage(ResourceLocation location, GuidePartFactory<GuidePageBase> page) {
         registeredPages.put(location, page);
         guideMap.put(location, page);
-        BCLog.logger.info("Registered " + location + " for " + locationBase);
     }
 
     public void registerPage(ResourceLocation location) {
@@ -154,13 +156,14 @@ public class GuideManager {
         unregister(new ResourceLocation(locationItem + Utils.getNameForItem(item)));
     }
 
-    public void unregisterEntity(Entity entity) {
-        unregister(new ResourceLocation(locationEntity + EntityList.getEntityString(entity)));
+    public void unregisterPipe(PipeDefinition definition) {
+        unregister(new ResourceLocation(locationPipe + definition.modUniqueTag));
     }
 
-    public void unregisterMechanic(String mechanic) {
-        unregister(new ResourceLocation(locationEntity + mechanic));
-    }
+    // TODO (PASS 1): Add robots the the in game manual
+    // public void unregisterRobot(buildcraft.api.boards.RedstoneBoardRobot robot) {
+    // unregister(new ResourceLocation(locationEntity + mechanic));
+    // }
 
     // Part getters
 
@@ -171,12 +174,9 @@ public class GuideManager {
         GuidePartFactory<?> part = null;
         if (location.getResourcePath().endsWith("md")) {// Wiki info page (Markdown)
             part = MarkdownLoader.loadMarkdown(location);
-        } else if (location.getResourcePath().endsWith("png")) { // Image
-            part = ImageLoader.loadImage(location);
         } else {
             throw new IllegalArgumentException("Recieved an unknown filetype! " + location);
         }
-        BCLog.logger.info("Getting " + location + " for the first time...");
         guideMap.put(location, part);
         return part;
     }
@@ -211,24 +211,17 @@ public class GuideManager {
         return getPage(locationBlock + Utils.getNameForBlock(block), gui);
     }
 
-    public GuidePageBase getEntityPage(Entity entity, GuiGuide gui) {
-        return getPage(locationEntity + EntityList.getEntityString(entity), gui);
+    public GuidePageBase getPipePage(PipeDefinition definition, GuiGuide gui) {
+        return getPage(locationPipe + definition.modUniqueTag, gui);
     }
 
-    public GuidePageBase getMechanicPage(String mechanic, GuiGuide gui) {
-        return getPage(locationMechanic + mechanic, gui);
-    }
+    // TODO (PASS 1): Add robots to the in-game manual
+    // public GuidePageBase getMechanicPage(String mechanic, GuiGuide gui) {
+    // return getPage(locationMechanic + mechanic, gui);
+    // }
 
     /** Gets an image for display that location */
     public GuideImage getImage(String imageLocation, GuiGuide gui) {
         return (GuideImage) getPart(new ResourceLocation(locationBase, imageLocation + ".png"), gui);
-    }
-
-    public GuideRenderedBlock getBlockImage(IBlockState state) {
-        return new GuideRenderedBlock(state);
-    }
-
-    public GuideRenderedItem getItemImage(ItemStack stack) {
-        return new GuideRenderedItem(stack);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.util.ResourceLocation;
 
 import buildcraft.core.gui.GuiTexture.GuiIcon;
 import buildcraft.core.gui.GuiTexture.Rectangle;
+import buildcraft.core.guide.parts.GuidePageBase;
 
 public class GuiGuide extends GuiScreen {
     public static final ResourceLocation ICONS = new ResourceLocation("buildcraftcore:textures/gui/guide/icons.png");
@@ -55,6 +56,11 @@ public class GuiGuide extends GuiScreen {
     public static final GuiIcon BOX_SELECTED_PLUS = new GuiIcon(ICONS, 32, 180, 16, 16);
     public static final GuiIcon BOX_SELECTED_TICKED = new GuiIcon(ICONS, 48, 180, 16, 16);
 
+    public static final GuiIcon BORDER_TOP_LEFT = new GuiIcon(ICONS, 0, 196, 13, 13);
+    public static final GuiIcon BORDER_TOP_RIGHT = new GuiIcon(ICONS, 13, 196, 13, 13);
+    public static final GuiIcon BORDER_BOTTOM_LEFT = new GuiIcon(ICONS, 0, 209, 13, 13);
+    public static final GuiIcon BORDER_BOTTOM_RIGHT = new GuiIcon(ICONS, 13, 209, 13, 13);
+
     public static final Rectangle BACK_POSITION = new Rectangle(PAGE_LEFT.x + PAGE_LEFT.width - BACK.width / 2, PAGE_LEFT.y + PAGE_LEFT.height
         - BACK.height - 2, BACK.width, BACK.height);
 
@@ -90,6 +96,7 @@ public class GuiGuide extends GuiScreen {
     private int minX, minY;
     /** The current mouse positions. Used by the GuideFontRenderer */
     public int mouseX, mouseY;
+    public ItemStack tooltipStack = null;
 
     private Deque<GuidePageBase> pages = Queues.newArrayDeque();
     private GuidePageBase currentPage;
@@ -220,6 +227,7 @@ public class GuiGuide extends GuiScreen {
             && mouseY <= minY + PEN_HIDDEN_BOX_Y_MAX;
 
         // Now draw the actual contents of the book
+        tooltipStack = null;
         currentPage.setSpecifics(fontRendererObj, mouseX, mouseY);
         currentPage.tick(diff);
         currentPage.renderFirstPage(minX + PAGE_LEFT_TEXT.x, minY + PAGE_LEFT_TEXT.y, PAGE_LEFT_TEXT.width, PAGE_LEFT_TEXT.height);
@@ -272,6 +280,10 @@ public class GuiGuide extends GuiScreen {
             // Draw pen
             mc.renderEngine.bindTexture(ICONS);
             drawTexturedModalRect(minX + PAGE_LEFT.width - PEN_HIDDEN_WIDTH / 2, minY - height, PEN_HIDDEN_X, PEN_HIDDEN_Y, PEN_HIDDEN_WIDTH, height);
+
+            if (tooltipStack != null) {
+                renderToolTip(tooltipStack, mouseX, mouseY);
+            }
         }
     }
 

@@ -1,10 +1,12 @@
-package buildcraft.core.guide;
+package buildcraft.core.guide.parts;
 
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.gui.FontRenderer;
+
+import buildcraft.core.guide.GuiGuide;
 
 public class GuidePage extends GuidePageBase {
     private final ImmutableList<GuidePart> parts;
@@ -38,7 +40,7 @@ public class GuidePage extends GuidePageBase {
     }
 
     @Override
-    protected void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
+    public void handleMouseClick(int x, int y, int width, int height, int mouseX, int mouseY, int mouseButton, int index, boolean isEditing) {
         // TODO Auto-generated method stub
         super.handleMouseClick(x, y, width, height, mouseX, mouseY, mouseButton, index, isEditing);
     }

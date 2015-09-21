@@ -3,7 +3,7 @@ package buildcraft.core.tablet;
 import buildcraft.api.tablet.ITablet;
 import buildcraft.api.tablet.TabletProgram;
 import buildcraft.core.guide.GuideMenu;
-import buildcraft.core.guide.GuidePageBase;
+import buildcraft.core.guide.parts.GuidePageBase;
 
 public class TabletProgramGuide extends TabletProgram {
     private final ITablet tablet;

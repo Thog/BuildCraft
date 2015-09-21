@@ -1,10 +1,12 @@
-package buildcraft.core.guide;
+package buildcraft.core.guide.parts;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
 import buildcraft.core.gui.GuiTexture.GuiIcon;
+import buildcraft.core.guide.GuiGuide;
+import buildcraft.core.guide.PageLine;
 
 /** Represents a single page, image or crafting recipe for displaying. Only exists on the client. */
 public abstract class GuidePart {

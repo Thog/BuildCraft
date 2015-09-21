@@ -1,5 +1,6 @@
-package buildcraft.core.guide;
+package buildcraft.core.guide.parts;
 
+import buildcraft.core.guide.GuiGuide;
 import buildcraft.core.guide.node.NodePageLine;
 
 public class GuideTextFactory extends GuidePartFactory<GuideText> {

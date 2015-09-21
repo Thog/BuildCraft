@@ -1,6 +1,7 @@
-package buildcraft.core.guide;
+package buildcraft.core.guide.parts;
 
-import buildcraft.core.guide.GuidePartNewLineFactory.GuidePartNewLine;
+import buildcraft.core.guide.GuiGuide;
+import buildcraft.core.guide.parts.GuidePartNewLineFactory.GuidePartNewLine;
 
 public class GuidePartNewLineFactory extends GuidePartFactory<GuidePartNewLine> {
     public static class GuidePartNewLine extends GuidePart {

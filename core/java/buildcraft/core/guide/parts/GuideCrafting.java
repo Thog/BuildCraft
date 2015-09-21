@@ -1,4 +1,4 @@
-package buildcraft.core.guide;
+package buildcraft.core.guide.parts;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 
 import buildcraft.core.gui.GuiTexture.GuiIcon;
 import buildcraft.core.gui.GuiTexture.Rectangle;
+import buildcraft.core.guide.GuiGuide;
 
 public class GuideCrafting extends GuidePart {
     public static final GuiIcon CRAFTING_GRID = new GuiIcon(GuiGuide.ICONS, 119, 0, 116, 54);
@@ -22,18 +23,24 @@ public class GuideCrafting extends GuidePart {
         }
     }
 
-    private final ItemStack[][] input;
-    private final ItemStack output;
+    private final ChangingItemStack[][] input;
+    private final ChangingItemStack output;
 
     GuideCrafting(GuiGuide gui, ItemStack[][] input, ItemStack output) {
         super(gui);
-        this.input = input;
-        this.output = output;
+        this.input = new ChangingItemStack[input.length][];
+        for (int x = 0; x < input.length; x++) {
+            this.input[x] = new ChangingItemStack[input[x].length];
+            for (int y = 0; y < input[x].length; y++) {
+                this.input[x][y] = new ChangingItemStack(input[x][y]);
+            }
+        }
+        this.output = new ChangingItemStack(output);
     }
 
     @Override
     public PagePart renderIntoArea(int x, int y, int width, int height, PagePart current, int index) {
-        if (current.line + 4 >= height / LINE_HEIGHT) {
+        if (current.line + 4 > height / LINE_HEIGHT) {
             current = current.newPage();
         }
         x += OFFSET.x;
@@ -46,30 +53,22 @@ public class GuideCrafting extends GuidePart {
             for (int itemX = 0; itemX < input.length; itemX++) {
                 for (int itemY = 0; itemY < input[itemX].length; itemY++) {
                     Rectangle rect = ITEM_POSITION[itemX][itemY];
-                    ItemStack stack = input[itemX][itemY];
+                    ItemStack stack = input[itemX][itemY].get();
                     if (stack != null) {
                         GlStateManager.color(1, 1, 1);
                         gui.mc.getRenderItem().renderItemIntoGUI(stack, x + rect.x, y + rect.y);
+                        if (rect.isMouseInside(x + rect.x, y + rect.y, mouseX, mouseY)) {
+                            gui.tooltipStack = stack;
+                        }
                     }
                 }
             }
-            gui.mc.getRenderItem().renderItemIntoGUI(output, x + OUT_POSITION.x, y + OUT_POSITION.y);
+            gui.mc.getRenderItem().renderItemIntoGUI(output.get(), x + OUT_POSITION.x, y + OUT_POSITION.y);
+            if (OUT_POSITION.isMouseInside(x + OUT_POSITION.x, y + OUT_POSITION.y, mouseX, mouseY)) {
+                gui.tooltipStack = output.get();
+            }
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableRescaleNormal();
-
-            // Render the tooltip
-            for (int itemX = 0; itemX < input.length; itemX++) {
-                for (int itemY = 0; itemY < input[itemX].length; itemY++) {
-                    Rectangle rect = ITEM_POSITION[itemX][itemY];
-                    ItemStack stack = input[itemX][itemY];
-                    if (stack != null && rect.isMouseInside(x + rect.x, y + rect.y, mouseX, mouseY)) {
-                        gui.drawTooltip(stack, mouseX, mouseY);
-                    }
-                }
-            }
-            if (OUT_POSITION.isMouseInside(x + OUT_POSITION.x, y + OUT_POSITION.y, mouseX, mouseY)) {
-                gui.drawTooltip(output, mouseX, mouseY);
-            }
         }
         current = current.nextLine(4, height / LINE_HEIGHT);
         return current;
