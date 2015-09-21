@@ -164,10 +164,6 @@ public class CoreProxy implements ICoreProxy {
     /** This function returns either the player from the handler if it's on the server, or directly from the minecraft
      * instance if it's the client. */
     public EntityPlayer getPlayerFromNetHandler(INetHandler handler) {
-        if (handler instanceof NetHandlerPlayServer) {
             return ((NetHandlerPlayServer) handler).playerEntity;
-        } else {
-            return Minecraft.getMinecraft().thePlayer;
-        }
     }
 }

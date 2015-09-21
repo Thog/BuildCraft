@@ -455,10 +455,12 @@ public class BuildCraftCore extends BuildCraftMod {
         }
 
         // Guide book setup
-        GuideManager coreGuideManager = new GuideManager("buildcraftcore");
-        GuideManager.registerManager(coreGuideManager);
-        coreGuideManager.registerCustomBlock(engineBlock, new EngineBlockMapper());
-        coreGuideManager.registerAllItems(false);
+        if (event.getSide() == Side.CLIENT) {
+            GuideManager coreGuideManager = new GuideManager("buildcraftcore");
+            GuideManager.registerManager(coreGuideManager);
+            coreGuideManager.registerCustomBlock(engineBlock, new EngineBlockMapper());
+            coreGuideManager.registerAllItems(false);
+        }
     }
 
     @Mod.EventHandler

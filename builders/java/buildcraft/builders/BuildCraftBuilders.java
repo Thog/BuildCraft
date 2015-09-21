@@ -104,6 +104,7 @@ import buildcraft.core.builders.schematics.SchematicIgnore;
 import buildcraft.core.builders.schematics.SchematicStandalone;
 import buildcraft.core.builders.schematics.SchematicTileCreative;
 import buildcraft.core.config.ConfigManager;
+import buildcraft.core.guide.GuideManager;
 import buildcraft.core.proxy.CoreProxy;
 
 @Mod(name = "BuildCraft Builders", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Builders",
@@ -317,6 +318,13 @@ public class BuildCraftBuilders extends BuildCraftMod {
         // Refresh the databases once all the library type handlers are registered
         serverDB.refresh();
         clientDB.refresh();
+
+        if (evt.getSide() == Side.CLIENT) {
+            GuideManager builderGuideManager = new GuideManager("buildcraftbuilders");
+            GuideManager.registerManager(builderGuideManager);
+            builderGuideManager.registerAllBlocks();
+            builderGuideManager.registerAllItems(false);
+        }
     }
 
     @Mod.EventHandler

@@ -12,17 +12,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import buildcraft.api.core.BCLog;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.guide.block.IBlockGuidePageMapper;
 import buildcraft.core.guide.parts.GuideImage;
-import buildcraft.core.guide.parts.GuideImageFactory;
 import buildcraft.core.guide.parts.GuidePageBase;
 import buildcraft.core.guide.parts.GuidePart;
 import buildcraft.core.guide.parts.GuidePartFactory;
 import buildcraft.core.lib.utils.Utils;
 
+@SideOnly(Side.CLIENT)
 public class GuideManager {
     static final Map<ModContainer, GuideManager> managers = Maps.newHashMap();
 

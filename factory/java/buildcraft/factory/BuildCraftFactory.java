@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -41,6 +42,7 @@ import buildcraft.core.InterModComms;
 import buildcraft.core.Version;
 import buildcraft.core.builders.schematics.SchematicFree;
 import buildcraft.core.config.ConfigManager;
+import buildcraft.core.guide.GuideManager;
 import buildcraft.core.lib.network.ChannelHandler;
 import buildcraft.core.lib.network.PacketHandler;
 import buildcraft.core.proxy.CoreProxy;
@@ -224,6 +226,17 @@ public class BuildCraftFactory extends BuildCraftMod {
             if (BuildCraftCore.mainConfiguration.hasChanged()) {
                 BuildCraftCore.mainConfiguration.save();
             }
+        }
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        // Guide book setup
+        if (event.getSide() == Side.CLIENT) {
+            GuideManager factoryGuideManager = new GuideManager("buildcraftfactory");
+            GuideManager.registerManager(factoryGuideManager);
+            factoryGuideManager.registerAllBlocks();
+            factoryGuideManager.registerAllItems(false);
         }
     }
 

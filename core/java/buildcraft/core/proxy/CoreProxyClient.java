@@ -149,7 +149,7 @@ public class CoreProxyClient extends CoreProxy {
     @Override
     public EntityPlayer getPlayerFromNetHandler(INetHandler handler) {
         if (handler instanceof NetHandlerPlayServer) {
-            return ((NetHandlerPlayServer) handler).playerEntity;
+            return super.getPlayerFromNetHandler(handler);
         } else {
             return Minecraft.getMinecraft().thePlayer;
         }

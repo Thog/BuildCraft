@@ -3,12 +3,15 @@ package buildcraft.core.guide.parts;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.core.gui.GuiTexture.GuiIcon;
 import buildcraft.core.guide.GuiGuide;
 import buildcraft.core.guide.PageLine;
 
 /** Represents a single page, image or crafting recipe for displaying. Only exists on the client. */
+@SideOnly(Side.CLIENT)
 public abstract class GuidePart {
     public static final int LINE_HEIGHT = 16;
     public static final int INDENT_WIDTH = 16;

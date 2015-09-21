@@ -36,6 +36,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.ConfigAccessor;
@@ -55,6 +56,8 @@ import buildcraft.core.InterModComms;
 import buildcraft.core.Version;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.config.ConfigManager.RestartRequirement;
+import buildcraft.core.guide.GuideManager;
+import buildcraft.core.guide.block.EngineBlockMapper;
 import buildcraft.core.lib.block.BlockBuildCraftFluid;
 import buildcraft.core.lib.engines.TileEngineBase;
 import buildcraft.core.lib.network.ChannelHandler;
@@ -398,6 +401,14 @@ public class BuildCraftEnergy extends BuildCraftMod {
         if (BuildCraftCore.modifyWorld) {
             MinecraftForge.EVENT_BUS.register(OilPopulate.INSTANCE);
             MinecraftForge.TERRAIN_GEN_BUS.register(new BiomeInitializer());
+        }
+        
+        // Guide book setup
+        if (evt.getSide() == Side.CLIENT) {
+            GuideManager energyGuideManager = new GuideManager("buildcraftenergy");
+            GuideManager.registerManager(energyGuideManager);
+            energyGuideManager.registerAllBlocks();
+            energyGuideManager.registerAllItems(false);
         }
     }
 
