@@ -2,7 +2,7 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.builders;
+package buildcraft.core.blueprints;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,6 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.api.library.LibraryAPI;
-import buildcraft.core.blueprints.LibraryId;
 import buildcraft.core.lib.utils.NBTUtils;
 
 public class LibraryDatabase {

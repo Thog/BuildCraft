@@ -51,7 +51,7 @@ public abstract class GuidePart {
     protected boolean wasHovered = false;
     protected boolean wasIconHovered = false;
 
-    GuidePart(GuiGuide gui) {
+    public GuidePart(GuiGuide gui) {
         this.gui = gui;
     }
 

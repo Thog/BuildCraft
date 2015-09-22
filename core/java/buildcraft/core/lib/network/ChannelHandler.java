@@ -12,9 +12,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
 public class ChannelHandler extends FMLIndexedMessageToMessageCodec<Packet> {
+    private static boolean recordStats = true;
+
+    public static ChannelHandler createChannelHandler() {
+        return recordStats ? new ChannelHandlerStats() : new ChannelHandler();
+    }
+
     private int maxDiscriminator;
 
-    public ChannelHandler() {
+    protected ChannelHandler() {
         // Packets common to buildcraft.core.network
         addDiscriminator(0, PacketTileUpdate.class);
         addDiscriminator(1, PacketTileState.class);

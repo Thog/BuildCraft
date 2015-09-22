@@ -74,7 +74,6 @@ import buildcraft.builders.block.BlockFrame;
 import buildcraft.builders.block.BlockMarker;
 import buildcraft.builders.block.BlockPathMarker;
 import buildcraft.builders.block.BlockQuarry;
-import buildcraft.builders.blueprints.RealBlueprintDeployer;
 import buildcraft.builders.item.ItemBlueprintStandard;
 import buildcraft.builders.item.ItemBlueprintTemplate;
 import buildcraft.builders.item.ItemConstructionMarker;
@@ -97,6 +96,8 @@ import buildcraft.core.CompatHooks;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
 import buildcraft.core.Version;
+import buildcraft.core.blueprints.LibraryDatabase;
+import buildcraft.core.blueprints.RealBlueprintDeployer;
 import buildcraft.core.blueprints.SchematicRegistry;
 import buildcraft.core.builders.patterns.*;
 import buildcraft.core.builders.schematics.SchematicBlockCreative;
@@ -506,8 +507,6 @@ public class BuildCraftBuilders extends BuildCraftMod {
         LibraryAPI.registerHandler(new LibraryBlueprintTypeHandler(false)); // Template
         LibraryAPI.registerHandler(new LibraryBlueprintTypeHandler(true)); // Blueprint
         LibraryAPI.registerHandler(new LibraryBookTypeHandler());
-
-        BlueprintDeployer.instance = new RealBlueprintDeployer();
 
         architectAchievement = BuildCraftCore.achievementManager.registerAchievement(new Achievement("achievement.architect", "architectAchievement",
                 11, 2, BuildCraftBuilders.architectBlock, BuildCraftCore.goldGearAchievement));

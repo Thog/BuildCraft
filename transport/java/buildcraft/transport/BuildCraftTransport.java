@@ -452,7 +452,7 @@ public class BuildCraftTransport extends BuildCraftMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent evt) {
-        transportChannelHandler = new ChannelHandler();
+        transportChannelHandler = ChannelHandler.createChannelHandler();
         MinecraftForge.EVENT_BUS.register(this);
 
         transportChannelHandler.registerPacketType(PacketFluidUpdate.class);

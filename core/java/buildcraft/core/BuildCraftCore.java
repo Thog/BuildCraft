@@ -62,6 +62,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
+import buildcraft.api.blueprints.BlueprintDeployer;
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.BuildCraftAPI;
@@ -84,6 +85,7 @@ import buildcraft.api.tiles.IDebuggable;
 import buildcraft.core.block.BlockBuildTool;
 import buildcraft.core.block.BlockEngine;
 import buildcraft.core.block.BlockSpring;
+import buildcraft.core.blueprints.RealBlueprintDeployer;
 import buildcraft.core.blueprints.SchematicRegistry;
 import buildcraft.core.command.SubCommandChangelog;
 import buildcraft.core.command.SubCommandVersion;
@@ -240,6 +242,7 @@ public class BuildCraftCore extends BuildCraftMod {
         BuildcraftRecipeRegistry.programmingTable = ProgrammingRecipeManager.INSTANCE;
 
         BuilderAPI.schematicRegistry = SchematicRegistry.INSTANCE;
+        BlueprintDeployer.instance = new RealBlueprintDeployer();
 
         mainConfiguration = new BuildCraftConfiguration(new File(evt.getModConfigurationDirectory(), "buildcraft/main.cfg"));
         mainConfigManager = new ConfigManager(mainConfiguration, this);
@@ -350,7 +353,7 @@ public class BuildCraftCore extends BuildCraftMod {
     public void init(FMLInitializationEvent evt) {
         BuildCraftAPI.proxy = CoreProxy.proxy;
 
-        ChannelHandler coreChannelHandler = new ChannelHandler();
+        ChannelHandler coreChannelHandler = ChannelHandler.createChannelHandler();
         coreChannelHandler.registerPacketType(PacketTabletMessage.class);
 
         channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-CORE", coreChannelHandler, new PacketHandlerCore());
@@ -405,6 +408,7 @@ public class BuildCraftCore extends BuildCraftMod {
 
         FMLCommonHandler.instance().bus().register(TabletManagerClient.INSTANCE);
         FMLCommonHandler.instance().bus().register(TabletManagerServer.INSTANCE);
+        FMLCommonHandler.instance().bus().register(new TickHandlerCore());
         MinecraftForge.EVENT_BUS.register(TabletManagerClient.INSTANCE);
         MinecraftForge.EVENT_BUS.register(TabletManagerServer.INSTANCE);
 
@@ -427,8 +431,6 @@ public class BuildCraftCore extends BuildCraftMod {
         BuildCraftAPI.softBlocks.add(Blocks.vine);
         BuildCraftAPI.softBlocks.add(Blocks.fire);
         BuildCraftAPI.softBlocks.add(Blocks.air);
-
-        FMLCommonHandler.instance().bus().register(new TickHandlerCore());
 
         CropManager.setDefaultHandler(new CropHandlerPlantable());
         CropManager.registerHandler(new CropHandlerReeds());

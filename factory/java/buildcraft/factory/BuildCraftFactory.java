@@ -130,7 +130,7 @@ public class BuildCraftFactory extends BuildCraftMod {
 
     @Mod.EventHandler
     public void initialize(FMLPreInitializationEvent evt) {
-        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-FACTORY", new ChannelHandler(), new PacketHandler());
+        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-FACTORY", ChannelHandler.createChannelHandler(), new PacketHandler());
 
         String plc = "Allows admins to whitelist or blacklist pumping of specific fluids in specific dimensions.\n"
             + "Eg. \"-/-1/Lava\" will disable lava in the nether. \"-/*/Lava\" will disable lava in any dimension. \"+/0/*\" will enable any fluid in the overworld.\n"

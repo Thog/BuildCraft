@@ -107,7 +107,7 @@ public class BuildCraftSilicon extends BuildCraftMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent evt) {
-        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-SILICON", new ChannelHandler(), new PacketHandlerSilicon());
+        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-SILICON", ChannelHandler.createChannelHandler(), new PacketHandlerSilicon());
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new SiliconGuiHandler());
         CoreProxy.proxy.registerTileEntity(TileLaser.class, "buildcraft.silicon.TileLaser", "net.minecraft.src.buildcraft.factory.TileLaser");

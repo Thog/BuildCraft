@@ -207,7 +207,7 @@ public class BuildCraftRobotics extends BuildCraftMod {
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
 
-        ChannelHandler roboticsHandler = new ChannelHandler();
+        ChannelHandler roboticsHandler = ChannelHandler.createChannelHandler();
         roboticsHandler.registerPacketType(PacketPathfinding.class);
 
         channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-ROBOTICS", roboticsHandler, new PacketHandlerRobotics());

@@ -12,6 +12,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.ITileAreaProvider;
 import buildcraft.builders.BuildCraftBuilders;
@@ -176,12 +177,6 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
                 signals[5] = Utils.createLaser(worldObj, cPos.addVector(0, 0, -rangePlus), cPos, LaserKind.Blue);
             }
         }
-    }
-
-    @Override
-    public void update() {
-        super.update();
-        readDataDelayed();
     }
 
     @Override
@@ -519,15 +514,8 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
 
     @Override
     public void readData(ByteBuf stream) {
-        this.stream = stream;
-    }
-
-    public void readDataDelayed() {
-        if (stream == null) {
-            return;
-        }
         origin.readData(stream);
-        showSignals = stream.readBoolean();
+        this.showSignals = stream.readBoolean();
 
         switchSignals();
 
@@ -544,8 +532,6 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
         }
 
         createLasers();
-
-        stream = null;
     }
 
     @Override

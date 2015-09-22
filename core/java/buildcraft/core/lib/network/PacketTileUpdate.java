@@ -57,13 +57,13 @@ public class PacketTileUpdate extends PacketUpdate {
             return;
         }
 
-        TileEntity entity = getTarget(world);
+        TileEntity tile = getTarget(world);
 
-        if (!(entity instanceof ISerializable)) {
+        if (!(tile instanceof ISerializable)) {
             return;
         }
 
-        ISerializable tile = (ISerializable) entity;
-        tile.readData(payloadData);
+        ISerializable ser = (ISerializable) tile;
+        ser.readData(payloadData);
     }
 }

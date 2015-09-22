@@ -35,6 +35,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.api.tiles.ITileAreaProvider;
 import buildcraft.api.transport.EnumPipeType;
