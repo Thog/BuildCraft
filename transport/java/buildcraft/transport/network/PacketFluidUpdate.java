@@ -6,6 +6,7 @@ package buildcraft.transport.network;
 
 import java.util.BitSet;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -41,16 +42,16 @@ public class PacketFluidUpdate extends PacketCoordinates {
     public PacketFluidUpdate() {}
 
     @Override
-    public void readData(ByteBuf data) {
-        super.readData(data);
+    public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
 
         int length = data.readInt();
         payloadData = data.readBytes(length);
     }
 
     @Override
-    public void writeData(ByteBuf data) {
-        super.writeData(data);
+    public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
 
         ByteBuf payloadData = Unpooled.buffer();
 

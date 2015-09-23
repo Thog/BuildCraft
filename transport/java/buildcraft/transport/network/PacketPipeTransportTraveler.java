@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.network;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -39,7 +40,7 @@ public class PacketPipeTransportTraveler extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
+    public void writeData(ByteBuf data, EntityPlayer player) {
         data.writeFloat((float) item.pos.xCoord);
         data.writeFloat((float) item.pos.yCoord);
         data.writeFloat((float) item.pos.zCoord);
@@ -59,7 +60,7 @@ public class PacketPipeTransportTraveler extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf data) {
+    public void readData(ByteBuf data, EntityPlayer player) {
         itemPos = new Vec3(data.readFloat(), data.readFloat(), data.readFloat());
 
         pos = Utils.convertFloor(itemPos);

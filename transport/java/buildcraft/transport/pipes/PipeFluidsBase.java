@@ -1,5 +1,7 @@
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 
@@ -9,7 +11,6 @@ import buildcraft.api.transport.IPipeFactory;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportFluids;
 
 public class PipeFluidsBase extends Pipe<PipeTransportFluids> {

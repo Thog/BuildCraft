@@ -5,6 +5,7 @@
 package buildcraft.transport.gui;
 
 import java.io.IOException;
+import java.nio.channels.Pipe;
 import java.util.Iterator;
 
 import org.lwjgl.input.Mouse;
@@ -24,7 +25,6 @@ import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.transport.ActionActiveState;
 import buildcraft.transport.Gate;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class GuiGateInterface extends GuiAdvancedInterface {
     IInventory playerInventory;

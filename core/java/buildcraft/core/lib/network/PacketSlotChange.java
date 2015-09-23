@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.network;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -26,16 +27,16 @@ public class PacketSlotChange extends PacketCoordinates {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
-        super.writeData(data);
+    public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
 
         data.writeShort(slot);
         NetworkUtils.writeStack(data, stack);
     }
 
     @Override
-    public void readData(ByteBuf data) {
-        super.readData(data);
+    public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
 
         this.slot = data.readUnsignedShort();
         stack = NetworkUtils.readStack(data);

@@ -57,7 +57,6 @@ import buildcraft.core.Version;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.config.ConfigManager.RestartRequirement;
 import buildcraft.core.guide.GuideManager;
-import buildcraft.core.guide.block.EngineBlockMapper;
 import buildcraft.core.lib.block.BlockBuildCraftFluid;
 import buildcraft.core.lib.engines.TileEngineBase;
 import buildcraft.core.lib.network.ChannelHandler;
@@ -377,7 +376,8 @@ public class BuildCraftEnergy extends BuildCraftMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent evt) {
-        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-ENERGY", ChannelHandler.createChannelHandler(), new PacketHandler());
+        channels = NetworkRegistry.INSTANCE.newChannel(DefaultProps.NET_CHANNEL_NAME + "-ENERGY", ChannelHandler.createChannelHandler(),
+                new PacketHandler());
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new EnergyGuiHandler());
 
@@ -402,7 +402,7 @@ public class BuildCraftEnergy extends BuildCraftMod {
             MinecraftForge.EVENT_BUS.register(OilPopulate.INSTANCE);
             MinecraftForge.TERRAIN_GEN_BUS.register(new BiomeInitializer());
         }
-        
+
         // Guide book setup
         if (evt.getSide() == Side.CLIENT) {
             GuideManager energyGuideManager = new GuideManager("buildcraftenergy");

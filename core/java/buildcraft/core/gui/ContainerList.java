@@ -96,7 +96,7 @@ public class ContainerList extends BuildCraftContainer implements ICommandReceiv
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isServer()) {
             if ("setLabel".equals(command)) {
                 setLabel(NetworkUtils.readUTF(stream));

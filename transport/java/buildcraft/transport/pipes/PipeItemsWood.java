@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -29,7 +31,6 @@ import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeItemsWood extends Pipe<PipeTransportItems>implements IMjExternalStorage {

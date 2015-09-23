@@ -1,5 +1,6 @@
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -22,7 +23,6 @@ import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.core.lib.utils.Average;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 import io.netty.buffer.ByteBuf;

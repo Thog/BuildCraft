@@ -1,5 +1,7 @@
 package buildcraft.transport.render.tile;
 
+import java.nio.channels.Pipe;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -18,7 +20,6 @@ import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 public class PipeRendererPower {

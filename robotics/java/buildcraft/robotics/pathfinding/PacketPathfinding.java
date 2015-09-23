@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -37,7 +38,7 @@ public class PacketPathfinding extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf stream) {
+    public void readData(ByteBuf stream, EntityPlayer player) {
         change = NetworkUtils.readEnum(stream, ChangeType.class);
         type = NetworkUtils.readEnum(stream, BlockType.class);
         switch (type) {
@@ -59,7 +60,7 @@ public class PacketPathfinding extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf stream) {
+    public void writeData(ByteBuf stream, EntityPlayer player) {
         NetworkUtils.writeEnum(stream, change);
         NetworkUtils.writeEnum(stream, type);
         switch (type) {

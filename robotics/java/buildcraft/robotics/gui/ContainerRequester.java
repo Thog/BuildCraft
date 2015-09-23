@@ -61,7 +61,7 @@ public class ContainerRequester extends BuildCraftContainer implements ICommandR
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isServer() && "getRequestList".equals(command)) {
             final ItemStack[] stacks = new ItemStack[TileRequester.NB_ITEMS];
 

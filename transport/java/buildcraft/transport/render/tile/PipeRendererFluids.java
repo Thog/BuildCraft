@@ -1,5 +1,6 @@
 package buildcraft.transport.render.tile;
 
+import java.nio.channels.Pipe;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -25,7 +26,6 @@ import buildcraft.core.lib.render.FluidRenderer;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportFluids;
 import buildcraft.transport.utils.FluidRenderData;
 

@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.robotics.item;
 
+import java.nio.channels.Pipe;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -37,7 +38,6 @@ import buildcraft.robotics.BuildCraftRobotics;
 import buildcraft.robotics.EntityRobot;
 import buildcraft.robotics.RobotStationPluggable;
 import buildcraft.transport.internal.pipes.BlockGenericPipe;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class ItemRobot extends ItemBuildCraft implements IMjItemHandler {
 

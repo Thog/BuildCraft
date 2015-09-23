@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.network;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 import buildcraft.api.core.ISerializable;
 
 import io.netty.buffer.ByteBuf;
@@ -29,7 +31,7 @@ public abstract class PacketUpdate extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
+    public void writeData(ByteBuf data, EntityPlayer player) {
         data.writeByte(packetId);
         writeIdentificationData(data);
 
@@ -45,7 +47,7 @@ public abstract class PacketUpdate extends Packet {
     public abstract void writeIdentificationData(ByteBuf data);
 
     @Override
-    public void readData(ByteBuf data) {
+    public void readData(ByteBuf data, EntityPlayer player) {
         packetId = data.readByte();
         readIdentificationData(data);
         int length = data.readInt();

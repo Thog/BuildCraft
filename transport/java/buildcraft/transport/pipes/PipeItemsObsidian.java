@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,7 +37,6 @@ import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.TransportProxy;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.utils.TransportUtils;
 

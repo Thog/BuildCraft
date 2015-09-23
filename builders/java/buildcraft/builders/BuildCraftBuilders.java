@@ -49,7 +49,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import buildcraft.api.blueprints.BlueprintDeployer;
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.blueprints.ISchematicRegistry;
 import buildcraft.api.blueprints.SchematicBlock;
@@ -97,7 +96,6 @@ import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
 import buildcraft.core.Version;
 import buildcraft.core.blueprints.LibraryDatabase;
-import buildcraft.core.blueprints.RealBlueprintDeployer;
 import buildcraft.core.blueprints.SchematicRegistry;
 import buildcraft.core.builders.patterns.*;
 import buildcraft.core.builders.schematics.SchematicBlockCreative;

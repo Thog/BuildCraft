@@ -72,7 +72,7 @@ public abstract class TileAbstractBuilder extends TileBuildCraft implements ITil
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isServer() && "uploadBuildersInAction".equals(command)) {
             for (BuildingItem i : buildersInAction) {
                 BuildCraftCore.instance.sendToPlayer((EntityPlayer) sender, createLaunchItemPacket(i));

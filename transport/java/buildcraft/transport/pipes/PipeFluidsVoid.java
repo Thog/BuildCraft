@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
@@ -14,7 +16,6 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.IPipeTransportFluidsHook;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportFluids;
 
 public class PipeFluidsVoid extends Pipe<PipeTransportFluids>implements IPipeTransportFluidsHook {

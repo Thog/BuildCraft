@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.statements;
 
+import java.nio.channels.Pipe;
 import java.util.Locale;
 
 import net.minecraft.util.EnumFacing;
@@ -18,7 +19,6 @@ import buildcraft.core.statements.BCStatement;
 import buildcraft.core.statements.StatementParameterDirection;
 import buildcraft.transport.Gate;
 import buildcraft.transport.PipeTransport;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class ActionValve extends BCStatement implements IActionInternal {
 

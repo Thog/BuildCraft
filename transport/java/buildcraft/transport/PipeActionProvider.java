@@ -1,5 +1,6 @@
 package buildcraft.transport;
 
+import java.nio.channels.Pipe;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -11,7 +12,6 @@ import buildcraft.api.statements.IActionExternal;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IActionProvider;
 import buildcraft.api.statements.IStatementContainer;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class PipeActionProvider implements IActionProvider {
 

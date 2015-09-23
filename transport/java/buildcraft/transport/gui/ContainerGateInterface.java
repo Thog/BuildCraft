@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.gui;
 
+import java.nio.channels.Pipe;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -31,7 +32,6 @@ import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.transport.ActionActiveState;
 import buildcraft.transport.Gate;
 import buildcraft.transport.gates.GateDefinition;
-import buildcraft.transport.internal.pipes.Pipe;
 
 import io.netty.buffer.ByteBuf;
 
@@ -312,7 +312,7 @@ public class ContainerGateInterface extends BuildCraftContainer implements IComm
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isServer()) {
             EntityPlayer player = (EntityPlayer) sender;
             if ("initRequest".equals(command)) {

@@ -1,5 +1,6 @@
 package buildcraft.core.tablet;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
@@ -31,12 +32,12 @@ public class PacketTabletMessage extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf data) {
+    public void readData(ByteBuf data, EntityPlayer player) {
         this.tag = NetworkUtils.readNBT(data);
     }
 
     @Override
-    public void writeData(ByteBuf data) {
+    public void writeData(ByteBuf data, EntityPlayer player) {
         int index = data.writerIndex();
         NetworkUtils.writeNBT(data, tag);
         index = data.writerIndex() - index;

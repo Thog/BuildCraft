@@ -80,7 +80,7 @@ public class ContainerZonePlan extends BuildCraftContainer implements ICommandRe
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isClient()) {
             if ("areaLoaded".equals(command)) {
                 currentAreaSelection = new ZonePlan();

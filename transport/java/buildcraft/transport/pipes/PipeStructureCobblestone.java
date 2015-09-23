@@ -4,6 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
@@ -16,7 +18,6 @@ import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
 import buildcraft.transport.PipeTransportStructure;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class PipeStructureCobblestone extends Pipe<PipeTransportStructure> {
     private final PipeInfo info;

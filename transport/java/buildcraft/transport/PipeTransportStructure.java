@@ -4,13 +4,14 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.internal.pipes.BlockGenericPipe;
-import buildcraft.transport.internal.pipes.Pipe;
 
 public class PipeTransportStructure extends PipeTransport {
 

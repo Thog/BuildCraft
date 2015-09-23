@@ -105,7 +105,6 @@ import buildcraft.core.lib.block.IAdditionalDataTile;
 import buildcraft.core.lib.commands.RootCommand;
 import buildcraft.core.lib.engines.ItemEngine;
 import buildcraft.core.lib.engines.TileEngineBase;
-import buildcraft.core.lib.items.ItemBlockBuildCraft;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.network.ChannelHandler;
 import buildcraft.core.lib.render.FluidRenderer;

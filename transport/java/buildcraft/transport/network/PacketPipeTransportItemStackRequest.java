@@ -27,12 +27,12 @@ public class PacketPipeTransportItemStackRequest extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
+    public void writeData(ByteBuf data, EntityPlayer player) {
         data.writeShort(travelerID);
     }
 
     @Override
-    public void readData(ByteBuf data) {
+    public void readData(ByteBuf data, EntityPlayer player) {
         travelerID = data.readShort();
         TravelingItem.TravelingItemCache cache = TravelingItem.serverCache;
         item = cache.get(travelerID);

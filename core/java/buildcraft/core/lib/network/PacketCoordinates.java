@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.network;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 
 import io.netty.buffer.ByteBuf;
@@ -21,7 +22,7 @@ public abstract class PacketCoordinates extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
+    public void writeData(ByteBuf data, EntityPlayer player) {
         data.writeByte(id);
         data.writeInt(pos.getX());
         data.writeInt(pos.getY());
@@ -29,7 +30,7 @@ public abstract class PacketCoordinates extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf data) {
+    public void readData(ByteBuf data, EntityPlayer player) {
         id = data.readByte();
         pos = new BlockPos(data.readInt(), data.readInt(), data.readInt());
     }

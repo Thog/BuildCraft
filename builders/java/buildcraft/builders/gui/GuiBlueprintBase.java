@@ -13,7 +13,7 @@ public abstract class GuiBlueprintBase extends GuiScreen {
     }
 
     protected abstract ResourceLocation getGuiBackground();
-    
+
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);

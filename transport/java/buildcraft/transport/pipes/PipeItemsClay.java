@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.pipes;
 
+import java.nio.channels.Pipe;
 import java.util.LinkedList;
 
 import net.minecraft.item.Item;
@@ -16,7 +17,6 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeItemsClay extends Pipe<PipeTransportItems> {

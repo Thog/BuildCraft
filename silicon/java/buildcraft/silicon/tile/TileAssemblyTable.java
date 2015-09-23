@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -349,7 +350,7 @@ public class TileAssemblyTable extends TileLaserTableBase implements IInventory,
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isServer() && "select".equals(command)) {
             String id = NetworkUtils.readUTF(stream);
             boolean select = stream.readBoolean();

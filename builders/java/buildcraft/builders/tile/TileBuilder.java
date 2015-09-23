@@ -614,7 +614,7 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         super.receiveCommand(command, side, sender, stream);
         if (side.isClient()) {
             if ("clearItemRequirements".equals(command)) {

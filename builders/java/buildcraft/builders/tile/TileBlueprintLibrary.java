@@ -279,7 +279,7 @@ public class TileBlueprintLibrary extends TileBuildCraft implements IInventory, 
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isClient()) {
             if ("requestSelectedBlueprint".equals(command)) {
                 if (isOutputConsistent()) {

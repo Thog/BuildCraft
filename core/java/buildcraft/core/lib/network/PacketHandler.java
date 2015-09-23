@@ -49,8 +49,8 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) {
-        Attribute<Side> attr = ctx.channel().attr(NetworkRegistry.CHANNEL_SOURCE);
-        Side side = attr.get();
+        Attribute<Side> attrSide = ctx.channel().attr(NetworkRegistry.CHANNEL_SOURCE);
+        Side side = attrSide.get();
         if (side != null) {
             packetMap.get(side).add(packet);
         } else {

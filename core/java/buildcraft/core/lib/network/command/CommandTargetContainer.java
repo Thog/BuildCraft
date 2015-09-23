@@ -12,7 +12,7 @@ import io.netty.buffer.ByteBuf;
 
 public class CommandTargetContainer extends CommandTarget {
     @Override
-    public Class getHandledClass() {
+    public Class<? extends Container> getHandledClass() {
         return Container.class;
     }
 

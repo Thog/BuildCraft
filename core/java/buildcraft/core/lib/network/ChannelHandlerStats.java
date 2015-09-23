@@ -40,7 +40,7 @@ public class ChannelHandlerStats extends ChannelHandler {
     @Override
     public void encodeInto(ChannelHandlerContext ctx, Packet packet, ByteBuf data) throws Exception {
         int start = data.writerIndex();
-        packet.writeData(data);
+        super.encodeInto(ctx, packet, data);
         int written = data.writerIndex() - start;
         updateInfo(written, packet.getClass(), Type.WRITE);
     }
@@ -48,7 +48,7 @@ public class ChannelHandlerStats extends ChannelHandler {
     @Override
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf data, Packet packet) {
         int start = data.readerIndex();
-        packet.readData(data);
+        super.decodeInto(ctx, data, packet);
         int read = data.readerIndex() - start;
         updateInfo(read, packet.getClass(), Type.READ);
     }
@@ -71,7 +71,7 @@ public class ChannelHandlerStats extends ChannelHandler {
         long diff = now - stats.lastStatTime;
         if (diff > TIME_GAP) {
             stats.lastStatTime = now;
-            
+
             BCLog.logger.info("Over " + diff + "ms, " + type.operation + " " + stats.bytes + " bytes " + type.word + " " + stats.packets
                 + " packets for " + packet.getName());
             stats.bytes = 0;

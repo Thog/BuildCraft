@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.network;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import buildcraft.core.lib.network.Packet;
@@ -26,13 +27,13 @@ public class PacketPipeTransportItemStack extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
+    public void writeData(ByteBuf data, EntityPlayer player) {
         data.writeInt(entityId);
         NetworkUtils.writeStack(data, stack);
     }
 
     @Override
-    public void readData(ByteBuf data) {
+    public void readData(ByteBuf data, EntityPlayer player) {
         this.entityId = data.readInt();
         stack = NetworkUtils.readStack(data);
         TravelingItem item = TravelingItem.clientCache.get(entityId);

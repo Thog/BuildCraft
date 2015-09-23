@@ -35,7 +35,6 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.api.tiles.ITileAreaProvider;
 import buildcraft.api.transport.EnumPipeType;
@@ -320,7 +319,7 @@ public final class Utils {
         ByteBuf buf = Unpooled.buffer();
 
         buf.writeByte((byte) discriminator);
-        packet.writeData(buf);
+        packet.writeData(buf, null);
 
         return new FMLProxyPacket(new PacketBuffer(buf), DefaultProps.NET_CHANNEL_NAME + "-CORE");
     }

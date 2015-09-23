@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.network;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -24,8 +25,8 @@ public class PacketPowerUpdate extends PacketCoordinates {
     }
 
     @Override
-    public void readData(ByteBuf stream) {
-        super.readData(stream);
+    public void readData(ByteBuf stream, EntityPlayer player) {
+        super.readData(stream, player);
         power = new byte[6];
         flow = new byte[6];
         for (int i = 0; i < 6; i++) {
@@ -35,8 +36,8 @@ public class PacketPowerUpdate extends PacketCoordinates {
     }
 
     @Override
-    public void writeData(ByteBuf stream) {
-        super.writeData(stream);
+    public void writeData(ByteBuf stream, EntityPlayer player) {
+        super.writeData(stream, player);
         for (int i = 0; i < 6; i++) {
             stream.writeByte(power[i]);
             stream.writeByte(flow[i]);

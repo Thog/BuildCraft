@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.render.tile;
 
+import java.nio.channels.Pipe;
 import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
@@ -26,7 +27,6 @@ import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.gates.GatePluggable;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeRenderState;
 import buildcraft.transport.internal.pipes.TileGenericPipe;
 

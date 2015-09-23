@@ -93,7 +93,7 @@ public class TileUrbanist extends TileBuildCraft implements IInventory, IBoxesPr
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         // Non-XYZ commands go here
         if (side.isClient() && "setFrameKind".equals(command)) {
             setFrameKind(stream.readInt(), stream.readInt());

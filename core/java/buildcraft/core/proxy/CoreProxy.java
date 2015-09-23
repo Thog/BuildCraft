@@ -8,7 +8,6 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -164,6 +163,6 @@ public class CoreProxy implements ICoreProxy {
     /** This function returns either the player from the handler if it's on the server, or directly from the minecraft
      * instance if it's the client. */
     public EntityPlayer getPlayerFromNetHandler(INetHandler handler) {
-            return ((NetHandlerPlayServer) handler).playerEntity;
+        return ((NetHandlerPlayServer) handler).playerEntity;
     }
 }

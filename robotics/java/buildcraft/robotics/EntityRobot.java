@@ -739,7 +739,7 @@ public class EntityRobot extends EntityRobotBase implements IEntityAdditionalSpa
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isClient()) {
             if ("clientSetItemInUse".equals(command)) {
                 itemInUse = NetworkUtils.readStack(stream);

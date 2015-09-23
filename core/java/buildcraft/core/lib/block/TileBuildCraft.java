@@ -21,7 +21,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
-import buildcraft.api.core.BCLog;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.core.BuildCraftCore;

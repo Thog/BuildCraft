@@ -4,9 +4,13 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.network;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.INetHandler;
 import net.minecraftforge.fml.common.network.FMLIndexedMessageToMessageCodec;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import buildcraft.core.lib.network.command.PacketCommand;
+import buildcraft.core.proxy.CoreProxy;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,11 +43,15 @@ public class ChannelHandler extends FMLIndexedMessageToMessageCodec<Packet> {
 
     @Override
     public void encodeInto(ChannelHandlerContext ctx, Packet packet, ByteBuf data) throws Exception {
-        packet.writeData(data);
+        INetHandler handler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
+        EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(handler);
+        packet.writeData(data, player);
     }
 
     @Override
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf data, Packet packet) {
-        packet.readData(data);
+        INetHandler handler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
+        EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(handler);
+        packet.readData(data, player);
     }
 }

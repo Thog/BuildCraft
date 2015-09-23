@@ -49,7 +49,6 @@ import buildcraft.core.BuildCraftMod;
 import buildcraft.core.CompatHooks;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
-import buildcraft.core.Version;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.lib.network.ChannelHandler;
 import buildcraft.core.network.EntityIds;
@@ -74,8 +73,8 @@ import buildcraft.robotics.tile.TileZonePlan;
 import buildcraft.silicon.BuildCraftSilicon;
 import buildcraft.silicon.item.ItemRedstoneChipset;
 
-//@Mod(name = "BuildCraft Robotics", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Robotics",
-//        dependencies = DefaultProps.DEPENDENCY_SILICON_TRANSPORT)
+// @Mod(name = "BuildCraft Robotics", version = Version.VERSION, useMetadata = false, modid = "BuildCraft|Robotics",
+// dependencies = DefaultProps.DEPENDENCY_SILICON_TRANSPORT)
 public class BuildCraftRobotics extends BuildCraftMod {
     @Mod.Instance("BuildCraft|Robotics")
     public static BuildCraftRobotics instance;

@@ -7,6 +7,7 @@ package buildcraft.core.lib.network;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -54,8 +55,8 @@ public class PacketTileState extends PacketCoordinates {
     }
 
     @Override
-    public void writeData(ByteBuf data) {
-        super.writeData(data);
+    public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
 
         ByteBuf tmpState = Unpooled.buffer();
 
@@ -70,8 +71,8 @@ public class PacketTileState extends PacketCoordinates {
     }
 
     @Override
-    public void readData(ByteBuf data) {
-        super.readData(data);
+    public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
 
         state = Unpooled.buffer();
         int length = data.readUnsignedShort();

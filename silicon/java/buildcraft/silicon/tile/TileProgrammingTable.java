@@ -6,6 +6,7 @@ package buildcraft.silicon.tile;
 
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -192,7 +193,7 @@ public class TileProgrammingTable extends TileLaserTableBase implements IInvento
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if (side.isServer() && "select".equals(command)) {
             optionId = stream.readUnsignedByte();
             if (optionId >= options.size()) {

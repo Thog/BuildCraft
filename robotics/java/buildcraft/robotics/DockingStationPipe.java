@@ -1,5 +1,7 @@
 package buildcraft.robotics;
 
+import java.nio.channels.Pipe;
+
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
@@ -20,7 +22,6 @@ import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.gates.ActionIterator;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.pipes.PipeFluidsWood;
 import buildcraft.transport.pipes.PipeItemsWood;

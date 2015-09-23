@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.schematics;
 
+import java.nio.channels.Pipe;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -26,7 +27,6 @@ import buildcraft.api.statements.StatementManager;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.transport.Gate;
 import buildcraft.transport.internal.pipes.BlockGenericPipe;
-import buildcraft.transport.internal.pipes.Pipe;
 import buildcraft.transport.internal.pipes.SideProperties;
 
 public class SchematicPipe extends SchematicTile {

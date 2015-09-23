@@ -290,7 +290,7 @@ public class TileArchitect extends TileBuildCraft implements IInventory, IBoxPro
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if ("setName".equals(command)) {
             this.name = NetworkUtils.readUTF(stream);
             if (side.isServer()) {

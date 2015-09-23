@@ -351,7 +351,7 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
     }
 
     @Override
-    public void receiveCommand(String command, Side side, Object sender, ByteBuf stream) {
+    public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         super.receiveCommand(command, side, sender, stream);
         if (side.isServer() && "setPattern".equals(command)) {
             String name = NetworkUtils.readUTF(stream);

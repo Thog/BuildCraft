@@ -5,7 +5,7 @@ import buildcraft.core.guide.world.WorldInfo;
 
 public class GuideInWorldFactory extends GuidePartFactory<GuideInWorld> {
     private final WorldInfo info;
-    
+
     public GuideInWorldFactory(WorldInfo info) {
         this.info = info;
     }
