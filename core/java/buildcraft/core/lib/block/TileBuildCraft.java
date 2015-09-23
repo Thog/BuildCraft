@@ -128,11 +128,6 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
     }
 
     @Override
-    public net.minecraft.network.Packet getDescriptionPacket() {
-        return Utils.toPacket(getPacketUpdate(), 0);
-    }
-
-    @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
     }

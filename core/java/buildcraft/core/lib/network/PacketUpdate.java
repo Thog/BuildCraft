@@ -32,6 +32,7 @@ public abstract class PacketUpdate extends Packet {
 
     @Override
     public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
         data.writeByte(packetId);
         writeIdentificationData(data);
 
@@ -48,6 +49,7 @@ public abstract class PacketUpdate extends Packet {
 
     @Override
     public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
         packetId = data.readByte();
         readIdentificationData(data);
         int length = data.readInt();

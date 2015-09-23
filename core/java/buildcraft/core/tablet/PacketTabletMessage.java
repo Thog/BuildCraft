@@ -33,11 +33,13 @@ public class PacketTabletMessage extends Packet {
 
     @Override
     public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
         this.tag = NetworkUtils.readNBT(data);
     }
 
     @Override
     public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
         int index = data.writerIndex();
         NetworkUtils.writeNBT(data, tag);
         index = data.writerIndex() - index;

@@ -30,6 +30,7 @@ public class PacketGuiWidget extends Packet {
 
     @Override
     public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
         data.writeByte(windowId);
         data.writeByte(widgetId);
         data.writeBytes(payload);
@@ -37,10 +38,9 @@ public class PacketGuiWidget extends Packet {
 
     @Override
     public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
         windowId = data.readByte();
         widgetId = data.readByte();
-
-        EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
 
         if (player.openContainer instanceof BuildCraftContainer && player.openContainer.windowId == windowId) {
             ((BuildCraftContainer) player.openContainer).handleWidgetClientData(widgetId, data);

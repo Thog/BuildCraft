@@ -39,8 +39,7 @@ public class PacketGuiReturn extends Packet {
 
     @Override
     public void writeData(ByteBuf data, EntityPlayer player) {
-        data.writeInt(obj.getWorld().provider.getDimensionId());
-
+        super.writeData(data, player);
         if (obj instanceof TileEntity) {
             TileEntity tile = (TileEntity) obj;
             data.writeBoolean(true);
@@ -64,8 +63,8 @@ public class PacketGuiReturn extends Packet {
 
     @Override
     public void readData(ByteBuf data, EntityPlayer player) {
-        int dim = data.readInt();
-        World world = DimensionManager.getWorld(dim);
+        super.readData(data, player);
+        World world = DimensionManager.getWorld(dimensionId);
         boolean tileReturn = data.readBoolean();
 
         if (tileReturn) {

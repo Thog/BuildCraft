@@ -6,6 +6,7 @@ package buildcraft.transport.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.utils.NetworkUtils;
@@ -28,12 +29,14 @@ public class PacketPipeTransportItemStack extends Packet {
 
     @Override
     public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
         data.writeInt(entityId);
         NetworkUtils.writeStack(data, stack);
     }
 
     @Override
     public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
         this.entityId = data.readInt();
         stack = NetworkUtils.readStack(data);
         TravelingItem item = TravelingItem.clientCache.get(entityId);
@@ -53,5 +56,10 @@ public class PacketPipeTransportItemStack extends Packet {
     @Override
     public int getID() {
         return PacketIds.PIPE_ITEMSTACK;
+    }
+
+    @Override
+    public void applyData(World world) {
+        // TODO Auto-generated method stub
     }
 }

@@ -39,8 +39,6 @@ public class ContainerArchitect extends BuildCraftContainer {
         }
     }
 
-    // FIXME: This is not called anymore
-
     @Override
     public void onCraftGuiOpened(ICrafting icrafting) {
         super.onCraftGuiOpened(icrafting);

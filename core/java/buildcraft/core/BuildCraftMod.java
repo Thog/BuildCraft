@@ -204,7 +204,7 @@ public class BuildCraftMod implements IBuildCraftMod {
         return null;
     }
 
-    /** WaRNING: INTERNAL USE ONLY! */
+    /** WARNING: INTERNAL USE ONLY! */
     public void putOption(String name, Property value) {
         options.put(name, value);
     }

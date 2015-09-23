@@ -39,6 +39,7 @@ public class PacketPathfinding extends Packet {
 
     @Override
     public void readData(ByteBuf stream, EntityPlayer player) {
+        super.readData(stream, player);
         change = NetworkUtils.readEnum(stream, ChangeType.class);
         type = NetworkUtils.readEnum(stream, BlockType.class);
         switch (type) {
@@ -61,6 +62,7 @@ public class PacketPathfinding extends Packet {
 
     @Override
     public void writeData(ByteBuf stream, EntityPlayer player) {
+        super.writeData(stream, player);
         NetworkUtils.writeEnum(stream, change);
         NetworkUtils.writeEnum(stream, type);
         switch (type) {

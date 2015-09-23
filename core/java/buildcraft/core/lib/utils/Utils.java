@@ -19,7 +19,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -31,7 +30,6 @@ import net.minecraft.util.Vec3i;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -41,7 +39,6 @@ import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IInjectable;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.CompatHooks;
-import buildcraft.core.DefaultProps;
 import buildcraft.core.EntityLaser;
 import buildcraft.core.LaserData;
 import buildcraft.core.LaserKind;
@@ -50,10 +47,6 @@ import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.inventory.ITransactor;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.Transactor;
-import buildcraft.core.lib.network.Packet;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
 public final class Utils {
     public static final boolean CAULDRON_DETECTED;
@@ -307,21 +300,6 @@ public final class Utils {
             slots[k - first] = k;
         }
         return slots;
-    }
-
-    /** This subprogram transforms a packet into a FML packet to be send in the minecraft default packet mechanism. This
-     * always use BC-CORE as a channel, and as a result, should use discriminators declared there.
-     *
-     * WARNING! The implementation of this subprogram relies on the internal behavior of
-     * #FMLIndexedMessageToMessageCodec (in particular the encode member). It is probably opening a maintenance issue
-     * and should be replaced eventually by some more solid mechanism. */
-    public static FMLProxyPacket toPacket(Packet packet, int discriminator) {
-        ByteBuf buf = Unpooled.buffer();
-
-        buf.writeByte((byte) discriminator);
-        packet.writeData(buf, null);
-
-        return new FMLProxyPacket(new PacketBuffer(buf), DefaultProps.NET_CHANNEL_NAME + "-CORE");
     }
 
     public static String getNameForItem(Item item) {

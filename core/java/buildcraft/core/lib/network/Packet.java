@@ -12,12 +12,17 @@ import io.netty.buffer.ByteBuf;
 public abstract class Packet {
 
     protected boolean isChunkDataPacket = false;
+    public int dimensionId;
 
     public abstract int getID();
 
-    public abstract void readData(ByteBuf data, EntityPlayer player);
+    public void readData(ByteBuf data, EntityPlayer player) {
+        dimensionId = data.readInt();
+    }
 
-    public abstract void writeData(ByteBuf data, EntityPlayer player);
+    public void writeData(ByteBuf data, EntityPlayer player) {
+        data.writeInt(player.worldObj.provider.getDimensionId());
+    }
 
     /** Called in the main world tick to apply any data that cannot be applied in a different thread. So, everything. */
     public abstract void applyData(World world);

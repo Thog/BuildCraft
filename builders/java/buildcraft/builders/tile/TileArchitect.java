@@ -19,6 +19,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.builders.blueprints.RecursiveBlueprintReader;
 import buildcraft.core.Box;
@@ -293,6 +294,7 @@ public class TileArchitect extends TileBuildCraft implements IInventory, IBoxPro
     public void receiveCommand(String command, Side side, EntityPlayer sender, ByteBuf stream) {
         if ("setName".equals(command)) {
             this.name = NetworkUtils.readUTF(stream);
+            BCLog.logger.info("Recieved set name (" + name + ")" + side);
             if (side.isServer()) {
                 BuildCraftCore.instance.sendToPlayersNear(getPacketSetName(), this);
             }

@@ -23,6 +23,7 @@ public abstract class PacketCoordinates extends Packet {
 
     @Override
     public void writeData(ByteBuf data, EntityPlayer player) {
+        super.writeData(data, player);
         data.writeByte(id);
         data.writeInt(pos.getX());
         data.writeInt(pos.getY());
@@ -31,6 +32,7 @@ public abstract class PacketCoordinates extends Packet {
 
     @Override
     public void readData(ByteBuf data, EntityPlayer player) {
+        super.readData(data, player);
         id = data.readByte();
         pos = new BlockPos(data.readInt(), data.readInt(), data.readInt());
     }
