@@ -17,7 +17,6 @@ public class ItemSpring extends ItemBlockBuildCraft {
     public ItemSpring(Block block) {
         super(block);
         setMaxDamage(0);
-        setHasSubtypes(true);
     }
 
     @Override

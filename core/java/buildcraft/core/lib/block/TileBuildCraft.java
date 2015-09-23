@@ -21,6 +21,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.core.BuildCraftCore;
@@ -70,7 +71,7 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
     @Override
     public void update() {
         if (init != 2 && !isInvalid()) {
-            if (init < 2) {
+            if (init < 1) {
                 init++;
                 return;
             }
@@ -83,9 +84,7 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
          * (stored != 0) { ledPower = stored * 2 / max + 1; } if (prePower != ledPower) { sendNetworkUpdate(); } } } */
     }
 
-    public void initialize() {
-
-    }
+    public void initialize() {}
 
     @Override
     public void validate() {

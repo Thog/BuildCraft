@@ -11,6 +11,7 @@ public class ItemBlockBuildCraft extends ItemBlock {
 
     public ItemBlockBuildCraft(Block b) {
         super(b);
+        setHasSubtypes(true);
     }
 
     @Override

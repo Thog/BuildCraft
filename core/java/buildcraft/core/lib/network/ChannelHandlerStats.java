@@ -12,13 +12,20 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class ChannelHandlerStats extends ChannelHandler {
     private enum Type {
-        READ,
-        WRITE;
+        READ("read", "from"),
+        WRITE("wrote", "to");
+
+        final String operation, word;
+
+        private Type(String operation, String word) {
+            this.operation = operation;
+            this.word = word;
+        }
     }
 
     private static class PacketStats {
-        private int totalPackets = 0;
-        private long totalBytes = 0;
+        private int packets = 0;
+        private long bytes = 0;
         private long lastStatTime;
 
         private PacketStats() {
@@ -57,18 +64,18 @@ public class ChannelHandlerStats extends ChannelHandler {
         }
         EnumMap<Type, PacketStats> map = packetMap.get(packet);
         PacketStats stats = map.get(type);
-        stats.totalPackets++;
-        stats.totalBytes += bytes;
+        stats.packets++;
+        stats.bytes += bytes;
 
         long now = System.currentTimeMillis();
         long diff = now - stats.lastStatTime;
         if (diff > TIME_GAP) {
             stats.lastStatTime = now;
-            String differ = type == Type.READ ? "from" : "to";
-            BCLog.logger.info("Over " + diff + "ms, " + type + " " + stats.totalBytes + " bytes " + differ + " " + stats.totalPackets
+            
+            BCLog.logger.info("Over " + diff + "ms, " + type.operation + " " + stats.bytes + " bytes " + type.word + " " + stats.packets
                 + " packets for " + packet.getName());
-            stats.totalBytes = 0;
-            stats.totalPackets = 0;
+            stats.bytes = 0;
+            stats.packets = 0;
         }
 
         if (packet != Packet.class) {

@@ -12,6 +12,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.blueprints.BuilderAPI;
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IAreaProvider;
 import buildcraft.api.filler.FillerManager;
 import buildcraft.api.properties.BuildCraftProperties;
@@ -73,13 +74,12 @@ public class TileFiller extends TileAbstractBuilder implements IHasWork, IContro
         }
 
         IAreaProvider a = Utils.getNearbyAreaProvider(worldObj, pos);
+        BCLog.logger.info("Filler#initialize = Area Provider = " + a);
 
         if (a != null) {
             box.initialize(a);
 
-            if (a instanceof TileMarker) {
-                a.removeFromWorld();
-            }
+            a.removeFromWorld();
 
             sendNetworkUpdate();
         }

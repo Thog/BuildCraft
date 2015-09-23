@@ -4,7 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.builders.tile;
 
-import net.minecraft.block.Block;
+import java.util.Arrays;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -12,7 +13,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import buildcraft.api.core.BCLog;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.ITileAreaProvider;
 import buildcraft.builders.BuildCraftBuilders;
@@ -139,8 +139,6 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
     private EntityLaser[] lasers;
     private EntityLaser[] signals;
 
-    private ByteBuf stream = null;
-
     public void updateSignals() {
         if (!worldObj.isRemote) {
             showSignals = worldObj.isBlockIndirectlyGettingPowered(pos) > 0;
@@ -225,12 +223,10 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
                 coords[n] += j;
                 coord = new BlockPos(coords[0], coords[1], coords[2]);
 
-                Block block = worldObj.getBlockState(pos).getBlock();
+                TileEntity tile = worldObj.getTileEntity(coord);
 
-                if (block == BuildCraftBuilders.markerBlock) {
-                    TileMarker marker = (TileMarker) worldObj.getTileEntity(coord);
-
-                    if (linkTo(marker, n)) {
+                if (tile instanceof TileMarker) {
+                    if (linkTo((TileMarker) tile, n)) {
                         break;
                     }
                 }
@@ -239,12 +235,10 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
                 coords[n] -= j;
                 coord = new BlockPos(coords[0], coords[1], coords[2]);
 
-                block = worldObj.getBlockState(coord).getBlock();
+                tile = worldObj.getTileEntity(coord);
 
-                if (block == BuildCraftBuilders.markerBlock) {
-                    TileMarker marker = (TileMarker) worldObj.getTileEntity(coord);
-
-                    if (linkTo(marker, n)) {
+                if (tile instanceof TileMarker) {
+                    if (linkTo((TileMarker) tile, n)) {
                         break;
                     }
                 }
@@ -571,5 +565,25 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
         }
 
         return touching == 1;
+    }
+
+    @Override
+    public String toString() {
+        final int maxLen = 10;
+        StringBuilder builder = new StringBuilder();
+        builder.append("TileMarker [origin=");
+        builder.append(origin);
+        builder.append(", showSignals=");
+        builder.append(showSignals);
+        builder.append(", initVectO=");
+        builder.append(initVectO);
+        builder.append(", initVect=");
+        builder.append(initVect != null ? Arrays.asList(initVect).subList(0, Math.min(initVect.length, maxLen)) : null);
+        builder.append(", lasers=");
+        builder.append(lasers != null ? Arrays.asList(lasers).subList(0, Math.min(lasers.length, maxLen)) : null);
+        builder.append(", signals=");
+        builder.append(signals != null ? Arrays.asList(signals).subList(0, Math.min(signals.length, maxLen)) : null);
+        builder.append("]");
+        return builder.toString();
     }
 }

@@ -686,9 +686,9 @@ public class BuildCraftBuilders extends BuildCraftMod {
         for (FMLMissingMappingsEvent.MissingMapping mapping : event.get()) {
             if (mapping.name.equals("BuildCraftBuilders:buildToolBlock") || mapping.name.equals("BuildCraftBuilders:null")) {
                 if (mapping.type == GameRegistry.Type.ITEM) {
-                    mapping.remap(Item.getItemFromBlock(BuildCraftCore.buildToolBlock));
+                    mapping.remap(Item.getItemFromBlock(BuildCraftCore.decorBlock));
                 } else {
-                    mapping.remap(BuildCraftCore.buildToolBlock);
+                    mapping.remap(BuildCraftCore.decorBlock);
                 }
             }
         }

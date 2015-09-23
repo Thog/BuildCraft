@@ -214,7 +214,7 @@ public abstract class BptBuilderBase implements IAreaProvider {
         int hardness = (int) Math.ceil(getBlockBreakPower(slot) / BuilderAPI.BREAK_ENERGY);
 
         for (int i = 0; i < hardness; ++i) {
-            slot.addStackConsumed(new ItemStack(BuildCraftCore.buildToolBlock));
+            slot.addStackConsumed(new ItemStack(BuildCraftCore.decorBlock));
         }
     }
 

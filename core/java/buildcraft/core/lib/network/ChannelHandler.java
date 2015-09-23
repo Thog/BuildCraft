@@ -12,7 +12,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
 public class ChannelHandler extends FMLIndexedMessageToMessageCodec<Packet> {
-    private static boolean recordStats = true;
+    private static boolean recordStats = false;
 
     public static ChannelHandler createChannelHandler() {
         return recordStats ? new ChannelHandlerStats() : new ChannelHandler();

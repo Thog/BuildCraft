@@ -18,7 +18,6 @@ public class ItemEngine extends ItemBlockBuildCraft {
         engineBlock = (BlockEngineBase) block;
         setCreativeTab(BCCreativeTab.get("main"));
         setMaxDamage(0);
-        setHasSubtypes(true);
     }
 
     @Override

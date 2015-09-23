@@ -82,7 +82,7 @@ import buildcraft.api.statements.StatementParameterItemStack;
 import buildcraft.api.tablet.TabletAPI;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IDebuggable;
-import buildcraft.core.block.BlockBuildTool;
+import buildcraft.core.block.BlockDecoration;
 import buildcraft.core.block.BlockEngine;
 import buildcraft.core.block.BlockSpring;
 import buildcraft.core.blueprints.RealBlueprintDeployer;
@@ -105,6 +105,7 @@ import buildcraft.core.lib.block.IAdditionalDataTile;
 import buildcraft.core.lib.commands.RootCommand;
 import buildcraft.core.lib.engines.ItemEngine;
 import buildcraft.core.lib.engines.TileEngineBase;
+import buildcraft.core.lib.items.ItemBlockBuildCraft;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.network.ChannelHandler;
 import buildcraft.core.lib.render.FluidRenderer;
@@ -163,9 +164,10 @@ public class BuildCraftCore extends BuildCraftMod {
     public static BuildCraftConfiguration mainConfiguration;
     public static ConfigManager mainConfigManager;
 
+    public static BlockDecoration decorBlock;
     public static BlockEngine engineBlock;
     public static BlockSpring springBlock;
-    public static BlockBuildTool buildToolBlock;
+
     public static Item woodenGearItem;
     public static Item stoneGearItem;
     public static Item ironGearItem;
@@ -327,9 +329,9 @@ public class BuildCraftCore extends BuildCraftMod {
                 CoreProxy.proxy.registerItem(tabletItem);
             }
 
-            buildToolBlock = new BlockBuildTool();
-            buildToolBlock.setUnlocalizedName("buildToolBlock");
-            CoreProxy.proxy.registerBlock(buildToolBlock);
+            decorBlock = new BlockDecoration();
+            decorBlock.setUnlocalizedName("decoratedBlock");
+            CoreProxy.proxy.registerBlock(decorBlock);
 
             engineBlock = (BlockEngine) CompatHooks.INSTANCE.getBlock(BlockEngine.class);
             CoreProxy.proxy.registerBlock(engineBlock, ItemEngine.class);

@@ -15,7 +15,6 @@ public class ItemLaserTable extends ItemBlockBuildCraft {
     public ItemLaserTable(Block block) {
         super(block);
         setMaxDamage(0);
-        setHasSubtypes(true);
     }
 
     @Override
