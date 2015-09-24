@@ -190,18 +190,19 @@ public class RecursiveBlueprintReader {
         return writingBlueprint;
     }
 
+    public ItemStack getBlueprintStack() {
+        if (done && writingBlueprint != null) {
+            return getBlueprint().getStack();
+        } else {
+            return null;
+        }
+    }
+
     public void createBlueprint() {
         writingBlueprint.id.name = architect.name;
         writingBlueprint.author = architect.currentAuthorName;
         NBTTagCompound nbt = writingBlueprint.getNBT();
         BuildCraftBuilders.serverDB.add(writingBlueprint.id, nbt);
-
-        if (parentBlueprint == null) {
-            // TODO: This is hacky, should probably be done in the architect
-            // itself.
-            architect.setInventorySlotContents(1, writingBlueprint.getStack());
-            architect.setInventorySlotContents(0, null);
-        }
     }
 
     public boolean isDone() {

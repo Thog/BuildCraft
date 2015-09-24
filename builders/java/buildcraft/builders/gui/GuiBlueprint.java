@@ -11,6 +11,6 @@ public class GuiBlueprint extends GuiBlueprintBase {
 
     @Override
     protected ResourceLocation getGuiBackground() {
-        return null;
+        return new ResourceLocation("buildcraftbuilders:gui/blueprint/blue");
     }
 }

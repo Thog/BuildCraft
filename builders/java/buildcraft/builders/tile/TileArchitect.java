@@ -69,7 +69,10 @@ public class TileArchitect extends TileBuildCraft implements IInventory, IBoxPro
             if (reader != null) {
                 reader.iterate();
 
-                if (reader.isDone()) {
+                ItemStack stack = reader.getBlueprintStack();
+                if (reader.isDone() && stack != null) {
+                    setInventorySlotContents(0, null);
+                    setInventorySlotContents(1, stack);
                     reader = null;
                     isProcessing = false;
                     sendNetworkUpdate();

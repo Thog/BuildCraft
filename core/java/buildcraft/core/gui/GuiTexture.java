@@ -3,6 +3,7 @@ package buildcraft.core.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiTexture {
@@ -18,6 +19,10 @@ public class GuiTexture {
 
         public boolean isMouseInside(int x, int y, int mouseX, int mouseY) {
             return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+        }
+
+        public DynamicTexture createDynamicTexure(int scale) {
+            return new DynamicTexture(width * scale, height * scale);
         }
 
         @Override

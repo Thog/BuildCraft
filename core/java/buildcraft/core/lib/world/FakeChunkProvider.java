@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -16,12 +16,18 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunkProvider;
 
+import buildcraft.api.enums.EnumDecoratedType;
+import buildcraft.api.properties.BuildCraftProperties;
+import buildcraft.core.BuildCraftCore;
+
 public class FakeChunkProvider implements IChunkProvider {
     private Map<ChunkCoordIntPair, Chunk> chunks = Maps.newHashMap();
     private final FakeWorld world;
+    private final EnumDecoratedType type;
 
-    public FakeChunkProvider(FakeWorld world) {
+    public FakeChunkProvider(FakeWorld world, EnumDecoratedType decor) {
         this.world = world;
+        this.type = decor;
     }
 
     @Override
@@ -33,10 +39,12 @@ public class FakeChunkProvider implements IChunkProvider {
     public Chunk provideChunk(int chunkXPos, int chunkZPos) {
         ChunkCoordIntPair ccip = new ChunkCoordIntPair(chunkXPos, chunkZPos);
         if (!chunks.containsKey(ccip)) {
+            IBlockState state = BuildCraftCore.decorBlock.getDefaultState();
+            state = state.withProperty(BuildCraftProperties.DECORATED_TYPE, type);
             ChunkPrimer primer = new ChunkPrimer();
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    primer.setBlockState(x, 0, z, Blocks.bedrock.getDefaultState());
+                    primer.setBlockState(x, 0, z, state);
                 }
             }
             Chunk chunk = new Chunk(world, primer, chunkXPos, chunkZPos);

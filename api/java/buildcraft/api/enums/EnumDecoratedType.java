@@ -1,7 +1,13 @@
 package buildcraft.api.enums;
 
 public enum EnumDecoratedType {
-    DESTROY,
-    BLUEPRINT,
-    TEMPLATE
+    DESTROY(0),
+    BLUEPRINT(10),
+    TEMPLATE(10);
+
+    public final int lightValue;
+
+    private EnumDecoratedType(int lightValue) {
+        this.lightValue = lightValue;
+    }
 }

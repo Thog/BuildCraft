@@ -44,7 +44,7 @@ public class BlockScanner implements Iterable<BlockPos> {
                 if (pos.getY() < box.yMax) {
                     pos = pos.up();
                 } else {
-                    pos = new BlockPos(pos.getX(), box.yMax, pos.getZ() + 1);
+                    pos = new BlockPos(pos.getX(), box.yMin, pos.getZ() + 1);
                 }
             }
 
@@ -57,10 +57,10 @@ public class BlockScanner implements Iterable<BlockPos> {
         }
     }
 
-    public BlockScanner(Box box, World world, int iterationsPreCycle) {
+    public BlockScanner(Box box, World world, int iterationsPerCycle) {
         this.box = box;
         this.world = world;
-        this.iterationsPerCycle = iterationsPreCycle;
+        this.iterationsPerCycle = iterationsPerCycle;
         pos = new BlockPos(box.xMin, box.yMin, box.zMin);
     }
 

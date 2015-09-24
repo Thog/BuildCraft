@@ -11,6 +11,8 @@ import java.util.List;
 
 import javax.vecmath.Vector3f;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,6 +29,7 @@ import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3i;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
@@ -487,12 +490,33 @@ public final class Utils {
         return entity.getPositionEyes(partialTicks).addVector(0, -entity.getEyeHeight(), 0);
     }
 
+    /** Returns all of the chunks that all the block positions returned by
+     * {@link #allInBoxIncludingCorners(BlockPos, BlockPos)} occupy */
+    public static Iterable<ChunkCoordIntPair> allChunksFor(BlockPos pos1, BlockPos pos2) {
+        BlockPos min = min(pos1, pos2);
+        BlockPos max = max(pos1, pos2);
+        int minX = min.getX() >> 4;
+        int maxX = max.getX() >> 4;
+        int minZ = min.getZ() >> 4;
+        int maxZ = max.getZ() >> 4;
+        List<ChunkCoordIntPair> list = Lists.newArrayList();
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                list.add(new ChunkCoordIntPair(x, z));
+            }
+        }
+        return list;
+    }
+
+    public static Iterable<BlockPos> allInChunk(ChunkCoordIntPair ccip) {
+        return allInBoxIncludingCorners(ccip.getBlock(0, 0, 0), ccip.getBlock(15, 255, 15));
+    }
+
     /** Like {@link BlockPos#getAllInBox(BlockPos, BlockPos)} but doesn't require unsafe casting. */
     @SuppressWarnings("unchecked")
     public static Iterable<BlockPos> allInBoxIncludingCorners(BlockPos pos1, BlockPos pos2) {
         BlockPos min = min(pos1, pos2);
         BlockPos max = max(pos1, pos2);
-        // max = max.add(1, 1, 1);
         Iterable<?> iterator = BlockPos.getAllInBox(min, max);
         return (Iterable<BlockPos>) iterator;
     }

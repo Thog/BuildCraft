@@ -11,6 +11,6 @@ public class GuiTemplate extends GuiBlueprintBase {
 
     @Override
     protected ResourceLocation getGuiBackground() {
-        return null;
+        return new ResourceLocation("");
     }
 }
