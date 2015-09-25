@@ -5,17 +5,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.SaveHandlerMP;
 import net.minecraft.world.storage.WorldInfo;
 
+import buildcraft.api.blueprints.BlueprintDeployer;
 import buildcraft.api.blueprints.SchematicBlockBase;
 import buildcraft.api.enums.EnumDecoratedType;
 import buildcraft.api.properties.BuildCraftProperties;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.blueprints.Blueprint;
-import buildcraft.core.blueprints.BptBuilderBlueprint;
 import buildcraft.core.blueprints.Template;
 import buildcraft.core.lib.utils.Utils;
 
@@ -31,8 +32,12 @@ public class FakeWorld extends World {
     public FakeWorld(Blueprint blueprint) {
         this(EnumDecoratedType.TEMPLATE);
         BlockPos start = new BlockPos(-blueprint.sizeX / 2, 1, -blueprint.sizeZ / 2);
-        BptBuilderBlueprint bpt = new BptBuilderBlueprint(blueprint, this, start);
-        bpt.deploy();
+        // Oh look! The blueprint deploys incorrectly :(
+
+        BlueprintDeployer.instance.deployBlueprint(this, start.add(blueprint.anchorX, blueprint.anchorY, blueprint.anchorZ), EnumFacing.EAST,
+                blueprint);
+        // BptBuilderBlueprint bpt = new BptBuilderBlueprint(blueprint, this, start);
+        // bpt.deploy();
 
         start = start.down();
         BlockPos end = start.add(blueprint.sizeX - 1, 0, blueprint.sizeZ - 1);
@@ -41,7 +46,7 @@ public class FakeWorld extends World {
         state = state.withProperty(BuildCraftProperties.DECORATED_TYPE, EnumDecoratedType.BLUEPRINT);
 
         IBlockState roofState = Blocks.dirt.getDefaultState();
-        
+
         for (BlockPos pos : Utils.allInBoxIncludingCorners(start, end)) {
             setBlockState(pos, state);
             setBlockState(pos.up(255), roofState);

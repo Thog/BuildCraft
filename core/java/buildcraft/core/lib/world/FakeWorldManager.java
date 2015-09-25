@@ -25,6 +25,7 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 
+import buildcraft.core.lib.render.RenderUtils;
 import buildcraft.core.lib.utils.Utils;
 
 public class FakeWorldManager {
@@ -70,7 +71,7 @@ public class FakeWorldManager {
         displayListMap.clear();
     }
 
-    public void renderWorld(int midX, int midY, int mouseX, int mouseY, double sf) {
+    public void renderWorld(double mouseX, double mouseY, double sf, BlockPos offset) {
         // Prepare
         mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
         RenderHelper.disableStandardItemLighting();
@@ -86,10 +87,10 @@ public class FakeWorldManager {
         Project.gluPerspective(mc.gameSettings.fovSetting, aspect, 0.01f, mc.gameSettings.renderDistanceChunks * 1000);
 
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        int dx = midX - mouseX;
-        int dy = midY - mouseY;
-        GlStateManager.rotate(dy / 2f, 1, 0, 0);
-        GlStateManager.rotate(dx / 2f, 0, 1, 0);
+        GL11.glRotated(mouseY, 1, 0, 0);
+        GL11.glRotated(mouseX, 0, 1, 0);
+
+        RenderUtils.translate(Utils.multiply(Utils.convert(offset), -0.5));
 
         renderAll();
 

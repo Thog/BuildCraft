@@ -19,20 +19,24 @@ public class RealBlueprintDeployer extends BlueprintDeployer {
 
     @Override
     public void deployBlueprint(World world, BlockPos pos, EnumFacing dir, File file) {
-
-        deployBlueprint(world, pos, dir, (Blueprint) BlueprintBase.loadBluePrint(LibraryDatabase.load(file)));
+        Blueprint blueprint = (Blueprint) BlueprintBase.loadBluePrint(LibraryDatabase.load(file));
+        readyBlueprint(blueprint);
+        deployBlueprint(world, pos, dir, blueprint);
     }
 
     @Override
     public void deployBlueprintFromFileStream(World world, BlockPos pos, EnumFacing dir, byte[] data) {
-
-        deployBlueprint(world, pos, dir, (Blueprint) BlueprintBase.loadBluePrint(NBTUtils.load(data)));
+        Blueprint blueprint = (Blueprint) BlueprintBase.loadBluePrint(NBTUtils.load(data));
+        readyBlueprint(blueprint);
+        deployBlueprint(world, pos, dir, blueprint);
     }
 
-    private void deployBlueprint(World world, BlockPos pos, EnumFacing dir, Blueprint bpt) {
+    private void readyBlueprint(Blueprint bpt) {
         bpt.id = new LibraryId();
         bpt.id.extension = "bpt";
+    }
 
+    public void deployBlueprint(World world, BlockPos pos, EnumFacing dir, Blueprint bpt) {
         BptContext context = bpt.getContext(world, bpt.getBoxForPos(pos));
 
         if (bpt.rotate) {
