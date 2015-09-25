@@ -1,22 +1,16 @@
 package buildcraft.api.transport;
 
-import java.util.Collections;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import com.google.common.collect.ImmutableList;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 
 import buildcraft.api.transport.event.IPipeContents;
+import buildcraft.api.transport.pipe.PipeRegistry;
 
 public class PipeAPI {
     /** The base pipe registry. Register all pipes into this, but only AFTER BuildCraft Transport has completed
      * pre-init. */
-    public static IPipeRegistry registry;
+    public static final IPipeRegistry registry = PipeRegistry.INSTANCE;
 
     /** The number of stacks contained within a pipe. Will return 0 if this not an item pipe. */
     public static final PipeProperty<Integer> STACK_COUNT = PipeProperty.create("stack_count", 0);
@@ -43,38 +37,4 @@ public class PipeAPI {
 
     /** How full the pipe is (between 0 and 100), or 0 if this pipe has no capacity. */
     public static final PipeProperty<Integer> PERCENT_FULL = PipeProperty.create("percent_full", 0);
-
-    static {
-        registry = new IPipeRegistry() {
-            @Override
-            public Item registerPipeDefinition(PipeDefinition definition) {
-                return null;
-            }
-
-            @Override
-            public Set<Entry<String, Pair<PipeDefinition, Item>>> getPipeDefinitions() {
-                return Collections.emptySet();
-            }
-
-            @Override
-            public PipeDefinition getDefinition(String uniqueTag) {
-                return null;
-            }
-
-            @Override
-            public Item getItem(PipeDefinition definition) {
-                return null;
-            }
-
-            @Override
-            public PipeDefinition getDefinition(Item item) {
-                return null;
-            }
-
-            @Override
-            public String getUniqueTag(Item item) {
-                return null;
-            }
-        };
-    }
 }

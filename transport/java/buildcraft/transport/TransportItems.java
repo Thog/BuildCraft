@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import buildcraft.api.transport.EnumPipeType;
-import buildcraft.api.transport.IBehaviourFactory;
+import buildcraft.api.transport.IPipeBehaviourFactory;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.core.proxy.CoreProxy;
@@ -144,7 +144,7 @@ public class TransportItems {
         return definition;
     }
 
-    private static PipeDefinition createDefinition(EnumPipeType type, EnumPipeMaterial material, IBehaviourFactory factory) {
+    private static PipeDefinition createDefinition(EnumPipeType type, EnumPipeMaterial material, IPipeBehaviourFactory factory) {
         String name = material.name().toLowerCase(Locale.ROOT) + "_" + type.name().toLowerCase(Locale.ROOT);
         PipeDefinition definition = new PipeDefinition(name, type, material.maxSprites, "buildcrafttransport:pipes/", factory);
         return definition;

@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import buildcraft.api.gates.IGate;
+import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.utils.ModelHelper;
@@ -46,17 +48,19 @@ public class ItemGateCopier extends ItemBuildCraft {
         Block block = world.getBlockState(pos).getBlock();
         TileEntity tile = world.getTileEntity(pos);
         NBTTagCompound data = NBTUtils.getItemData(stack);
-        Gate gate = null;
+        IGate gate = null;
 
-        if (tile == null || !(tile instanceof TileGenericPipe) || !(block instanceof BlockGenericPipe)) {
+        if (tile == null || !(tile instanceof IPipeTile)) {
             isCopying = true;
         } else {
+            IPipeTile pipe = (IPipeTile) tile;
             RaytraceResult rayTraceResult = ((BlockGenericPipe) block).doRayTrace(world, pos, player);
 
             if (rayTraceResult != null && rayTraceResult.boundingBox != null && rayTraceResult.hitPart == Part.Pluggable) {
-                PipePluggable pluggable = ((TileGenericPipe) tile).getPipePluggable(rayTraceResult.sideHit);
+                PipePluggable pluggable = pipe.getPipePluggable(rayTraceResult.sideHit);
                 if (pluggable instanceof GatePluggable) {
-                    gate = ((TileGenericPipe) tile).pipe.gates[rayTraceResult.sideHit.ordinal()];
+
+                    gate = pipe.getPipe().getGate(rayTraceResult.sideHit);
                 }
             }
         }

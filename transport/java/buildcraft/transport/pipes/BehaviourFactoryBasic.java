@@ -2,11 +2,11 @@ package buildcraft.transport.pipes;
 
 import com.google.common.collect.ImmutableList;
 
-import buildcraft.api.transport.IBehaviourFactory;
+import buildcraft.api.transport.IPipeBehaviourFactory;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 
-public class BehaviourFactoryBasic implements IBehaviourFactory {
+public class BehaviourFactoryBasic implements IPipeBehaviourFactory {
     public static enum EnumListStatus {
         WHITELIST,
         BLACKLIST

@@ -1,4 +1,4 @@
-package buildcraft.transport.pipes;
+package buildcraft.api.transport.pipe;
 
 import java.util.Collections;
 import java.util.Map;
@@ -17,12 +17,14 @@ import buildcraft.api.transport.IPipeRegistry;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.transport.item.ItemPipe;
 
-public class PipeRegistry implements IPipeRegistry {
+public enum PipeRegistry implements IPipeRegistry {
+    INSTANCE;
+
     private final Map<String, Pair<PipeDefinition, Item>> pipeMap = Maps.newHashMap();
     private final BiMap<PipeDefinition, Item> definitionItemMap = HashBiMap.create();
 
     @Override
-    public Item registerPipeDefinition(PipeDefinition definition) {
+    public Item registerDefinition(PipeDefinition definition) {
         if (definition == null) {
             throw new IllegalArgumentException("Tried to register with a null pipe definition!");
         }
@@ -34,7 +36,7 @@ public class PipeRegistry implements IPipeRegistry {
     }
 
     @Override
-    public Set<Entry<String, Pair<PipeDefinition, Item>>> getPipeDefinitions() {
+    public Set<Entry<String, Pair<PipeDefinition, Item>>> getDefinitions() {
         return Collections.unmodifiableSet(pipeMap.entrySet());
     }
 

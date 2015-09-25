@@ -244,9 +244,7 @@ public class ItemGate extends ItemBuildCraft implements IPipePluggableItem {
 
     @Override
     public PipePluggable createPipePluggable(IPipe pipe, EnumFacing side, ItemStack stack) {
-        Pipe realPipe = (Pipe) pipe;
-
-        return new GatePluggable(GateFactory.makeGate(realPipe, stack, side));
+        return new GatePluggable(GateFactory.makeGate(pipe, stack, side));
     }
 
     public static ArrayList<ItemStack> getAllGates() {

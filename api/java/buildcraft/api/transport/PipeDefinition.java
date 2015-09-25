@@ -4,18 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /** Contains all of the definitions of a pipe. */
-public final class PipeDefinition {
-    /** A globally unique tag for the pipe */
-    public final String globalUniqueTag;
-    /** A mod unique tag for the pipe. WARNING: this wshould only be used to register other mod-unique things, such as
-     * the pipe item. For general use, use {@link #globalUniqueTag} */
-    public final String modUniqueTag;
+public final class PipeDefinition extends ObjectDefinition {
     /** The number of sprites to register related to this definition. */
     public final int maxSprites;
     /** A string containing the location of the texture of a pipe. The final texture location will be
@@ -26,7 +19,7 @@ public final class PipeDefinition {
      * initialised to {@link #textureLocationStart}+{@link #globalUniqueTag} */
     public final String[] spriteLocations;
     /** A factory the creates the behaviour of this definition. */
-    public final IBehaviourFactory behaviourFactory;
+    public final IPipeBehaviourFactory behaviourFactory;
     /** The type of this pipe. This determines how the pipe should be rendered and how the pipe should act. */
     public final EnumPipeType type;
 
@@ -36,7 +29,7 @@ public final class PipeDefinition {
 
     public final int itemSpriteIndex;
 
-    public PipeDefinition(String tag, EnumPipeType type, int maxSprites, String textureStart, IBehaviourFactory behaviour) {
+    public PipeDefinition(String tag, EnumPipeType type, int maxSprites, String textureStart, IPipeBehaviourFactory behaviour) {
         this(tag, type, maxSprites, 0, textureStart, behaviour);
     }
 
@@ -46,9 +39,8 @@ public final class PipeDefinition {
      * @param itemSpriteIndex
      * @param textureStart
      * @param factory */
-    public PipeDefinition(String tag, EnumPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IBehaviourFactory factory) {
-        this.globalUniqueTag = getCurrentMod() + ":" + tag;
-        this.modUniqueTag = tag;
+    public PipeDefinition(String tag, EnumPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IPipeBehaviourFactory factory) {
+        super(tag);
         this.type = type;
         this.maxSprites = maxSprites;
         this.itemSpriteIndex = itemSpriteIndex;
@@ -58,14 +50,6 @@ public final class PipeDefinition {
             spriteLocations[i] = textureLocationStart + tag + factory.createNew().getIconSuffix(i);
         }
         this.behaviourFactory = factory;
-    }
-
-    private static String getCurrentMod() {
-        ModContainer container = Loader.instance().activeModContainer();
-        if (container == null) {
-            throw new IllegalStateException("Pipes MUST be registered inside a mod");
-        }
-        return container.getModId();
     }
 
     @SideOnly(Side.CLIENT)

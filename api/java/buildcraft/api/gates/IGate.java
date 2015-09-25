@@ -15,9 +15,6 @@ import buildcraft.api.statements.containers.ISidedStatementContainer;
 import buildcraft.api.transport.IPipe;
 
 public interface IGate extends ISidedStatementContainer {
-    @Deprecated
-    void setPulsing(boolean pulse);
-
     IPipe getPipe();
 
     /** Gets the side of the pipe that the gate is on */
