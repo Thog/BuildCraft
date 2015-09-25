@@ -10,6 +10,7 @@ import org.lwjgl.util.glu.Project;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -69,14 +70,14 @@ public class FakeWorldManager {
         displayListMap.clear();
     }
 
-    public void renderWorld(int midX, int midY, int mouseX, int mouseY, float scroll) {
+    public void renderWorld(int midX, int midY, int mouseX, int mouseY, double sf) {
         // Prepare
         mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
         RenderHelper.disableStandardItemLighting();
 
         GlStateManager.pushMatrix();
-        float sf = scroll;
-        GlStateManager.scale(sf, sf, sf);
+        GL11.glTranslated(0, 0, 2000 - sf);
+        // GlStateManager.scale(sf, sf, sf);
 
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GlStateManager.pushMatrix();
@@ -199,14 +200,17 @@ public class FakeWorldManager {
 
         actualState = block.getActualState(actualState, world, pos);
 
+        BlockRendererDispatcher dispatcher = mc.getBlockRendererDispatcher();
+
         @SuppressWarnings("deprecation")
-        IBakedModel model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(actualState);
+        IBakedModel model = dispatcher.getBlockModelShapes().getModelForState(actualState);
 
         if (model == null) {
             return;
         }
 
         renderer.setVertexFormat(DefaultVertexFormats.BLOCK);
-        mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModelStandard(world, model, block, pos, renderer, true);
+        boolean checkSides = pos.getY() > 0;
+        dispatcher.getBlockModelRenderer().renderModelStandard(world, model, block, pos, renderer, checkSides);
     }
 }

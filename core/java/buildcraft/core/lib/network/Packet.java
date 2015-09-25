@@ -26,4 +26,15 @@ public abstract class Packet {
 
     /** Called in the main world tick to apply any data that cannot be applied in a different thread. So, everything. */
     public abstract void applyData(World world);
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Packet [isChunkDataPacket=");
+        builder.append(isChunkDataPacket);
+        builder.append(", dimensionId=");
+        builder.append(dimensionId);
+        builder.append("]");
+        return builder.toString();
+    }
 }

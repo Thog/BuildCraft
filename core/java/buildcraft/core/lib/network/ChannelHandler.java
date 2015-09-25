@@ -9,6 +9,7 @@ import net.minecraft.network.INetHandler;
 import net.minecraftforge.fml.common.network.FMLIndexedMessageToMessageCodec;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.core.lib.network.command.PacketCommand;
 import buildcraft.core.proxy.CoreProxy;
 
@@ -45,13 +46,21 @@ public class ChannelHandler extends FMLIndexedMessageToMessageCodec<Packet> {
     public void encodeInto(ChannelHandlerContext ctx, Packet packet, ByteBuf data) throws Exception {
         INetHandler handler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
         EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(handler);
-        packet.writeData(data, player);
+        if (player != null) {
+            packet.writeData(data, player);
+        } else {
+            BCLog.logger.warn("The player was null! (Encode) (Message = " + packet + ")");
+        }
     }
 
     @Override
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf data, Packet packet) {
         INetHandler handler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
         EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(handler);
-        packet.readData(data, player);
+        if (player != null) {
+            packet.readData(data, player);
+        } else {
+            BCLog.logger.warn("The player was null! (Decode)");
+        }
     }
 }

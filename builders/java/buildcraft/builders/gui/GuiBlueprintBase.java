@@ -7,23 +7,17 @@ import org.lwjgl.input.Mouse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.ResourceLocation;
 
 import buildcraft.core.blueprints.Blueprint;
 import buildcraft.core.blueprints.BlueprintBase;
 import buildcraft.core.blueprints.Template;
-import buildcraft.core.gui.GuiTexture.GuiIcon;
-import buildcraft.core.gui.GuiTexture.Rectangle;
 import buildcraft.core.lib.world.FakeWorld;
 import buildcraft.core.lib.world.FakeWorldManager;
 
 public abstract class GuiBlueprintBase extends GuiScreen {
-    public final GuiIcon BACKGROUND = new GuiIcon(getGuiBackground(), 0, 0, 200, 120);
-    public final Rectangle PREVIEW = new Rectangle(30, 30, 140, 80);
-
     protected final BlueprintBase blueprint;
     private final FakeWorldManager fakeWorld;
-    private float scroll = 64;
+    private float scroll = 16;
 
     public GuiBlueprintBase(BlueprintBase blueprint) {
         this.blueprint = blueprint;
@@ -41,8 +35,6 @@ public abstract class GuiBlueprintBase extends GuiScreen {
         return false;
     }
 
-    protected abstract ResourceLocation getGuiBackground();
-
     @Override
     public void setWorldAndResolution(Minecraft mc, int width, int height) {
         super.setWorldAndResolution(mc, width, height);
@@ -50,19 +42,18 @@ public abstract class GuiBlueprintBase extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        // BACKGROUND.draw(minX, minY);
-        // String text = blueprint.id.name;
-        // int x = (width - fontRendererObj.getStringWidth(text)) / 2;
-        // fontRendererObj.drawString(text, x, minY + 10, 0xFFFFFF);
-        fakeWorld.renderWorld(width / 2, height / 2, mouseX, mouseY, scroll);
+        double scale = scroll;
+        fakeWorld.renderWorld(width / 2, height / 2, mouseX, mouseY, scale);
+        fontRendererObj.drawString("scroll = " + scroll + ", scale = " + scale, 10, 10, 0);
     }
 
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        scroll += Mouse.getEventDWheel() / 8f;
-        if (scroll < 8) {
-            scroll = 8;
+        double deltaWheel = Mouse.getEventDWheel() / 64;
+        scroll -= deltaWheel;
+        if (scroll < 2) {
+            scroll += deltaWheel;
         }
     }
 }
