@@ -27,6 +27,8 @@ public void onEvent(IPipeEvent event) {
 
 The hierachy for events is as follows:
 
+````
+
 IPipeEvent
  |  The main event, this can be quered for the IPipe object that the event is fired on.
  |	
@@ -52,3 +54,4 @@ IPipeEvent
  |        Fired whenever a connection is removed from a pipe. Note that you cannot cancel this like a pipe connection event.
  |
  +--IPipeEvent
+ ````
