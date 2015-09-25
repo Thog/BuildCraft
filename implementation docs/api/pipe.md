@@ -30,28 +30,28 @@ The hierachy for events is as follows:
 ````
 
 IPipeEvent
- |  The main event, this can be quered for the IPipe object that the event is fired on.
- |	
+ │  The main event, this can be quered for the IPipe object that the event is fired on.
+ │	
  ├──IPipeEventTick
- |      Fired every tick from the pipe object.
- |		
+ │      Fired every tick from the pipe object.
+ │		
  ├──IPipeEventRandomDisplayTick
- |      Fired whenever the pipe block has the randomDisplayTick method called
- |
+ │      Fired whenever the pipe block has the randomDisplayTick method called
+ │
  ├──IPipeEventConnection
- | |    Fired whenever a connection changes with a pipe. The most useful events to listen to are its subtypes.
- | |
- | ├──IPipeEventConnect
- | | |    Fired whenever a tile entity is placed down next to the pipe that could be connected to. It is important to note that it may just be a normal block (for example, dirt) that cannot currently connect. If that is the case, calling isCorrectType() will return if the pipe should normally be able to connect.
- | | |
- | | ├──IPipeEventConnectBlock
- | | |      Fired specifically whenever a block attempts to connect to this pipe.
- | | |
- | | └──IPipeEventConnectPipe
- | |        Fired specifically whenever a pipe attempts to connect to another pipe. You can call getConnectingPipe() to get the other pipe
- | |
- | └──IPipeEventDisconnect
- |        Fired whenever a connection is removed from a pipe. Note that you cannot cancel this like a pipe connection event.
- |
+ │ │    Fired whenever a connection changes with a pipe. The most useful events to listen to are its subtypes.
+ │ │
+ │ ├──IPipeEventConnect
+ │ │ │    Fired whenever a tile entity is placed down next to the pipe that could be connected to. It is important to note that it may just be a normal block (for example, dirt) that cannot currently connect. If that is the case, calling isCorrectType() will return if the pipe should normally be able to connect.
+ │ │ │
+ │ │ ├──IPipeEventConnectBlock
+ │ │ │      Fired specifically whenever a block attempts to connect to this pipe.
+ │ │ │
+ │ │ └──IPipeEventConnectPipe
+ │ │        Fired specifically whenever a pipe attempts to connect to another pipe. You can call getConnectingPipe() to get the other pipe
+ │ │
+ │ └──IPipeEventDisconnect
+ │        Fired whenever a connection is removed from a pipe. Note that you cannot cancel this like a pipe connection event.
+ │
  ├──IPipeEvent
  ````
