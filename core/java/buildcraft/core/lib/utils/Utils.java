@@ -22,6 +22,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
@@ -54,6 +55,15 @@ import buildcraft.core.lib.inventory.Transactor;
 public final class Utils {
     public static final boolean CAULDRON_DETECTED;
     public static final XorShift128Random RANDOM = new XorShift128Random();
+
+    // Commonly used vectors
+    public static final BlockPos POS_ZERO = BlockPos.ORIGIN;
+    public static final BlockPos POS_ONE = vec3i(1);
+
+    public static final Vec3 VEC_ZERO = vec3(0);
+    public static final Vec3 VEC_HALF = vec3(0.5);
+    public static final Vec3 VEC_ONE = vec3(1);
+
     private static final List<EnumFacing> directions = new ArrayList<EnumFacing>(Arrays.asList(EnumFacing.VALUES));
 
     static {
@@ -360,6 +370,24 @@ public final class Utils {
         }
     }
 
+    // Vector utils
+
+    /** Factory that returns a new Vec3 with the same argument for x, y and z. */
+    public static Vec3 vec3(double value) {
+        return new Vec3(value, value, value);
+    }
+
+    /** Factory that returns a new BlockPos with the same argument for x, y and z. */
+    public static BlockPos vec3i(int value) {
+        return new BlockPos(value, value, value);
+    }
+
+    /** Factory that returns a new Vector3f with the same argument for x, y and z. */
+    public static Vector3f vec3f(float value) {
+        return new Vector3f(value, value, value);
+    }
+
+    /** Factory that converts an integer vector to a double vector. */
     public static Vec3 convert(Vec3i vec3i) {
         return new Vec3(vec3i.getX(), vec3i.getY(), vec3i.getZ());
     }
@@ -367,12 +395,12 @@ public final class Utils {
     /** Convert an integer vector to an equal floating point vector, 0.5 added to all coordinates (so the middle of a
      * block if this vector represents a block) */
     public static Vec3 convertMiddle(Vec3i vec3i) {
-        return convert(vec3i).add(new Vec3(0.5, 0.5, 0.5));
+        return convert(vec3i).add(Utils.VEC_HALF);
     }
 
     public static Vec3 convert(EnumFacing face) {
         if (face == null) {
-            return new Vec3(0, 0, 0);
+            return Utils.VEC_ZERO;
         }
         return new Vec3(face.getFrontOffsetX(), face.getFrontOffsetY(), face.getFrontOffsetZ());
 
@@ -566,5 +594,11 @@ public final class Utils {
         BlockPos maxMin = max(from, min);
         BlockPos minMax = min(maxMin, max);
         return minMax;
+    }
+
+    public static AxisAlignedBB boundingBox(Vec3 pointA, Vec3 pointB) {
+        Vec3 min = min(pointA, pointB);
+        Vec3 max = max(pointA, pointB);
+        return new AxisAlignedBB(min.xCoord, min.yCoord, min.zCoord, max.xCoord, max.yCoord, max.zCoord);
     }
 }

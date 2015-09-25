@@ -328,7 +328,7 @@ public class TileArchitect extends TileBuildCraft implements IInventory, IBoxPro
     private void addSubBlueprint(BlockPos index) {
         subBlueprints.add(index);
 
-        Vec3 point5 = new Vec3(0.5, 0.5, 0.5);
+        Vec3 point5 = Utils.VEC_HALF;
 
         LaserData laser = new LaserData(Utils.convert(index).add(point5), Utils.convert(this.getPos()).add(point5));
 

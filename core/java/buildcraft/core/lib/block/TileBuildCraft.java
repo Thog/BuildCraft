@@ -20,6 +20,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.IControllable;
@@ -28,7 +29,6 @@ import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.TileBuffer;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.network.PacketTileUpdate;
-import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
@@ -106,6 +106,11 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
 
     public void destroy() {
         cache = null;
+    }
+
+    @Override
+    public net.minecraft.network.Packet getDescriptionPacket() {
+        return BuildCraftCore.instance.channels.get(Side.SERVER).generatePacketFrom(getPacketUpdate());
     }
 
     @Override

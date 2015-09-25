@@ -59,7 +59,7 @@ public final class PipeTransportPower extends PipeTransport implements IDebuggab
     /** Used at the client to show flow properly */
     public double[] clientDisplayFlow = new double[6];
 
-    public Vec3 clientDisplayFlowCentre = new Vec3(0, 0, 0);
+    public Vec3 clientDisplayFlowCentre = Utils.VEC_ZERO;
 
     private SafeTimeTracker tracker = new SafeTimeTracker(2);
 

@@ -235,7 +235,7 @@ public class PipeRendererFluids {
                 EnumFacing pos = connect.getAxisDirection() == AxisDirection.POSITIVE ? connect : connect.getOpposite();
 
                 Vec3 size = new Vec3(width, 0.5, width).subtract(Utils.convert(pos, 0.25));
-                Vec3 position = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(connect, 0.375));
+                Vec3 position = Utils.VEC_HALF.add(Utils.convert(connect, 0.375));
                 position = position.subtract(Utils.multiply(size, 0.5));
 
                 // The position is not correct!

@@ -281,8 +281,6 @@ public class BuildCraftTransport extends BuildCraftMod {
 
         TransportItems.initItems();
 
-        BCCreativeTab pipeTab = BCCreativeTab.get("pipes");
-
         // Init pipe items
         //
         // pipeItemsWood = buildPipe(PipeItemsWood.class, pipeTab, "plankWood", "blockGlassColorless", "plankWood");

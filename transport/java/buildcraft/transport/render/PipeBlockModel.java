@@ -105,7 +105,7 @@ public class PipeBlockModel extends BuildCraftBakedModel implements ISmartBlockM
                 } else {
                     smallerFace = Utils.convert(connect.getOpposite(), 4 / 16d - extension);
                 }
-                Vec3 actualSize = new Vec3(0.5, 0.5, 0.5).subtract(smallerFace);
+                Vec3 actualSize = Utils.VEC_HALF.subtract(smallerFace);
 
                 Vec3 pos = actualCenter.subtract(Utils.multiply(actualSize, 1 / 2d));
 

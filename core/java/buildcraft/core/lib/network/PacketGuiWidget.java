@@ -6,7 +6,6 @@ package buildcraft.core.lib.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.client.FMLClientHandler;
 
 import buildcraft.core.lib.gui.BuildCraftContainer;
 import buildcraft.core.network.PacketIds;

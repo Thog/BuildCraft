@@ -8,11 +8,9 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 
 import org.lwjgl.input.Mouse;
@@ -36,13 +34,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -56,7 +52,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -101,7 +96,6 @@ import buildcraft.core.item.ItemMapLocation;
 import buildcraft.core.item.ItemPaintbrush;
 import buildcraft.core.item.ItemSpring;
 import buildcraft.core.item.ItemWrench;
-import buildcraft.core.lib.block.IAdditionalDataTile;
 import buildcraft.core.lib.commands.RootCommand;
 import buildcraft.core.lib.engines.ItemEngine;
 import buildcraft.core.lib.engines.TileEngineBase;
@@ -711,25 +705,5 @@ public class BuildCraftCore extends BuildCraftMod {
         } else if (type == MovingObjectType.ENTITY) {
 
         }
-    }
-
-    private List<World> worldsNeedingUpdate = Lists.newArrayList();
-
-    @SubscribeEvent
-    public void worldTickEvent(WorldTickEvent event) {
-        if (worldsNeedingUpdate.contains(event.world)) {
-            worldsNeedingUpdate.remove(event.world);
-            for (Object obj : event.world.loadedTileEntityList) {
-                TileEntity tile = (TileEntity) obj;
-                if (tile instanceof IAdditionalDataTile) {
-                    ((IAdditionalDataTile) tile).sendNetworkUpdate();
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void playerJoinWorld(EntityJoinWorldEvent event) {
-        worldsNeedingUpdate.add(event.world);
     }
 }

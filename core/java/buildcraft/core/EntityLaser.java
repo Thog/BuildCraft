@@ -11,6 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
+import buildcraft.core.lib.utils.Utils;
+
 public class EntityLaser extends Entity {
 
     public static final ResourceLocation LASER_RED = new ResourceLocation("buildcraftcore:textures/lasers/red.png");
@@ -41,7 +43,7 @@ public class EntityLaser extends Entity {
     }
 
     public EntityLaser(World world) {
-        this(world, new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+        this(world, Utils.VEC_ZERO, Utils.VEC_ZERO);
     }
 
     public EntityLaser(World world, Vec3 head, Vec3 tail) {
@@ -160,7 +162,7 @@ public class EntityLaser extends Entity {
 
     // Workaround for the laser's posY loosing it's precision e.g 103.5 becomes 104
     public Vec3 renderOffset() {
-        return new Vec3(0.5, 0.5, 0.5);
+        return Utils.VEC_HALF;
     }
 
     @Override

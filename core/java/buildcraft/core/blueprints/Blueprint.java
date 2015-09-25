@@ -25,6 +25,7 @@ import buildcraft.api.blueprints.SchematicBlock;
 import buildcraft.api.blueprints.SchematicEntity;
 import buildcraft.api.core.BCLog;
 import buildcraft.core.lib.utils.NBTUtils;
+import buildcraft.core.lib.utils.Utils;
 
 public class Blueprint extends BlueprintBase {
     public LinkedList<SchematicEntity> entities = new LinkedList<SchematicEntity>();
@@ -128,7 +129,7 @@ public class Blueprint extends BlueprintBase {
     public void readEntitiesFromWorld(IBuilderContext context, TileEntity anchorTile) {
         BptContext bptContext = (BptContext) context;
         // Should this be used somewhere?
-        Vec3 transform = new Vec3(0, 0, 0).subtract(context.surroundingBox().pMin());
+        Vec3 transform = Utils.VEC_ZERO.subtract(context.surroundingBox().pMin());
 
         for (Object o : context.world().loadedEntityList) {
             Entity e = (Entity) o;

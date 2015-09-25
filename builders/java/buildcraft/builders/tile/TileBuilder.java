@@ -288,7 +288,7 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
 
         for (BlockPos b : path) {
             if (previous != null) {
-                Vec3 point5 = new Vec3(0.5, 0.5, 0.5);
+                Vec3 point5 = Utils.VEC_HALF;
                 LaserData laser = new LaserData(Utils.convert(previous).add(point5), Utils.convert(b).add(point5));
 
                 pathLasers.add(laser);

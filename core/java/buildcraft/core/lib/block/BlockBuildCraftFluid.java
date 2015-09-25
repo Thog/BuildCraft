@@ -68,9 +68,9 @@ public class BlockBuildCraftFluid extends BlockFluidClassic implements ICustomSt
             }
         }
 
-        Vec3 acc = new Vec3(0, 0, 0);
+        Vec3 acc = Utils.VEC_ZERO;
         acc = modifyAcceleration(world, pos, entity, acc);
-        Vec3 accDir = new Vec3(0, 0, 0);
+        Vec3 accDir = Utils.VEC_ZERO;
         if (acc.lengthVector() > 0) {
             acc = acc.normalize();
             double multiplier = 0.07;

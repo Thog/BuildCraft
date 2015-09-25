@@ -80,7 +80,7 @@ public class PipeTransportItems extends PipeTransport implements IDebuggable {
         Vec3 newPos = Utils.clamp(item.pos, middle.subtract(littleBitBelow0Point5), middle.add(littleBitBelow0Point5));
 
         if (item.input.getAxis() != Axis.Y) {
-            newPos = new Vec3(newPos.xCoord, container.y() + TransportUtils.getPipeFloorOf(item.getItemStack()), newPos.zCoord);
+            newPos = new Vec3(newPos.xCoord, container.getPos().getY() + TransportUtils.getPipeFloorOf(item.getItemStack()), newPos.zCoord);
         }
 
         item.pos = newPos;

@@ -61,7 +61,7 @@ public class TilePathMarker extends TileMarker implements IPathProvider {
         if (worldObj.isRemote) {
             return;
         }
-        Vec3 point5 = new Vec3(0.5, 0.5, 0.5);
+        Vec3 point5 = Utils.VEC_HALF;
 
         LaserData laser = new LaserData(Utils.convert(pos).add(point5), Utils.convert(pathMarker.pos).add(point5));
 

@@ -49,8 +49,8 @@ public class BlockLaser extends BlockBuildCraft implements ICustomHighlight {
     static {
         for (EnumFacing face : EnumFacing.values()) {
             AxisAlignedBB[] array = new AxisAlignedBB[2];
-            Vec3 min = new Vec3(0, 0, 0);
-            Vec3 max = new Vec3(1, 1, 1);
+            Vec3 min = Utils.VEC_ZERO;
+            Vec3 max = Utils.VEC_ONE;
             if (face.getAxisDirection() == AxisDirection.POSITIVE) {
                 max = max.add(Utils.convert(face, -0.75));
             } else {

@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Level;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,7 +21,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -274,18 +272,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             if (sendClientUpdate) {
                 sendClientUpdate = false;
 
-                if (worldObj instanceof WorldServer) {
-                    WorldServer world = (WorldServer) worldObj;
-                    Packet updatePacket = getBCDescriptionPacket();
-
-                    for (Object o : world.playerEntities) {
-                        EntityPlayerMP player = (EntityPlayerMP) o;
-
-                        if (world.getPlayerManager().isPlayerWatchingChunk(player, getPos().getX() >> 4, getPos().getX() >> 4)) {
-                            BuildCraftCore.instance.sendToPlayer(player, updatePacket);
-                        }
-                    }
-                }
+                BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -527,7 +514,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public net.minecraft.network.Packet getDescriptionPacket() {
-        return Utils.toPacket(getBCDescriptionPacket(), 1);
+        return BuildCraftTransport.instance.channels.get(Side.SERVER).generatePacketFrom(getBCDescriptionPacket());
     }
 
     @Override

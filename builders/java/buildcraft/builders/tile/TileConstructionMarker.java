@@ -112,7 +112,7 @@ public class TileConstructionMarker extends TileBuildCraft implements IBuildingI
         }
 
         if (laser == null && direction != null) {
-            Vec3 point5 = new Vec3(0.5, 0.5, 0.5);
+            Vec3 point5 = Utils.VEC_HALF;
             laser = new LaserData();
             laser.head = Utils.convert(pos).add(point5);
             laser.tail = laser.head.add(Utils.convert(direction, 0.5));

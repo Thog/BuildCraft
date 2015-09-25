@@ -27,7 +27,7 @@ public abstract class AIRobotGoto extends AIRobot {
         if (magnitude != 0) {
             dir = Utils.multiply(dir, 1 / magnitude);
         } else {
-            dir = new Vec3(0, 0, 0);
+            dir = Utils.VEC_ZERO;
         }
 
         robot.motionX = dir.xCoord / 10f;

@@ -41,8 +41,8 @@ public final class FacadePluggableRenderer extends BuildCraftBakedModel implemen
         TextureAtlasSprite sprite = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(facade.getCurrentState());
 
         // Render the actual facade
-        Vec3 center = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 7 / 16d));
-        Vec3 radius = new Vec3(0.5, 0.5, 0.5).subtract(Utils.convert(Utils.convertPositive(face), 14 / 32d));
+        Vec3 center = Utils.VEC_HALF.add(Utils.convert(face, 7 / 16d));
+        Vec3 radius = Utils.VEC_HALF.subtract(Utils.convert(Utils.convertPositive(face), 14 / 32d));
 
         for (EnumFacing renderFace : EnumFacing.VALUES) {
             if (face.getAxis() != renderFace.getAxis()) {
@@ -80,7 +80,7 @@ public final class FacadePluggableRenderer extends BuildCraftBakedModel implemen
         }
 
         // Render the little box
-        center = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 5 / 16d));
+        center = Utils.VEC_HALF.add(Utils.convert(face, 5 / 16d));
         radius = new Vec3(4 / 16d, 4 / 16d, 4 / 16d).subtract(Utils.convert(Utils.convertPositive(face), 3 / 16d));
 
         sprite = TransportItems.getPipe(EnumPipeType.STRUCTURE, EnumPipeMaterial.COBBLESTONE).getSprite(0);

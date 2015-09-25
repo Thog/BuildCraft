@@ -10,12 +10,13 @@ import net.minecraft.util.Vec3;
 import buildcraft.api.core.ISerializable;
 import buildcraft.core.lib.utils.NBTUtils;
 import buildcraft.core.lib.utils.NetworkUtils;
+import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
 
 public class LaserData implements ISerializable {
-    public Vec3 head = new Vec3(0, 0, 0);
-    public Vec3 tail = new Vec3(0, 0, 0);
+    public Vec3 head = Utils.VEC_ZERO;
+    public Vec3 tail = Utils.VEC_ZERO;
     public boolean isVisible = true;
     public boolean isGlowing = false;
 

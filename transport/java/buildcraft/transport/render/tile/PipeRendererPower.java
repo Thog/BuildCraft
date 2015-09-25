@@ -111,10 +111,10 @@ public class PipeRendererPower {
         double width = 0.5 * stage / (double) POWER_STAGES;
         double centerRadius = 0.25 * centerStage / (double) POWER_STAGES;
 
-        Vec3 center = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 0.25 + centerRadius / 2d));
+        Vec3 center = Utils.VEC_HALF.add(Utils.convert(face, 0.25 + centerRadius / 2d));
 
         face = Utils.convertPositive(face);
-        Vec3 size = new Vec3(1, 1, 1).subtract(Utils.convert(face));
+        Vec3 size = Utils.VEC_ONE.subtract(Utils.convert(face));
         size = Utils.multiply(size, width);
         size = size.add(Utils.convert(face, 0.5 - centerRadius));
 
@@ -147,7 +147,7 @@ public class PipeRendererPower {
         double width = 0.5 * stage / (double) POWER_STAGES;
 
         Vec3 size = new Vec3(width, width, width);
-        Vec3 pos = new Vec3(0.5, 0.5, 0.5);
+        Vec3 pos = Utils.VEC_HALF;
 
         EntityResizableCuboid erc = new EntityResizableCuboid(null);
         erc.setSize(size);
@@ -182,7 +182,7 @@ public class PipeRendererPower {
             double width = 0.5 * stage / (double) POWER_STAGES;
 
             Vec3 size = new Vec3(width, width, width);
-            Vec3 pos = new Vec3(0.5, 0.5, 0.5);
+            Vec3 pos = Utils.VEC_HALF;
 
             EntityResizableCuboid erc = new EntityResizableCuboid(null);
             erc.setSize(size);
@@ -208,10 +208,10 @@ public class PipeRendererPower {
 
                     EnumFacing face = EnumFacing.values()[side];
 
-                    Vec3 pos = new Vec3(0.5, 0.5, 0.5).add(Utils.convert(face, 0.25 + centerOffset / 2d));
+                    Vec3 pos = Utils.VEC_HALF.add(Utils.convert(face, 0.25 + centerOffset / 2d));
 
                     face = Utils.convertPositive(face);
-                    Vec3 size = new Vec3(1, 1, 1).subtract(Utils.convert(face));
+                    Vec3 size = Utils.VEC_ONE.subtract(Utils.convert(face));
                     size = Utils.multiply(size, width);
                     size = size.add(Utils.convert(face, 0.5 - centerOffset));
 
