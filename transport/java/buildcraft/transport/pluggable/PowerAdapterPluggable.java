@@ -16,7 +16,7 @@ import buildcraft.api.mj.IMjInternalStorage;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IPipePluggableState;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
@@ -27,7 +27,7 @@ import io.netty.buffer.ByteBuf;
 public class PowerAdapterPluggable extends PipePluggable implements IMjExternalStorage {
     private IPipeTile container;
 
-    public class PowerAdapterPluggableRenderer implements IPipePluggableStaticRenderer {
+    public class PowerAdapterPluggableRenderer implements IPluggableStaticRenderer {
         private float zFightOffset = 1 / 4096.0F;
 
         @Override
@@ -145,7 +145,7 @@ public class PowerAdapterPluggable extends PipePluggable implements IMjExternalS
     }
 
     @Override
-    public IPipePluggableStaticRenderer getStaticRenderer() {
+    public IPluggableStaticRenderer getStaticRenderer() {
         return new PowerAdapterPluggableRenderer();
     }
 

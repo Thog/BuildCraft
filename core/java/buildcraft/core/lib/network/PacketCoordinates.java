@@ -41,4 +41,18 @@ public abstract class PacketCoordinates extends Packet {
     public int getID() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("PacketCoordinates [pos=");
+        builder.append(pos);
+        builder.append(", id=");
+        builder.append(id);
+        builder.append(", super=");
+        builder.append(super.toString());
+        builder.append("]");
+        return builder.toString();
+    }
+
 }

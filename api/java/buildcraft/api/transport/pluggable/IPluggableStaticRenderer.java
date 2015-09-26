@@ -9,8 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.transport.IPipe;
 
-@SideOnly(Side.CLIENT)
-public interface IPipePluggableStaticRenderer {
+public interface IPluggableStaticRenderer {
     @SideOnly(Side.CLIENT)
     List<BakedQuad> renderStaticPluggable(IPipeRenderState render, IPipePluggableState pluggableState, IPipe pipe, PipePluggable pluggable,
             EnumFacing face);

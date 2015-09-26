@@ -62,14 +62,24 @@ final class Pipe implements IDropControlInventory, IPipe {
     private boolean initialized = false;
 
     private ArrayList<ActionState> actionStates = new ArrayList<ActionState>();
-    Map<PipeProperty<Object>, Object> properties = Maps.newHashMap();
-    Set<PipeProperty<Object>> dirtyProperties = Sets.newHashSet();
+    Map<PipeProperty<?>, Object> properties = Maps.newHashMap();
+    Set<PipeProperty<?>> dirtyProperties = Sets.newHashSet();
 
     public Pipe(PipeDefinition definition) {
         this.definition = definition;
+        if (definition.behaviourFactory == null) {
+            throw new RuntimeException("Found a definition with a null behaviour factory! THIS A MAJOR BUG! (" + definition + ")");
+        }
         behaviour = definition.behaviourFactory.createNew();
+        if (behaviour == null) {
+            throw new RuntimeException("Found a definition that did not create a pipe behaviour object! THIS IS A MAJOR BUG! (" + definition + ")");
+        }
+        if (behaviour.definition == null) {
+            throw new RuntimeException("Found a definition that created a behaviour without linking itself back to it!"
+                + " (definition.behaviourFactory.createNew().definition is null) [defintion = " + definition + "]");
+        }
         transport = getTransport(definition.type);
-        for (PipeProperty<Object> property : transport.getAllProperties()) {
+        for (PipeProperty<?> property : transport.getAllProperties()) {
             dirtyProperties.add(property);
             properties.put(property, property.getDefault());
         }

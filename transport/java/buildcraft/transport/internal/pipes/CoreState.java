@@ -20,7 +20,7 @@ public class CoreState implements ISerializable {
     @Override
     public void readData(ByteBuf data) {
         pipeId = data.readInt();
-        definition = PipeAPI.registry.getDefinition(Item.getItemById(pipeId));
+        definition = PipeAPI.REGISTRY.getDefinition(Item.getItemById(pipeId));
     }
 
     public PipeDefinition getDefinition() {
@@ -29,7 +29,7 @@ public class CoreState implements ISerializable {
 
     public void setDefinition(PipeDefinition definition) {
         this.definition = definition;
-        Item item = PipeAPI.registry.getItem(definition);
+        Item item = PipeAPI.REGISTRY.getItem(definition);
         if (item == null) {
             pipeId = -1;
         } else {

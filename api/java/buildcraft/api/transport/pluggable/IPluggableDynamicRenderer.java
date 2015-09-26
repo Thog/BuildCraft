@@ -6,8 +6,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.transport.IPipe;
 
-@SideOnly(Side.CLIENT)
-public interface IPipePluggableDynamicRenderer {
+public interface IPluggableDynamicRenderer {
     @SideOnly(Side.CLIENT)
     void renderDynamicPluggable(IPipe pipe, EnumFacing side, PipePluggable pipePluggable, double x, double y, double z);
 }

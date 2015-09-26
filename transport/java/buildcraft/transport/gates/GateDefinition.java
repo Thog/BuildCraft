@@ -14,6 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.core.lib.utils.StringUtils;
 
+@Deprecated
 public final class GateDefinition {
 
     private GateDefinition() {}

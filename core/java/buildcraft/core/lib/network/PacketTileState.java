@@ -30,6 +30,17 @@ public class PacketTileState extends PacketCoordinates {
             this.stateId = stateId;
             this.state = state;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("StateWithId [stateId=");
+            builder.append(stateId);
+            builder.append(", state=");
+            builder.append(state == null ? "null" : state.getClass());
+            builder.append("]");
+            return builder.toString();
+        }
     }
 
     private List<StateWithId> stateList = new LinkedList<StateWithId>();
@@ -92,5 +103,19 @@ public class PacketTileState extends PacketCoordinates {
                 tile1.afterStateUpdated(stateId);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        final int maxLen = 10;
+        StringBuilder builder = new StringBuilder();
+        builder.append("PacketTileState [state=");
+        builder.append(state == null ? "-1" : state.readableBytes());
+        builder.append(", stateList=");
+        builder.append(stateList != null ? stateList.subList(0, Math.min(stateList.size(), maxLen)) : null);
+        builder.append(", super=");
+        builder.append(super.toString());
+        builder.append("]");
+        return builder.toString();
     }
 }

@@ -1,6 +1,5 @@
 package buildcraft.transport.render.tile;
 
-import java.nio.channels.Pipe;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -21,6 +20,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import buildcraft.api.core.BCLog;
+import buildcraft.api.transport.IPipe;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.FluidRenderer;
 import buildcraft.core.lib.render.RenderResizableCuboid;
@@ -73,8 +73,7 @@ public class PipeRendererFluids {
         }
     }
 
-    static void renderFluidPipe(Pipe pipe, double x, double y, double z) {
-        PipeTransportFluids trans = (PipeTransportFluids) pipe.transport;
+    static void renderFluidPipe(IPipe pipe, PipeTransportFluids trans, double x, double y, double z) {
 
         boolean needsRender = false;
         FluidRenderData renderData = trans.renderCache;

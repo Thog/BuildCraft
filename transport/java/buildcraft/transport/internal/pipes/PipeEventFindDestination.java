@@ -1,6 +1,7 @@
 package buildcraft.transport.internal.pipes;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
@@ -22,12 +23,12 @@ class PipeEventFindDestination extends PipeEvent implements IPipeEventFindDestin
     private final int maxPossibleDestinations;
     int maxDestinations;
 
-    PipeEventFindDestination(IPipe pipe, IPipeContents contents, EnumFacing origin, ImmutableMap<EnumFacing, TileEntity> potentialDestinations,
+    PipeEventFindDestination(IPipe pipe, IPipeContents contents, EnumFacing origin, Map<EnumFacing, TileEntity> potentialDestinations,
             int maxPossibleDestinations) {
         super(pipe);
         this.contents = contents;
         this.origin = origin;
-        this.potentialDestinations = potentialDestinations;
+        this.potentialDestinations = ImmutableMap.copyOf(potentialDestinations);
         this.destinations = Sets.newHashSet(potentialDestinations.keySet());
         this.unmodifiableDestinations = Collections.unmodifiableSet(destinations);
         this.maxPossibleDestinations = maxPossibleDestinations;

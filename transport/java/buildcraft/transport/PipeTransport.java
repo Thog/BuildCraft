@@ -124,5 +124,5 @@ public abstract class PipeTransport {
         return false;
     }
 
-    public abstract List<PipeProperty<Object>> getAllProperties();
+    public abstract List<PipeProperty<?>> getAllProperties();
 }

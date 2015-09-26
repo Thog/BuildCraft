@@ -1,8 +1,8 @@
 package buildcraft.transport.internal.pipes;
 
 import buildcraft.api.transport.IPipe;
-import buildcraft.api.transport.event.IPipeContents.IPipeContentsItem;
 import buildcraft.api.transport.event.IPipeEventAdjustSpeed;
+import buildcraft.api.transport.event.IPipeContents.IPipeContentsItem;
 
 class PipeEventAdjustSpeed extends PipeEvent implements IPipeEventAdjustSpeed {
     private final IPipeContentsItem contents;

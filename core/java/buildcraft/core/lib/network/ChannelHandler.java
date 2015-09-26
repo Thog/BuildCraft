@@ -58,7 +58,11 @@ public class ChannelHandler extends FMLIndexedMessageToMessageCodec<Packet> {
         INetHandler handler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
         EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(handler);
         if (player != null) {
-            packet.readData(data, player);
+            if (data.readableBytes() > 0) {
+                packet.readData(data, player);
+            } else {
+                BCLog.logger.warn("Recieved a packet with no message! (" + packet + ")");
+            }
         } else {
             BCLog.logger.warn("The player was null! (Decode)");
         }

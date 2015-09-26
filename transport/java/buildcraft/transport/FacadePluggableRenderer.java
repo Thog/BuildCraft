@@ -16,15 +16,15 @@ import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.pluggable.IFacadePluggable;
 import buildcraft.api.transport.pluggable.IPipePluggableState;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.render.BuildCraftBakedModel;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.pipes.EnumPipeMaterial;
 
-public final class FacadePluggableRenderer extends BuildCraftBakedModel implements IPipePluggableStaticRenderer {
-    public static final IPipePluggableStaticRenderer INSTANCE = new FacadePluggableRenderer();
+public final class FacadePluggableRenderer extends BuildCraftBakedModel implements IPluggableStaticRenderer {
+    public static final IPluggableStaticRenderer INSTANCE = new FacadePluggableRenderer();
 
     private FacadePluggableRenderer() {
         super(null, null, null);// We only extend BuildCraftBakedModel to get the model functions

@@ -9,5 +9,5 @@ public interface IItemCustomPipeRender {
 
     /** @return False to use the default renderer, true otherwise. */
     @SideOnly(Side.CLIENT)
-    boolean renderItemInPipe(ItemStack stack, double x, double y, double z);
+    boolean renderItemInPipe(ItemStack stack);
 }

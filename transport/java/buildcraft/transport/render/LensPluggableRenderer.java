@@ -7,12 +7,12 @@ import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.pluggable.IPipePluggableState;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
 import buildcraft.api.transport.pluggable.PipePluggable;
 
-public final class LensPluggableRenderer implements IPipePluggableStaticRenderer {
-    public static final IPipePluggableStaticRenderer INSTANCE = new LensPluggableRenderer();
+public final class LensPluggableRenderer implements IPluggableStaticRenderer {
+    public static final IPluggableStaticRenderer INSTANCE = new LensPluggableRenderer();
     private static final float zFightOffset = 1 / 4096.0F;
 
     private LensPluggableRenderer() {

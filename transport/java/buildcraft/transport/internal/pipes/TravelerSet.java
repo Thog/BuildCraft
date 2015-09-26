@@ -2,7 +2,7 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.transport;
+package buildcraft.transport.internal.pipes;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -11,7 +11,7 @@ import java.util.Set;
 import com.google.common.collect.ForwardingSet;
 import com.google.common.collect.Sets;
 
-import buildcraft.transport.internal.pipes.PipeTransportItems;
+import buildcraft.transport.TravelingItem;
 
 public class TravelerSet extends ForwardingSet<TravelingItem> {
 

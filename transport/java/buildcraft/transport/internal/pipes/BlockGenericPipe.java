@@ -207,7 +207,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         extended = extended.withProperty(PIPE_CORE_STATE.asUnlistedProperty(), pipe.coreState);
         extended = extended.withProperty(PIPE_RENDER_STATE.asUnlistedProperty(), pipe.renderState);
         extended = extended.withProperty(PIPE_PLUGGABLE_STATE.asUnlistedProperty(), pipe.pluggableState);
-        extended = extended.withProperty(PIPE_PIPE.asUnlistedProperty(), pipe.pipe);
+        extended = extended.withProperty(PIPE_PIPE.asUnlistedProperty(), pipe.getPipe());
 
         return extended;
     }
@@ -451,7 +451,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
 
         if (pipe != null) {
             if (pipe.definition != null) {
-                Item item = PipeAPI.registry.getItem(pipe.definition);
+                Item item = PipeAPI.REGISTRY.getItem(pipe.definition);
                 list.add(new ItemStack(item, 1, pipe.container.getItemMetadata()));
                 list.addAll(pipe.computeItemDrop());
                 list.addAll(pipe.getDroppedItems());
@@ -477,7 +477,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         }
 
         if (pipe != null) {
-            Item k1 = PipeAPI.registry.getItem(pipe.definition);
+            Item k1 = PipeAPI.REGISTRY.getItem(pipe.definition);
 
             if (k1 != null) {
                 pipe.dropContents();
@@ -511,7 +511,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
                     }
                 }
                 case Pipe:
-                    return new ItemStack(PipeAPI.registry.getItem(getPipe(world, pos).definition), 1, getPipe(world, pos).container
+                    return new ItemStack(PipeAPI.REGISTRY.getItem(getPipe(world, pos).definition), 1, getPipe(world, pos).container
                             .getItemMetadata());
             }
         }
@@ -1024,10 +1024,10 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         }
         if (tile instanceof TileGenericPipe) {
             TileGenericPipe genericPipe = (TileGenericPipe) tile;
-            if (genericPipe.pipe.behaviour instanceof ICustomPipeConnection) {
-                return ((ICustomPipeConnection) genericPipe.pipe.behaviour).getExtension(world, pos, face, state);
-            } else if (genericPipe.pipe.transport instanceof ICustomPipeConnection) {
-                return ((ICustomPipeConnection) genericPipe.pipe.transport).getExtension(world, pos, face, state);
+            if (genericPipe.getPipe().behaviour instanceof ICustomPipeConnection) {
+                return ((ICustomPipeConnection) genericPipe.getPipe().behaviour).getExtension(world, pos, face, state);
+            } else if (genericPipe.getPipe().transport instanceof ICustomPipeConnection) {
+                return ((ICustomPipeConnection) genericPipe.getPipe().transport).getExtension(world, pos, face, state);
             }
         }
         return 0;

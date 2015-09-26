@@ -4,7 +4,6 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.item;
 
-import java.nio.channels.Pipe;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -218,29 +217,6 @@ public class ItemGate extends ItemBuildCraft implements IPipePluggableItem {
             }
         }
     }
-
-    // @Override
-    // public TextureAtlasSprite getIconIndex(ItemStack stack) {
-    // return getLogic(stack).getIconItem();
-    // }
-
-    // @Override
-    // @SideOnly(Side.CLIENT)
-    // public void registerIcons(TextureMap iconRegister) {
-    // for (GateDefinition.GateMaterial material : GateDefinition.GateMaterial.VALUES) {
-    // material.registerItemIcon(iconRegister);
-    // }
-    //
-    // for (GateDefinition.GateLogic logic : GateDefinition.GateLogic.VALUES) {
-    // logic.registerItemIcon(iconRegister);
-    // }
-    //
-    // for (IGateExpansion expansion : GateExpansions.getExpansions()) {
-    // expansion.registerItemOverlay(iconRegister);
-    // }
-    //
-    // StatementManager.registerIcons(iconRegister);
-    // }
 
     @Override
     public PipePluggable createPipePluggable(IPipe pipe, EnumFacing side, ItemStack stack) {

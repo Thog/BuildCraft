@@ -1,7 +1,5 @@
 package buildcraft.transport.render.tile;
 
-import java.nio.channels.Pipe;
-
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -14,6 +12,7 @@ import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.Vec3;
 
+import buildcraft.api.transport.IPipe;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
@@ -31,10 +30,8 @@ public class PipeRendererPower {
 
     private static boolean initialized = false;
 
-    static void renderPowerPipe(Pipe pipe, double x, double y, double z) {
+    static void renderPowerPipe(IPipe pipe, PipeTransportPower pow, double x, double y, double z) {
         initializeDisplayPowerList();
-
-        PipeTransportPower pow = (PipeTransportPower) pipe.transport;
 
         GL11.glPushMatrix();
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
@@ -65,7 +62,7 @@ public class PipeRendererPower {
 
         for (int i = 0; i < 6; i++) {
             EnumFacing face = EnumFacing.values()[i];
-            if (!pipe.container.isPipeConnected(face)) {
+            if (!pipe.getTile().isPipeConnected(face)) {
                 continue;
             }
             double clientDiff = flow[i] * FLOW_MULTIPLIER;
@@ -151,7 +148,7 @@ public class PipeRendererPower {
 
         EntityResizableCuboid erc = new EntityResizableCuboid(null);
         erc.setSize(size);
-        erc.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
+//        erc.texture = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
 
         erc.textureOffsetX = centerFlow.xCoord;
         erc.textureOffsetY = centerFlow.yCoord;
@@ -171,7 +168,7 @@ public class PipeRendererPower {
 
         initialized = true;
 
-        TextureAtlasSprite normal = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
+//        TextureAtlasSprite normal = BuildCraftTransport.instance.pipeIconProvider.getIcon(PipeIconProvider.TYPE.Power_Normal.ordinal());
 
         for (int stage = 0; stage < POWER_STAGES; stage++) {
             int address = GLAllocation.generateDisplayLists(1);
@@ -186,7 +183,7 @@ public class PipeRendererPower {
 
             EntityResizableCuboid erc = new EntityResizableCuboid(null);
             erc.setSize(size);
-            erc.texture = normal;
+//            erc.texture = normal;
 
             GL11.glPushMatrix();
             RenderUtils.translate(pos);
@@ -217,7 +214,7 @@ public class PipeRendererPower {
 
                     EntityResizableCuboid erc = new EntityResizableCuboid(null);
                     erc.setSize(size);
-                    erc.texture = normal;
+//                    erc.texture = normal;
 
                     GL11.glPushMatrix();
                     RenderUtils.translate(pos);

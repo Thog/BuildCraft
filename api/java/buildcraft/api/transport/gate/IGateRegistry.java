@@ -1,5 +1,5 @@
 package buildcraft.api.transport.gate;
 
-import buildcraft.api.transport.IRegistry;
+import buildcraft.api.IDoubleRegistry;
 
-public interface IGateRegistry extends IRegistry<GateDefinition> {}
+public interface IGateRegistry extends IDoubleRegistry<GateDefinition> {}

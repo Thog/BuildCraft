@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -62,6 +62,7 @@ import buildcraft.api.transport.PipeConnectionAPI;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.api.transport.PipeWire;
+import buildcraft.api.transport.gate.GateAPI;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.BuildCraftMod;
@@ -69,6 +70,7 @@ import buildcraft.core.CompatHooks;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
 import buildcraft.core.PowerMode;
+import buildcraft.core.Version;
 import buildcraft.core.config.ConfigManager;
 import buildcraft.core.lib.items.ItemBuildCraft;
 import buildcraft.core.lib.network.ChannelHandler;
@@ -98,7 +100,6 @@ import buildcraft.transport.network.PacketPipeTransportItemStack;
 import buildcraft.transport.network.PacketPipeTransportItemStackRequest;
 import buildcraft.transport.network.PacketPipeTransportTraveler;
 import buildcraft.transport.network.PacketPowerUpdate;
-import buildcraft.transport.pipes.PipeRegistry;
 import buildcraft.transport.pluggable.ItemLens;
 import buildcraft.transport.pluggable.ItemPlug;
 import buildcraft.transport.pluggable.LensPluggable;
@@ -116,8 +117,7 @@ import buildcraft.transport.statements.TriggerClockTimer.Time;
 import buildcraft.transport.statements.TriggerPipeContents.PipeContents;
 import buildcraft.transport.stripes.*;
 
-// @Mod(version = Version.VERSION, modid = "BuildCraft|Transport", name = "Buildcraft Transport", dependencies =
-// DefaultProps.DEPENDENCY_CORE)
+@Mod(version = Version.VERSION, modid = "BuildCraft|Transport", name = "Buildcraft Transport", dependencies = DefaultProps.DEPENDENCY_CORE)
 public class BuildCraftTransport extends BuildCraftMod {
     @Mod.Instance("BuildCraft|Transport")
     public static BuildCraftTransport instance;
@@ -229,11 +229,10 @@ public class BuildCraftTransport extends BuildCraftMod {
     public void preInit(FMLPreInitializationEvent evt) {
         new BCCreativeTab("pipes");
         new BCCreativeTab("facades");
+
         if (Loader.isModLoaded("BuildCraft|Silicon")) {
             new BCCreativeTab("gates");
         }
-
-        PipeAPI.registry = new PipeRegistry();
 
         try {
             BuildCraftCore.mainConfigManager.register("experimental.kinesisPowerLossOnTravel", false,
@@ -597,8 +596,12 @@ public class BuildCraftTransport extends BuildCraftMod {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void textureHook(TextureStitchEvent.Pre event) {
-        for (Entry<String, Pair<PipeDefinition, Item>> entry : PipeAPI.registry.getPipeDefinitions()) {
-            entry.getValue().getLeft().registerSprites(event.map);
+        for (Triple<String, Item, PipeDefinition> entry : PipeAPI.REGISTRY.getDefinitions()) {
+            entry.getRight().registerSprites(event.map);
+        }
+
+        for (Entry<String, buildcraft.api.transport.gate.GateDefinition> entry : GateAPI.REGISTRY.getDefinitions()) {
+            entry.getValue().registerSprites(event.map);
         }
 
         WireIconProvider.registerIcons(event.map);
@@ -621,18 +624,19 @@ public class BuildCraftTransport extends BuildCraftMod {
 
     @Mod.EventHandler
     public void serverLoading(FMLServerStartingEvent event) {
-        pipeExtensionListener = new PipeExtensionListener();
-        FMLCommonHandler.instance().bus().register(pipeExtensionListener);
+        // TODO (PASS 0): MAKE STRIPES PIPES WORK!
+        // pipeExtensionListener = new PipeExtensionListener();
+        // FMLCommonHandler.instance().bus().register(pipeExtensionListener);
     }
 
     @Mod.EventHandler
     public void serverUnloading(FMLServerStoppingEvent event) {
-        // One last tick
-        for (WorldServer w : DimensionManager.getWorlds()) {
-            pipeExtensionListener.tick(new TickEvent.WorldTickEvent(Side.SERVER, TickEvent.Phase.END, w));
-        }
-        FMLCommonHandler.instance().bus().unregister(pipeExtensionListener);
-        pipeExtensionListener = null;
+        // One last tick, to make sure that all extensions have happened. (We don't read and write them to and from NBT)
+//        for (WorldServer w : DimensionManager.getWorlds()) {
+//            pipeExtensionListener.tick(new TickEvent.WorldTickEvent(Side.SERVER, TickEvent.Phase.END, w));
+//        }
+//        FMLCommonHandler.instance().bus().unregister(pipeExtensionListener);
+//        pipeExtensionListener = null;
     }
 
     public void loadRecipes() {
@@ -716,8 +720,8 @@ public class BuildCraftTransport extends BuildCraftMod {
     public void registerModels(ModelBakeEvent event) {
         ModelResourceLocation mrl = new ModelResourceLocation("buildcrafttransport:pipeBlock");
         event.modelRegistry.putObject(mrl, new PipeBlockModel());
-        for (Entry<String, Pair<PipeDefinition, Item>> entry : PipeAPI.registry.getPipeDefinitions()) {
-            Item item = entry.getValue().getRight();
+        for (Triple<String, Item, PipeDefinition> entry : PipeAPI.REGISTRY.getDefinitions()) {
+            Item item = entry.getMiddle();
             ItemPipe itemPipe = (ItemPipe) item;
             mrl = ModelHelper.getItemResourceLocation(itemPipe, "");
             event.modelRegistry.putObject(mrl, PipeItemModel.create(itemPipe));

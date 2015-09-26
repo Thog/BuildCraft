@@ -4,7 +4,6 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.render.tile;
 
-import java.nio.channels.Pipe;
 import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
@@ -26,8 +25,12 @@ import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.MatrixTranformations;
+import buildcraft.transport.PipeTransport;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.internal.pipes.PipeRenderState;
+import buildcraft.transport.internal.pipes.PipeTransportFluids;
+import buildcraft.transport.internal.pipes.PipeTransportItems;
+import buildcraft.transport.internal.pipes.PipeTransportPower;
 import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
@@ -46,7 +49,7 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
         TileGenericPipe pipe = (TileGenericPipe) tileentity;
 
-        if (pipe.pipe == null) {
+        if (pipe.getPipe() == null) {
             return;
         }
 
@@ -54,12 +57,14 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
         EnumPipeType pipeType = pipe.getPipeType();
 
+        PipeTransport transport = pipe.getTransportForRender();
+
         if (pipeType == EnumPipeType.ITEM) {
-            PipeRendererItems.renderItemPipe((Pipe) pipe.pipe, x, y, z, f);
+            PipeRendererItems.renderItemPipe(pipe.getPipe(), (PipeTransportItems) transport, x, y, z, f);
         } else if (pipeType == EnumPipeType.FLUID) {
-            PipeRendererFluids.renderFluidPipe((Pipe) pipe.pipe, x, y, z);
+            PipeRendererFluids.renderFluidPipe(pipe.getPipe(), (PipeTransportFluids) transport, x, y, z);
         } else if (pipeType == EnumPipeType.POWER) {
-            PipeRendererPower.renderPowerPipe((Pipe) pipe.pipe, x, y, z);
+            PipeRendererPower.renderPowerPipe(pipe.getPipe(), (PipeTransportPower) transport, x, y, z);
         } /* else if (pipeType == PipeType.STRUCTURE) { // no object to render in a structure pipe; } */
     }
 

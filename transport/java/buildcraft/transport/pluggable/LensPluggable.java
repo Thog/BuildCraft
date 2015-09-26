@@ -9,7 +9,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.BuildCraftTransport;
@@ -73,7 +73,7 @@ public class LensPluggable extends PipePluggable {
     }
 
     @Override
-    public IPipePluggableStaticRenderer getStaticRenderer() {
+    public IPluggableStaticRenderer getStaticRenderer() {
         return LensPluggableRenderer.INSTANCE;
     }
 

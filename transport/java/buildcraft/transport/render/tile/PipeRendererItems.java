@@ -1,6 +1,8 @@
 package buildcraft.transport.render.tile;
 
-import java.nio.channels.Pipe;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import org.lwjgl.opengl.GL11;
 
@@ -16,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
 import buildcraft.api.items.IItemCustomPipeRender;
+import buildcraft.api.transport.IPipe;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.render.RenderUtils;
@@ -25,6 +28,7 @@ import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 public class PipeRendererItems {
     private static final int MAX_ITEMS_TO_RENDER = 10;
+    private static final Map<EnumDyeColor, Integer> LIGHT_HEX = Maps.newEnumMap(EnumDyeColor.class);
 
     private static final EntityItem dummyEntityItem = new EntityItem(null);
     private static final RenderEntityItem customRenderItem;
@@ -41,16 +45,31 @@ public class PipeRendererItems {
                 return false;
             }
         };
+        LIGHT_HEX.put(EnumDyeColor.BLACK, 0x181414);
+        LIGHT_HEX.put(EnumDyeColor.RED, 0xBE2B27);
+        LIGHT_HEX.put(EnumDyeColor.GREEN, 0x007F0E);
+        LIGHT_HEX.put(EnumDyeColor.BROWN, 0x89502D);
+        LIGHT_HEX.put(EnumDyeColor.BLUE, 0x253193);
+        LIGHT_HEX.put(EnumDyeColor.PURPLE, 0x7e34bf);
+        LIGHT_HEX.put(EnumDyeColor.CYAN, 0x299799);
+        LIGHT_HEX.put(EnumDyeColor.SILVER, 0xa0a7a7);
+        LIGHT_HEX.put(EnumDyeColor.GRAY, 0x7A7A7A);
+        LIGHT_HEX.put(EnumDyeColor.PINK, 0xD97199);
+        LIGHT_HEX.put(EnumDyeColor.LIME, 0x39D52E);
+        LIGHT_HEX.put(EnumDyeColor.YELLOW, 0xFFD91C);
+        LIGHT_HEX.put(EnumDyeColor.LIGHT_BLUE, 0x66AAFF);
+        LIGHT_HEX.put(EnumDyeColor.MAGENTA, 0xD943C6);
+        LIGHT_HEX.put(EnumDyeColor.ORANGE, 0xEA7835);
+        LIGHT_HEX.put(EnumDyeColor.WHITE, 0xe4e4e4);
     }
 
-    static void renderItemPipe(Pipe pipe, double x, double y, double z, float f) {
+    static void renderItemPipe(IPipe pipe, PipeTransportItems transport, double x, double y, double z, float f) {
         GL11.glPushMatrix();
 
-        PipeTransportItems transport = (PipeTransportItems) pipe.transport;
-
-        float light = pipe.container.getWorld().getLightBrightness(pipe.container.getPos());
+        float light = pipe.getTile().getWorld().getLightBrightness(pipe.getTile().getPos());
 
         int count = 0;
+        GL11.glTranslated(x, y, z);
         for (TravelingItem item : transport.items) {
             if (count >= MAX_ITEMS_TO_RENDER) {
                 break;
@@ -63,15 +82,15 @@ public class PipeRendererItems {
             EnumFacing face = item.toCenter ? item.input : item.output;
             Vec3 motion = Utils.convert(face, item.getSpeed() * f);
 
-            doRenderItem(item, x + item.pos.xCoord - pipe.container.x() + motion.xCoord, y + item.pos.yCoord - pipe.container.y() + motion.yCoord, z
-                + item.pos.zCoord - pipe.container.z() + motion.zCoord, light, item.color);
+            Vec3 pos = item.pos.subtract(Utils.convert(pipe.getTile().getPos())).add(motion);
+            doRenderItem(item, pos, light, item.color);
             count++;
         }
 
         GL11.glPopMatrix();
     }
 
-    public static void doRenderItem(TravelingItem travellingItem, double x, double y, double z, float light, EnumDyeColor color) {
+    public static void doRenderItem(TravelingItem travellingItem, Vec3 itemPos, float light, EnumDyeColor color) {
 
         if (travellingItem == null || travellingItem.getItemStack() == null) {
             return;
@@ -81,7 +100,8 @@ public class PipeRendererItems {
         ItemStack itemstack = travellingItem.getItemStack();
 
         GL11.glPushMatrix();
-        GL11.glTranslatef((float) x, (float) y + 0.05f, (float) z);
+        GL11.glTranslatef(0, 0.05f, 0);
+        RenderUtils.translate(itemPos);
         GL11.glPushMatrix();
 
         if (travellingItem.hasDisplayList) {
@@ -97,7 +117,7 @@ public class PipeRendererItems {
                 GL11.glScalef(renderScale * itemScale, renderScale * itemScale, renderScale * itemScale);
                 itemScale = 1 / itemScale;
 
-                if (!render.renderItemInPipe(itemstack, x, y, z)) {
+                if (!render.renderItemInPipe(itemstack)) {
                     dummyEntityItem.setEntityItemStack(itemstack);
                     customRenderItem.doRender(dummyEntityItem, 0, 0, 0, 0, 0);
                 }
@@ -126,7 +146,7 @@ public class PipeRendererItems {
             GL11.glScalef(renderScale, renderScale, renderScale);
             GL11.glTranslatef(-0.5f, -0.5f, -0.5f);
 
-            RenderUtils.setGLColorFromInt(color.getLightHex());
+            RenderUtils.setGLColorFromInt(LIGHT_HEX.get(color));
             RenderResizableCuboid.INSTANCE.renderCube(erc);
             GlStateManager.color(1, 1, 1, 1);
 

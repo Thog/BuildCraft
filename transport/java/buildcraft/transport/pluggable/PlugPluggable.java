@@ -11,7 +11,7 @@ import net.minecraft.util.EnumFacing;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IPipePluggableState;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
@@ -20,8 +20,8 @@ import buildcraft.transport.BuildCraftTransport;
 import io.netty.buffer.ByteBuf;
 
 public class PlugPluggable extends PipePluggable {
-    private static final class PlugPluggableRenderer implements IPipePluggableStaticRenderer {
-        public static final IPipePluggableStaticRenderer INSTANCE = new PlugPluggableRenderer();
+    private static final class PlugPluggableRenderer implements IPluggableStaticRenderer {
+        public static final IPluggableStaticRenderer INSTANCE = new PlugPluggableRenderer();
         private float zFightOffset = 1 / 4096.0F;
 
         @Override
@@ -124,7 +124,7 @@ public class PlugPluggable extends PipePluggable {
     }
 
     @Override
-    public IPipePluggableStaticRenderer getStaticRenderer() {
+    public IPluggableStaticRenderer getStaticRenderer() {
         return PlugPluggableRenderer.INSTANCE;
     }
 

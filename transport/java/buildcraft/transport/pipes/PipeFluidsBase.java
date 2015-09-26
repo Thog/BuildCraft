@@ -22,7 +22,7 @@ public class PipeFluidsBase extends Pipe<PipeTransportFluids> {
     }
 
     public static Item createFactory(final PipeInfo info) {
-        final Item item = PipeAPI.registry.createNewPipeItem();
+        final Item item = PipeAPI.REGISTRY.createNewPipeItem();
         // TODO (JDK1.8): Convert this to a lambda
         IPipeFactory factory = new IPipeFactory() {
             @Override
@@ -30,7 +30,7 @@ public class PipeFluidsBase extends Pipe<PipeTransportFluids> {
                 return new PipeFluidsBase(item, info);
             }
         };
-        PipeAPI.registry.registerFactory(item, factory);
+        PipeAPI.REGISTRY.registerFactory(item, factory);
         item.setUnlocalizedName(info.getUnlocalizedName());
         return item;
     }

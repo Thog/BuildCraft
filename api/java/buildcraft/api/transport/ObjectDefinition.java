@@ -3,6 +3,9 @@ package buildcraft.api.transport;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
+/* Note that neither this class (Or any of its subtypes) overrides equals or hash code, despite it being used as a key
+ * in a hash table. This is to speed up comparisons as no two ObjectDefinitions instances should be created with the
+ * same values. */
 public class ObjectDefinition {
     /** A globally unique tag for the pipe */
     public final String globalUniqueTag;

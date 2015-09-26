@@ -26,6 +26,8 @@ import buildcraft.transport.gates.GateDefinition.GateLogic;
 import buildcraft.transport.gates.GateDefinition.GateMaterial;
 import buildcraft.transport.item.ItemGate;
 
+// TODO (PASS 0): Remove this and replace it with a texture generator based off of all addons added to the registry
+@Deprecated
 public class GateItemModel extends BuildCraftBakedModel implements ISmartItemModel {
     private static class GateInfo {
         final GateLogic logic;

@@ -14,6 +14,8 @@ import buildcraft.api.statements.StatementSlot;
 import buildcraft.api.statements.containers.ISidedStatementContainer;
 import buildcraft.api.transport.IPipe;
 
+// Deprecated as all of this is moved to GateBehaviour
+@Deprecated
 public interface IGate extends ISidedStatementContainer {
     IPipe getPipe();
 

@@ -8,7 +8,7 @@ public class BehaviourFactoryWooden implements IPipeBehaviourFactory {
     private PipeDefinition definition;
 
     public void setDefinition(PipeDefinition definition) {
-        if (definition == null) {
+        if (this.definition == null) {
             this.definition = definition;
         }
     }

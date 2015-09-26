@@ -62,6 +62,7 @@ import buildcraft.transport.FacadePluggable;
 import buildcraft.transport.Gate;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipePluggableState;
+import buildcraft.transport.PipeTransport;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.gates.GatePluggable;
@@ -78,7 +79,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public final CoreState coreState = new CoreState();
     public boolean[] pipeConnectionsBuffer = new boolean[6];
 
-    public Pipe pipe;
+    private Pipe pipe;
     public int redstoneInput;
     public int[] redstoneInputSide = new int[EnumFacing.VALUES.length];
 
@@ -110,12 +111,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             nbt.setByte(key, (byte) redstoneInputSide[i]);
         }
 
-        if (pipe != null) {
-            nbt.setString("pipeTag", pipe.definition.globalUniqueTag);
-            pipe.writeToNBT(nbt);
-        } else {
-            nbt.setInteger("pipeId", coreState.pipeId);
-        }
+        nbt.setInteger("pipeId", Item.getIdFromItem(PipeAPI.REGISTRY.getItem(pipe.definition)));
 
         sideProperties.writeToNBT(nbt);
     }
@@ -140,27 +136,29 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 redstoneInputSide[i] = 0;
             }
         }
-        PipeDefinition definition = PipeAPI.registry.getDefinition(nbt.getString("pipeTag"));
-        if (nbt.hasKey("pipeId")) {
-            // Pre 7.x compat
-            int id = nbt.getInteger("pipeId");
-            definition = PipeAPI.registry.getDefinition(Item.getItemById(id));
+        int id = nbt.getInteger("pipeId");
+        PipeDefinition definition = PipeAPI.REGISTRY.getDefinition(Item.getItemById(id));
 
-        }
-        coreState.pipeId = Item.getIdFromItem(PipeAPI.registry.getItem(definition));
-
-        pipe = new Pipe(definition);
-        bindPipe();
-
-        if (pipe != null) {
-            pipe.readFromNBT(nbt);
+        if (definition == null) {
+            this.deletePipe = true;
+            new RuntimeException("Definition was null! (id = " + id + ", item = " + Item.getItemById(id) + ")").printStackTrace();;
         } else {
-            BCLog.logger.log(Level.WARN, "Pipe failed to load from NBT at {0}", getPos());
-            deletePipe = true;
-        }
 
-        sideProperties.readFromNBT(nbt);
-        attachPluggables = true;
+            coreState.pipeId = Item.getIdFromItem(PipeAPI.REGISTRY.getItem(definition));
+
+            pipe = new Pipe(definition);
+            bindPipe();
+
+            if (pipe != null) {
+                pipe.readFromNBT(nbt);
+            } else {
+                BCLog.logger.log(Level.WARN, "Pipe failed to load from NBT at " + getPos() + ", deleting");
+                deletePipe = true;
+            }
+
+            sideProperties.readFromNBT(nbt);
+            attachPluggables = true;
+        }
     }
 
     @Override
@@ -206,6 +204,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             if (!worldObj.isRemote) {
                 if (deletePipe) {
                     worldObj.setBlockToAir(getPos());
+                    return;
                 }
 
                 if (pipe == null) {
@@ -271,7 +270,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
             if (sendClientUpdate) {
                 sendClientUpdate = false;
-
                 BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
             }
         } catch (Throwable t) {
@@ -388,15 +386,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public void initialize(PipeDefinition definition) {
         this.blockType = getBlockType();
 
-        if (pipe == null) {
-            BCLog.logger.log(Level.WARN, "Pipe failed to initialize at {0}, deleting", getPos());
-            worldObj.setBlockToAir(getPos());
-            return;
-        }
-
-        Pipe pipe = new Pipe(definition);
-
-        this.pipe = pipe;
+        pipe = new Pipe(definition);
 
         for (EnumFacing o : EnumFacing.VALUES) {
             TileEntity tile = getTile(o);
@@ -1025,6 +1015,12 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         if (pipe == null || pipe.transport == null) {
             return;
         }
+
+        left.add("");
+        for (EnumFacing face : EnumFacing.values()) {
+            left.add(face.getName() + " = " + isPipeConnected(face));
+        }
+
         if (pipe.behaviour instanceof IDebuggable) {
             ((IDebuggable) pipe.behaviour).getDebugInfo(left, right, side);
         }
@@ -1039,5 +1035,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     @Override
     public IMjExternalStorage getMjStorage() {
         return storage;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public PipeTransport getTransportForRender() {
+        return pipe.transport;
     }
 }

@@ -64,7 +64,7 @@ public class ItemPipe extends ItemBuildCraft implements IItemPipe {
         }
 
         if (world.canBlockBePlaced(block, pos, false, side, entityplayer, itemstack)) {
-            PipeDefinition definition = PipeAPI.registry.getDefinition(this);
+            PipeDefinition definition = PipeAPI.REGISTRY.getDefinition(this);
 
             if (definition == null) {
                 BCLog.logger.log(Level.WARN, "Pipe failed to create during placement at " + pos);
@@ -105,7 +105,7 @@ public class ItemPipe extends ItemBuildCraft implements IItemPipe {
             int color = (stack.getItemDamage() - 1) & 15;
             list.add(ColorUtils.getFormattingTooltip(color) + EnumChatFormatting.ITALIC + StringUtils.localize("color." + ColorUtils.getName(color)));
         }
-        List<String> toolTip = PipeToolTipManager.getToolTip(PipeAPI.registry.getDefinition(this), advanced);
+        List<String> toolTip = PipeToolTipManager.getToolTip(PipeAPI.REGISTRY.getDefinition(this), advanced);
         list.addAll(toolTip);
     }
 

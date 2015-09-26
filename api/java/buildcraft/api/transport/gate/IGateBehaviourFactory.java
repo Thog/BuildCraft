@@ -1,5 +1,7 @@
 package buildcraft.api.transport.gate;
 
-public interface IGateBehaviourFactory {
+import buildcraft.api.gates.IGate;
 
+public interface IGateBehaviourFactory {
+    GateBehaviour createNew(IGate gate, GateDefinition definition);
 }

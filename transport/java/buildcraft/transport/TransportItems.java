@@ -28,6 +28,8 @@ import buildcraft.transport.pipes.EnumPipeMaterial;
 public class TransportItems {
     private static final Table<EnumPipeMaterial, EnumPipeType, PipeDefinition> pipes = HashBasedTable.create();
 
+    // private static final Table<> gates = HashBasedTable.create();
+
     public static void initItems() {
         // Register everything that applies to all different types
         for (EnumPipeType type : EnumPipeType.CONTENTS) {
@@ -87,7 +89,7 @@ public class TransportItems {
             EnumPipeMaterial material = entry.getRowKey();
             EnumPipeType type = entry.getColumnKey();
             PipeDefinition definition = entry.getValue();
-            Item pipe = PipeAPI.registry.getItem(definition);
+            Item pipe = PipeAPI.REGISTRY.getItem(definition);
 
             // 0 for unpainted and 1-16 for different glass colours
             for (int i = 0; i < 17; i++) {
@@ -151,7 +153,7 @@ public class TransportItems {
     }
 
     private static void registerDefinition(EnumPipeMaterial material, EnumPipeType type, PipeDefinition definition) {
-        Item item = PipeAPI.registry.registerPipeDefinition(definition);
+        Item item = PipeAPI.REGISTRY.registerDefinition(definition);
         item.setUnlocalizedName("buildcraft_" + item.getUnlocalizedName().replace("item.", ""));
         pipes.put(material, type, definition);
         CoreProxy.proxy.registerItem(item);

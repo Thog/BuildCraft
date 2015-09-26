@@ -7,7 +7,6 @@ package buildcraft.transport.statements;
 import java.util.Locale;
 
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.util.ResourceLocation;
 
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatementContainer;
@@ -20,8 +19,8 @@ public class ActionExtractionPreset extends BCStatement implements IActionIntern
     public final EnumDyeColor color;
 
     public ActionExtractionPreset(EnumDyeColor color) {
-        super(new ResourceLocation("buildcrafttransport:triggers/extraction_preset_" + color.name().toLowerCase(Locale.ENGLISH)),
-                "buildcraft:extraction.preset." + color.getTag(), "buildcraft.extraction.preset." + color.getTag());
+        super("buildcraft:extraction.preset." + color.getName(), "buildcraft.extraction.preset." + color.getName());
+        setLocation("buildcrafttransport:triggers/extraction_preset_" + color.name().toLowerCase(Locale.ENGLISH));
 
         this.color = color;
     }

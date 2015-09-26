@@ -10,7 +10,7 @@ import net.minecraftforge.common.util.Constants;
 
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IFacadePluggable;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.item.ItemFacade;
@@ -106,7 +106,7 @@ public class FacadePluggable extends PipePluggable implements IFacadePluggable {
     }
 
     @Override
-    public IPipePluggableStaticRenderer getStaticRenderer() {
+    public IPluggableStaticRenderer getStaticRenderer() {
         return FacadePluggableRenderer.INSTANCE;
     }
 

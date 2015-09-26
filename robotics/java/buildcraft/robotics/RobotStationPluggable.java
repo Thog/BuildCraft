@@ -24,7 +24,7 @@ import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.pluggable.IPipePluggableItem;
 import buildcraft.api.transport.pluggable.IPipePluggableState;
-import buildcraft.api.transport.pluggable.IPipePluggableStaticRenderer;
+import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.IPipeRenderState;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
@@ -33,7 +33,7 @@ import buildcraft.transport.internal.pipes.TileGenericPipe;
 import io.netty.buffer.ByteBuf;
 
 public class RobotStationPluggable extends PipePluggable implements IPipePluggableItem, IDebuggable, IDockingStationProvider, IMjHandler {
-    public class RobotStationPluggableRenderer implements IPipePluggableStaticRenderer {
+    public class RobotStationPluggableRenderer implements IPluggableStaticRenderer {
         private float zFightOffset = 1 / 4096.0F;
 
         @Override
@@ -221,7 +221,7 @@ public class RobotStationPluggable extends PipePluggable implements IPipePluggab
     }
 
     @Override
-    public IPipePluggableStaticRenderer getStaticRenderer() {
+    public IPluggableStaticRenderer getStaticRenderer() {
         return new RobotStationPluggableRenderer();
     }
 

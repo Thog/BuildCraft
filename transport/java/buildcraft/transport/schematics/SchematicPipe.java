@@ -38,7 +38,7 @@ public class SchematicPipe extends SchematicTile {
         Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
-            return pipe.definition == PipeAPI.registry.getDefinition(this.tileNBT.getString("pipeTag"));
+            return pipe.definition == PipeAPI.REGISTRY.getDefinition(this.tileNBT.getString("pipeTag"));
         } else {
             return false;
         }
@@ -188,7 +188,7 @@ public class SchematicPipe extends SchematicTile {
             ArrayList<ItemStack> items = pipe.computeItemDrop();
             storedRequirements = new ItemStack[items.size() + 1];
             items.toArray(storedRequirements);
-            Item pipeItem = PipeAPI.registry.getItem(pipe.definition);
+            Item pipeItem = PipeAPI.REGISTRY.getItem(pipe.definition);
             storedRequirements[storedRequirements.length - 1] = new ItemStack(pipeItem, 1, pipe.container.getItemMetadata());
         }
     }

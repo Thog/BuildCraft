@@ -42,7 +42,7 @@ public class StripesHandlerPipes implements IStripesHandler {
         }
 
         Vec3 p = Utils.convert(pos).add(Utils.convert(direction, -1));
-        PipeDefinition definition = PipeAPI.registry.getDefinition(stack.getItem());
+        PipeDefinition definition = PipeAPI.REGISTRY.getDefinition(stack.getItem());
         if (definition == null) {
             return false;
         }
