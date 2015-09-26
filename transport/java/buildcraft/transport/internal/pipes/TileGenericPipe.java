@@ -485,6 +485,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         bindPipe();
         updateCoreState();
 
+        if (pipe == null || pipe.definition == null || pipe.behaviour == null) {
+            // If ANY of these are null it will cause major problems for the client, so lets just not send them
+            return null;
+        }
         PacketTileState packet = new PacketTileState(getPos());
 
         if (pipe != null && pipe.transport != null) {
@@ -495,7 +499,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         packet.addStateForSerialization((byte) 1, renderState);
         packet.addStateForSerialization((byte) 2, pluggableState);
 
-        if (pipe.behaviour instanceof ISerializable) {
+        if (pipe != null && pipe.behaviour instanceof ISerializable) {
             packet.addStateForSerialization((byte) 3, (ISerializable) pipe.behaviour);
         }
 
@@ -504,7 +508,11 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public net.minecraft.network.Packet getDescriptionPacket() {
-        return BuildCraftTransport.instance.channels.get(Side.SERVER).generatePacketFrom(getBCDescriptionPacket());
+        Packet bcPacket = getBCDescriptionPacket();
+        if (bcPacket == null) {
+            return null;
+        }
+        return BuildCraftTransport.instance.channels.get(Side.SERVER).generatePacketFrom(bcPacket);
     }
 
     @Override
