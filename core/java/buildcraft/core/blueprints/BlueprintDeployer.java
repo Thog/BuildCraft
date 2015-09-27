@@ -11,11 +11,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import buildcraft.api.blueprints.BlueprintDeployer;
+import buildcraft.api.blueprints.IBlueprintDeployer;
 import buildcraft.core.lib.utils.NBTUtils;
 import buildcraft.core.lib.utils.Utils;
 
-public class RealBlueprintDeployer extends BlueprintDeployer {
+public enum BlueprintDeployer implements IBlueprintDeployer {
+    INSTANCE;
 
     @Override
     public void deployBlueprint(World world, BlockPos pos, EnumFacing dir, File file) {

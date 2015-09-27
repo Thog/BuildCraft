@@ -49,10 +49,11 @@ public class HashDefinitionMap<I extends Item, D extends ObjectDefinition> imple
     }
 
     @Override
-    public void put(String tag, I item, D definition) {
-        if (tag == null || item == null || definition == null) {
+    public void put(I item, D definition) {
+        if (item == null || definition == null) {
             throw new NullPointerException("Cannot put any null values!");
         }
+        String tag = definition.globalUniqueTag;
         if (containsTag(tag) || containsItem(item) || containsDefinition(definition)) {
             throw new IllegalArgumentException("Cannot re-put any values into the map!");
         }

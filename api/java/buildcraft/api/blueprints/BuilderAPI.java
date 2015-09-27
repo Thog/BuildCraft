@@ -4,11 +4,19 @@
  * should be located as "LICENSE.API" in the BuildCraft source code distribution. */
 package buildcraft.api.blueprints;
 
-public final class BuilderAPI {
-    public static ISchematicRegistry schematicRegistry;
+import buildcraft.api.APIHelper;
+
+public enum BuilderAPI {
+    INSTANCE;
+
+    public static final ISchematicRegistry SCHEMATIC_REGISTRY;
+    public static final IBlueprintDeployer BLUEPRINT_DEPLOYER;
 
     public static final double BREAK_ENERGY = 16;
     public static final double BUILD_ENERGY = 24;
 
-    private BuilderAPI() {}
+    static {
+        SCHEMATIC_REGISTRY = APIHelper.getInstance("buildcraft.core.blueprints.SchematicRegistry", ISchematicRegistry.class, null);
+        BLUEPRINT_DEPLOYER = APIHelper.getInstance("buildcraft.core.blueprints.BlueprintDeployer", IBlueprintDeployer.class, null);
+    }
 }

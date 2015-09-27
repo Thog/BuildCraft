@@ -21,8 +21,14 @@ public class ObjectDefinition {
         return container.getModId();
     }
 
+    /* This constructor is here so we can test this implementation as a key for HashDefinitionMap and instances of
+     * ObjectDefinition. IT SHOULD REMAIN PACKAGE-PRIVATE, AND SHOULD NEVER BE GIVEN OUT TO OTHER PACKAGES! */
+    ObjectDefinition(String mod, String modUniqueTag) {
+        this.globalUniqueTag = mod + ":" + modUniqueTag;
+        this.modUniqueTag = modUniqueTag;
+    }
+
     public ObjectDefinition(String tag) {
-        this.globalUniqueTag = getCurrentMod() + ":" + tag;
-        this.modUniqueTag = tag;
+        this(getCurrentMod(), tag);
     }
 }

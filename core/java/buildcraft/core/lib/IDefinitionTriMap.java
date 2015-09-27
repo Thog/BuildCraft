@@ -10,7 +10,7 @@ import buildcraft.api.transport.ObjectDefinition;
 
 public interface IDefinitionTriMap<I extends Item, D extends ObjectDefinition> {
     // Additions
-    void put(String tag, I item, D definition);
+    void put(I item, D definition);
 
     // Removal
     void clear();

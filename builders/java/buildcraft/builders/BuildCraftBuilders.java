@@ -304,7 +304,7 @@ public class BuildCraftBuilders extends BuildCraftMod {
             try {
                 PrintWriter writer = new PrintWriter("SchematicDebug.txt", "UTF-8");
                 writer.println("*** REGISTERED SCHEMATICS ***");
-                SchematicRegistry reg = (SchematicRegistry) BuilderAPI.schematicRegistry;
+                SchematicRegistry reg = (SchematicRegistry) BuilderAPI.SCHEMATIC_REGISTRY;
                 for (String s : reg.schematicBlocks.keySet()) {
                     writer.println(s + " -> " + reg.schematicBlocks.get(s).clazz.getCanonicalName());
                 }
@@ -335,7 +335,7 @@ public class BuildCraftBuilders extends BuildCraftMod {
         MinecraftForge.EVENT_BUS.register(new EventHandlerBuilders());
 
         // Standard blocks
-        ISchematicRegistry schemes = BuilderAPI.schematicRegistry;
+        ISchematicRegistry schemes = BuilderAPI.SCHEMATIC_REGISTRY;
         schemes.registerSchematicBlock(Blocks.air, SchematicAir.class);
 
         schemes.registerSchematicBlock(Blocks.snow, SchematicIgnore.class);

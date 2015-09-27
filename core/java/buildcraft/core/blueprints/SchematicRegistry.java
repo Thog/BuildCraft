@@ -23,9 +23,9 @@ import buildcraft.api.core.BCLog;
 import buildcraft.api.core.JavaTools;
 import buildcraft.core.lib.utils.Utils;
 
-public final class SchematicRegistry implements ISchematicRegistry {
+public enum SchematicRegistry implements ISchematicRegistry {
+    INSTANCE;
 
-    public static SchematicRegistry INSTANCE = new SchematicRegistry();
     private static final HashMap<Class<? extends Schematic>, Constructor<?>> emptyConstructorMap =
         new HashMap<Class<? extends Schematic>, Constructor<?>>();
 

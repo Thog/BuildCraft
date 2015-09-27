@@ -107,14 +107,14 @@ public class BuildCraftFactory extends BuildCraftMod {
 
         FactoryProxy.proxy.initializeTileEntities();
 
-        BuilderAPI.schematicRegistry.registerSchematicBlock(refineryBlock, SchematicRefinery.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(tankBlock, SchematicTileIgnoreState.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(pumpBlock, SchematicPump.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(miningWellBlock, SchematicTileIgnoreState.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(floodGateBlock, SchematicTileIgnoreState.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(autoWorkbenchBlock, SchematicAutoWorkbench.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(chuteBlock, SchematicTile.class);
-        BuilderAPI.schematicRegistry.registerSchematicBlock(plainPipeBlock, SchematicFree.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(refineryBlock, SchematicRefinery.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(tankBlock, SchematicTileIgnoreState.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(pumpBlock, SchematicPump.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(miningWellBlock, SchematicTileIgnoreState.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(floodGateBlock, SchematicTileIgnoreState.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(autoWorkbenchBlock, SchematicAutoWorkbench.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(chuteBlock, SchematicTile.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(plainPipeBlock, SchematicFree.class);
 
         aLotOfCraftingAchievement = BuildCraftCore.achievementManager.registerAchievement(new Achievement("achievement.aLotOfCrafting",
                 "aLotOfCraftingAchievement", 1, 2, autoWorkbenchBlock, BuildCraftCore.woodenGearAchievement));

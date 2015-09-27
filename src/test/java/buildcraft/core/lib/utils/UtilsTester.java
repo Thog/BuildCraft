@@ -1,4 +1,4 @@
-package buildcraft.tests.core.lib.utils;
+package buildcraft.core.lib.utils;
 
 import java.util.Set;
 
@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-
-import buildcraft.core.lib.utils.Utils;
 
 public class UtilsTester {
     @Test

@@ -37,10 +37,6 @@ allprojects {
         replace "@VERSION@", project.version
         replace "@MC_VERSION@", version
     }
-
-    dependencies {
-        testCompile "junit:junit:4.12"
-    }
 }
 
 // Only applied for the root buildcraft project
@@ -153,6 +149,6 @@ apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "idea"
 
-//dependencies {
-//    testCompile "junit:junit:4.12"
-//}
+dependencies {
+    testCompile "junit:junit:4.12"
+}

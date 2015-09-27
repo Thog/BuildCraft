@@ -1,4 +1,4 @@
-package buildcraft.tests.api.mj;
+package buildcraft.api.mj;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,8 +12,6 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
 
-import buildcraft.api.mj.EnumMjDevice;
-import buildcraft.api.mj.EnumMjPower;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 

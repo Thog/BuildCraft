@@ -1,4 +1,4 @@
-package buildcraft.tests.api.mj;
+package buildcraft.api.mj;
 
 import org.junit.Assert;
 import org.junit.Test;

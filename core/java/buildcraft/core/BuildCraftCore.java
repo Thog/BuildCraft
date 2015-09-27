@@ -57,7 +57,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
-import buildcraft.api.blueprints.BlueprintDeployer;
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.BuildCraftAPI;
@@ -80,8 +79,6 @@ import buildcraft.api.tiles.IDebuggable;
 import buildcraft.core.block.BlockDecoration;
 import buildcraft.core.block.BlockEngine;
 import buildcraft.core.block.BlockSpring;
-import buildcraft.core.blueprints.RealBlueprintDeployer;
-import buildcraft.core.blueprints.SchematicRegistry;
 import buildcraft.core.command.SubCommandChangelog;
 import buildcraft.core.command.SubCommandVersion;
 import buildcraft.core.config.BuildCraftConfiguration;
@@ -235,9 +232,6 @@ public class BuildCraftCore extends BuildCraftMod {
         BuildcraftRecipeRegistry.integrationTable = IntegrationRecipeManager.INSTANCE;
         BuildcraftRecipeRegistry.refinery = RefineryRecipeManager.INSTANCE;
         BuildcraftRecipeRegistry.programmingTable = ProgrammingRecipeManager.INSTANCE;
-
-        BuilderAPI.schematicRegistry = SchematicRegistry.INSTANCE;
-        BlueprintDeployer.instance = new RealBlueprintDeployer();
 
         mainConfiguration = new BuildCraftConfiguration(new File(evt.getModConfigurationDirectory(), "buildcraft/main.cfg"));
         mainConfigManager = new ConfigManager(mainConfiguration, this);
@@ -394,7 +388,7 @@ public class BuildCraftCore extends BuildCraftMod {
         EntityList.stringToClassMapping.remove("BuildCraft|Core.bcLaser");
         EntityList.stringToClassMapping.remove("BuildCraft|Core.bcEnergyLaser");
 
-        BuilderAPI.schematicRegistry.registerSchematicBlock(engineBlock, SchematicEngine.class);
+        BuilderAPI.SCHEMATIC_REGISTRY.registerSchematicBlock(engineBlock, SchematicEngine.class);
 
         CoreProxy.proxy.initializeRendering();
         CoreProxy.proxy.initializeEntityRendering();
