@@ -7,11 +7,17 @@ package buildcraft.api.transport;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.gates.IGate;
+import buildcraft.api.transport.event.IPipeEvent;
+import buildcraft.transport.PipeTransport;
 
 public interface IPipe {
     IPipeTile getTile();
 
     PipeBehaviour getBehaviour();
+
+    PipeTransport getTransport();
+
+    void postEvent(IPipeEvent event);
 
     IGate getGate(EnumFacing side);
 

@@ -1,4 +1,4 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import java.util.Collections;
 import java.util.Map;
@@ -14,16 +14,16 @@ import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.event.IPipeContents;
 import buildcraft.api.transport.event.IPipeEventFindDestination;
 
-class PipeEventFindDestination extends PipeEvent implements IPipeEventFindDestination {
+public class PipeEventFindDestination extends PipeEvent implements IPipeEventFindDestination {
     private final IPipeContents contents;
     private final EnumFacing origin;
     private final ImmutableMap<EnumFacing, TileEntity> potentialDestinations;
     private final Set<EnumFacing> destinations;
     private final Set<EnumFacing> unmodifiableDestinations;
     private final int maxPossibleDestinations;
-    int maxDestinations;
+    private int maxDestinations;
 
-    PipeEventFindDestination(IPipe pipe, IPipeContents contents, EnumFacing origin, Map<EnumFacing, TileEntity> potentialDestinations,
+    public PipeEventFindDestination(IPipe pipe, IPipeContents contents, EnumFacing origin, Map<EnumFacing, TileEntity> potentialDestinations,
             int maxPossibleDestinations) {
         super(pipe);
         this.contents = contents;

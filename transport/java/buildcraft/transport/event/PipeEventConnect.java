@@ -1,4 +1,4 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -6,12 +6,12 @@ import net.minecraft.util.EnumFacing;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.event.IPipeEventConnect;
 
-class PipeEventConnect extends PipeEventConnection implements IPipeEventConnect {
+public class PipeEventConnect extends PipeEventConnection implements IPipeEventConnect {
     private final boolean askedForConnection;
     private final boolean isCorrectType;
     boolean allowed;
 
-    PipeEventConnect(IPipe pipe, EnumFacing side, TileEntity tile, boolean askedForConnection, boolean isCorrectType) {
+    public PipeEventConnect(IPipe pipe, EnumFacing side, TileEntity tile, boolean askedForConnection, boolean isCorrectType) {
         super(pipe, side, tile);
         this.askedForConnection = askedForConnection;
         this.isCorrectType = isCorrectType;

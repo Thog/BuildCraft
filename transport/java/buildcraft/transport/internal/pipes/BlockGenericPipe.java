@@ -72,6 +72,7 @@ import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipePluggableState;
+import buildcraft.transport.event.PipeEventRandomDisplayTick;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.item.ItemGateCopier;
 import buildcraft.transport.item.ItemPipe;
@@ -858,7 +859,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         TileEntity tile = blockAccess.getTileEntity(pos);
 
         if (tile instanceof TileGenericPipe && !tile.isInvalid()) {
-            return ((TileGenericPipe) tile).getPipe();
+            return ((TileGenericPipe) tile).pipe;
         }
         return null;
     }
@@ -1024,10 +1025,10 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         }
         if (tile instanceof TileGenericPipe) {
             TileGenericPipe genericPipe = (TileGenericPipe) tile;
-            if (genericPipe.getPipe().behaviour instanceof ICustomPipeConnection) {
-                return ((ICustomPipeConnection) genericPipe.getPipe().behaviour).getExtension(world, pos, face, state);
-            } else if (genericPipe.getPipe().transport instanceof ICustomPipeConnection) {
-                return ((ICustomPipeConnection) genericPipe.getPipe().transport).getExtension(world, pos, face, state);
+            if (genericPipe.getPipe().getBehaviour() instanceof ICustomPipeConnection) {
+                return ((ICustomPipeConnection) genericPipe.getPipe().getBehaviour()).getExtension(world, pos, face, state);
+            } else if (genericPipe.getPipe().getTransport() instanceof ICustomPipeConnection) {
+                return ((ICustomPipeConnection) genericPipe.getPipe().getTransport()).getExtension(world, pos, face, state);
             }
         }
         return 0;

@@ -22,6 +22,7 @@ import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeConnection;
+import buildcraft.api.transport.IPipeType;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.lib.block.TileBuildCraft;
 import buildcraft.core.lib.utils.BlockMiner;
@@ -183,7 +184,7 @@ public class TileMiningWell extends TileBuildCraft implements IHasWork, IPipeCon
     }
 
     @Override
-    public ConnectOverride overridePipeConnection(EnumPipeType type, EnumFacing with) {
+    public ConnectOverride overridePipeConnection(IPipeType type, EnumFacing with) {
         if (BuildCraftProperties.BLOCK_FACING.getValue(worldObj.getBlockState(pos)) == with) {
             return ConnectOverride.DISCONNECT;
         }

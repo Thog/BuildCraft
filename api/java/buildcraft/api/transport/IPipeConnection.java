@@ -24,5 +24,5 @@ public interface IPipeConnection {
      * @param type
      * @param with
      * @return CONNECT to force a connection, DISCONNECT to force no connection, and DEFAULT to let the pipe decide. */
-    ConnectOverride overridePipeConnection(EnumPipeType type, EnumFacing with);
+    ConnectOverride overridePipeConnection(IPipeType type, EnumFacing with);
 }

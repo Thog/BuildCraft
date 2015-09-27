@@ -27,6 +27,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.api.tiles.IDebuggable;
@@ -42,8 +44,17 @@ import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeTransport;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.event.PipeContentsEditableItem;
+import buildcraft.transport.event.PipeContentsItem;
+import buildcraft.transport.event.PipeEventAdjustSpeed;
+import buildcraft.transport.event.PipeEventDropItem;
+import buildcraft.transport.event.PipeEventFindDestination;
+import buildcraft.transport.event.PipeEventMovementEnter;
+import buildcraft.transport.event.PipeEventMovementExit;
+import buildcraft.transport.event.PipeEventMovementReachCenter;
 import buildcraft.transport.network.PacketPipeTransportItemStackRequest;
 import buildcraft.transport.network.PacketPipeTransportTraveler;
+import buildcraft.transport.render.tile.PipeRendererItems;
 import buildcraft.transport.utils.TransportUtils;
 
 public final class PipeTransportItems extends PipeTransport implements IDebuggable {
@@ -96,7 +107,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
         PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
         PipeEventMovementEnter enter = new PipeEventMovementEnter(container.getPipe(), contents, inputOrientation);
-        container.getPipe().eventBus.post(enter);
+        container.getPipe().postEvent(enter);
 
         item.setItemStack(contents.stack);
 
@@ -105,7 +116,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         }
 
         PipeEventAdjustSpeed speed = new PipeEventAdjustSpeed(container.getPipe(), contents.uneditable(), item.getSpeed());
-        container.getPipe().eventBus.post(speed);
+        container.getPipe().postEvent(speed);
 
         item.setSpeed(item.getSpeed());
 
@@ -163,7 +174,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
         PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
         PipeEventMovementEnter enter = new PipeEventMovementEnter(container.getPipe(), contents, item.input);
-        container.getPipe().eventBus.post(enter);
+        container.getPipe().postEvent(enter);
 
         item.setItemStack(contents.stack);
         item.color = contents.colour;
@@ -173,7 +184,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         }
 
         PipeEventAdjustSpeed speed = new PipeEventAdjustSpeed(container.getPipe(), contents.uneditable(), item.getSpeed());
-        container.getPipe().eventBus.post(speed);
+        container.getPipe().postEvent(speed);
         item.setSpeed(speed.speed);
 
         readjustPosition(item);
@@ -217,7 +228,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
         PipeContentsItem contents = new PipeContentsItem(item.getItemStack(), item.color);
         PipeEventFindDestination findDest = new PipeEventFindDestination(container.getPipe(), contents, item.input, potentialDestinations, 6);
-        container.getPipe().eventBus.post(findDest);
+        container.getPipe().postEvent(findDest);
 
         if (allowBouncing && destinations.isEmpty()) {
             if (canReceivePipeObjects(item.input.getOpposite(), item)) {
@@ -297,7 +308,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
                     PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
                     PipeEventMovementReachCenter reachCenter = new PipeEventMovementReachCenter(container.getPipe(), contents, item.input,
                             item.output);
-                    container.getPipe().eventBus.post(reachCenter);
+                    container.getPipe().postEvent(reachCenter);
                     item.setItemStack(contents.getStack());
                     item.color = contents.getColor();
                 }
@@ -311,7 +322,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
                 PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
                 PipeEventMovementExit exit = new PipeEventMovementExit(container.getPipe(), contents, item.output);
-                container.getPipe().eventBus.post(exit);
+                container.getPipe().postEvent(exit);
 
                 // boolean handleItem = !exit.handled;
                 // TODO (PASS 0): FIND OUT WHAT ITEM EVENT #EXIT #HADNLED WAS USED FOR
@@ -362,7 +373,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         }
 
         PipeEventDropItem dropItemEvent = new PipeEventDropItem(container.getPipe(), item.toEntityItem());
-        container.getPipe().eventBus.post(dropItemEvent);
+        container.getPipe().postEvent(dropItemEvent);
 
         if (dropItemEvent.getDroppedItem() == null || dropItemEvent.getDroppedItem().getEntityItem().stackSize <= 0) {
             return;
@@ -587,5 +598,11 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         list.add(PipeAPI.CONTENTS);
         list.add(PipeAPI.PERCENT_FULL);
         return list;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderTransport(float partialTicks) {
+        PipeRendererItems.renderItemPipe(container.getPipe(), this, partialTicks);
     }
 }

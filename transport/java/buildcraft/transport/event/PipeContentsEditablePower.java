@@ -1,9 +1,9 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import buildcraft.api.transport.event.IPipeContentsEditable.IPipeContentsEditablePower;
 
-class PipeContentsEditablePower extends PipeContentsPower implements IPipeContentsEditablePower {
-    PipeContentsEditablePower(double power) {
+public class PipeContentsEditablePower extends PipeContentsPower implements IPipeContentsEditablePower {
+    public PipeContentsEditablePower(double power) {
         super(power);
     }
 

@@ -34,16 +34,8 @@ import buildcraft.api.gates.IGateExpansion;
 import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.tiles.IDebuggable;
-import buildcraft.api.transport.EnumPipeType;
-import buildcraft.api.transport.ICustomPipeConnection;
-import buildcraft.api.transport.IPipe;
-import buildcraft.api.transport.IPipeConnection;
+import buildcraft.api.transport.*;
 import buildcraft.api.transport.IPipeConnection.ConnectOverride;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.PipeAPI;
-import buildcraft.api.transport.PipeConnectionAPI;
-import buildcraft.api.transport.PipeDefinition;
-import buildcraft.api.transport.PipeWire;
 import buildcraft.api.transport.pluggable.IFacadePluggable;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
@@ -62,8 +54,10 @@ import buildcraft.transport.FacadePluggable;
 import buildcraft.transport.Gate;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipePluggableState;
-import buildcraft.transport.PipeTransport;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.event.PipeEventConnect;
+import buildcraft.transport.event.PipeEventConnectBlock;
+import buildcraft.transport.event.PipeEventConnectPipe;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.item.ItemFacade.FacadeState;
@@ -79,7 +73,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public final CoreState coreState = new CoreState();
     public boolean[] pipeConnectionsBuffer = new boolean[6];
 
-    private Pipe pipe;
+    Pipe pipe;
     public int redstoneInput;
     public int[] redstoneInputSide = new int[EnumFacing.VALUES.length];
 
@@ -454,29 +448,11 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     @Override
-    public EnumPipeType getPipeType() {
+    public IPipeType getPipeType() {
         if (BlockGenericPipe.isValid(pipe)) {
             return pipe.transport.getPipeType();
         }
         return null;
-    }
-
-    @Override
-    @Deprecated
-    public int x() {
-        return getPos().getX();
-    }
-
-    @Override
-    @Deprecated
-    public int y() {
-        return getPos().getY();
-    }
-
-    @Override
-    @Deprecated
-    public int z() {
-        return getPos().getZ();
     }
 
     /* SMP */
@@ -1014,7 +990,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     @Override
-    public Pipe getPipe() {
+    public IPipe getPipe() {
         return pipe;
     }
 
@@ -1043,10 +1019,5 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     @Override
     public IMjExternalStorage getMjStorage() {
         return storage;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public PipeTransport getTransportForRender() {
-        return pipe.transport;
     }
 }

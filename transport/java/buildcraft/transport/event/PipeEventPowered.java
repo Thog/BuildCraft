@@ -1,15 +1,15 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.event.IPipeEventPowered;
 
-class PipeEventPowered extends PipeEvent implements IPipeEventPowered {
+public class PipeEventPowered extends PipeEvent implements IPipeEventPowered {
     private EnumFacing side;
-    double mj;
+    private double mj;
 
-    PipeEventPowered(IPipe pipe, EnumFacing side, double mj) {
+    public PipeEventPowered(IPipe pipe, EnumFacing side, double mj) {
         super(pipe);
         this.side = side;
         this.mj = mj;

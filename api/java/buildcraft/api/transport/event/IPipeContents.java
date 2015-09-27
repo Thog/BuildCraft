@@ -2,7 +2,9 @@ package buildcraft.api.transport.event;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 
 import buildcraft.api.transport.EnumPipeType;
 
@@ -24,6 +26,12 @@ public interface IPipeContents {
 
         /** @return The actual fluid type. May be null */
         Fluid getFluid();
+
+        /** @return The extra NBT data stored with the fluid. May be null */
+        NBTTagCompound getNBT();
+
+        /** @return An identical fluid stack to the first one, but completely separate. */
+        FluidStack cloneFluidStack();
     }
 
     public interface IPipeContentsPower extends IPipeContents {

@@ -13,6 +13,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.PipeDefinition;
@@ -125,4 +127,7 @@ public abstract class PipeTransport {
     }
 
     public abstract List<PipeProperty<?>> getAllProperties();
+
+    @SideOnly(Side.CLIENT)
+    public abstract void renderTransport(float partialTicks);
 }

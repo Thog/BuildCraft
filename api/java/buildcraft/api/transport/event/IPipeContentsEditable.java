@@ -2,6 +2,7 @@ package buildcraft.api.transport.event;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 
 public interface IPipeContentsEditable extends IPipeContents {
@@ -32,6 +33,12 @@ public interface IPipeContentsEditable extends IPipeContents {
         /** @param fluid The new fluid type. This will carry over the amount of fluid to the new type. If the fluid type
          *            is null, then it clears the amount held. */
         void setFluid(Fluid fluid);
+
+        /** @param nbt The new NBT object
+         * @throws IllegalArgumentException If {@link #getFluid()} returns null. (We cannot initialise a fluidstack with
+         *             a null fluid as that will lead to all sorts of bugs- call {@link #setFluid(Fluid)} with a non
+         *             null before if the {@link #getFluid()} returns null) */
+        void setNBT(NBTTagCompound nbt) throws IllegalArgumentException;
     }
 
     public interface IPipeContentsEditablePower extends IPipeContentsEditable, IPipeContentsPower {

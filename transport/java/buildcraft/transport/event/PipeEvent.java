@@ -1,12 +1,12 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.event.IPipeEvent;
 
-abstract class PipeEvent implements IPipeEvent {
+public abstract class PipeEvent implements IPipeEvent {
     private final IPipe pipe;
 
-    PipeEvent(IPipe pipe) {
+    public PipeEvent(IPipe pipe) {
         this.pipe = pipe;
     }
 

@@ -7,6 +7,7 @@ package buildcraft.transport.internal.pipes;
 import java.util.EnumMap;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
@@ -28,7 +29,10 @@ import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.PipeAPI;
+import buildcraft.api.transport.PipeProperty;
 import buildcraft.core.DefaultProps;
+import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeTransport;
 import buildcraft.transport.network.PacketPowerUpdate;
@@ -80,8 +84,9 @@ public final class PipeTransportPower extends PipeTransport implements IDebuggab
             return true;
         }
 
+        // TODO (PASS 0): Move this out into _something_
         if (tile instanceof IMjHandler) {
-            if (container.pipe.behaviour instanceof PipeBehaviourWood) {
+            if (container.getPipe().getBehaviour() instanceof PipeBehaviourWood) {
                 IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
                 return storage.getDeviceType(side.getOpposite()).givesPowerTo(EnumMjDevice.TRANSPORT);
             }
@@ -204,5 +209,18 @@ public final class PipeTransportPower extends PipeTransport implements IDebuggab
             return MAX_POWER;
         }
         return pipePartMap.get(side).maxPower();
+    }
+
+    @Override
+    public List<PipeProperty<?>> getAllProperties() {
+        List<PipeProperty<?>> properties = Lists.newArrayList();
+        properties.add(PipeAPI.POWER);
+        properties.add(PipeAPI.PERCENT_FULL);
+        return properties;
+    }
+
+    @Override
+    public void renderTransport(float partialTicks) {
+
     }
 }

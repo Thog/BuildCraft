@@ -1,4 +1,4 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
@@ -6,11 +6,11 @@ import net.minecraft.item.ItemStack;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.event.IPipeContents.IPipeContentsItem;
 
-class PipeContentsItem implements IPipeContentsItem {
-    ItemStack stack;
-    EnumDyeColor colour;
+public class PipeContentsItem implements IPipeContentsItem {
+    protected ItemStack stack;
+    protected EnumDyeColor colour;
 
-    PipeContentsItem(ItemStack stack, EnumDyeColor colour) {
+    public PipeContentsItem(ItemStack stack, EnumDyeColor colour) {
         this.stack = stack;
         this.colour = colour;
     }
@@ -29,5 +29,4 @@ class PipeContentsItem implements IPipeContentsItem {
     public EnumDyeColor getColor() {
         return colour;
     }
-
 }

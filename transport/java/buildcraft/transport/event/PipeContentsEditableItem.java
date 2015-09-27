@@ -1,12 +1,12 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 
 import buildcraft.api.transport.event.IPipeContentsEditable.IPipeContentsEditableItem;
 
-class PipeContentsEditableItem extends PipeContentsItem implements IPipeContentsEditableItem {
-    PipeContentsEditableItem(ItemStack stack, EnumDyeColor colour) {
+public class PipeContentsEditableItem extends PipeContentsItem implements IPipeContentsEditableItem {
+    public PipeContentsEditableItem(ItemStack stack, EnumDyeColor colour) {
         super(stack, colour);
     }
 
@@ -25,7 +25,7 @@ class PipeContentsEditableItem extends PipeContentsItem implements IPipeContents
         this.colour = color;
     }
 
-    PipeContentsItem uneditable() {
+    public PipeContentsItem uneditable() {
         return new PipeContentsItem(stack, colour);
     }
 }

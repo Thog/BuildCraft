@@ -1,12 +1,13 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
 import buildcraft.api.transport.event.IPipeContentsEditable.IPipeContentsEditableFluid;
 
-class PipeContentsEditableFluid extends PipeContentsFluid implements IPipeContentsEditableFluid {
-    PipeContentsEditableFluid(FluidStack fluidStack) {
+public class PipeContentsEditableFluid extends PipeContentsFluid implements IPipeContentsEditableFluid {
+    public PipeContentsEditableFluid(FluidStack fluidStack) {
         super(fluidStack);
     }
 
@@ -44,6 +45,15 @@ class PipeContentsEditableFluid extends PipeContentsFluid implements IPipeConten
             fluidStack = null;
         } else {
             fluidStack = new FluidStack(getFluid(), fluidStack.amount);
+        }
+    }
+
+    @Override
+    public void setNBT(NBTTagCompound nbt) throws IllegalArgumentException {
+        if (fluidStack == null) {
+            throw new IllegalArgumentException("Did not have a stack to set the NBT to!");
+        } else {
+            fluidStack.tag = nbt;
         }
     }
 }

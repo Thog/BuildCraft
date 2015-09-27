@@ -13,20 +13,11 @@ import net.minecraft.world.World;
 import buildcraft.api.transport.pluggable.PipePluggable;
 
 public interface IPipeTile extends IInjectable {
-    EnumPipeType getPipeType();
+    IPipeType getPipeType();
 
     World getWorld();
 
     BlockPos getPos();
-
-    @Deprecated
-    int x();
-
-    @Deprecated
-    int y();
-
-    @Deprecated
-    int z();
 
     /** True if the pipe is connected to the block/pipe in the specific direction
      * 

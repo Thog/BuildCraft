@@ -21,7 +21,7 @@ public final class PipeDefinition extends ObjectDefinition {
     /** A factory the creates the behaviour of this definition. */
     public final IPipeBehaviourFactory behaviourFactory;
     /** The type of this pipe. This determines how the pipe should be rendered and how the pipe should act. */
-    public final EnumPipeType type;
+    public final IPipeType type;
 
     /** An array containing the actual sprites, where the positions are determined by {@link #spriteLocations} */
     @SideOnly(Side.CLIENT)
@@ -29,7 +29,7 @@ public final class PipeDefinition extends ObjectDefinition {
 
     public final int itemSpriteIndex;
 
-    public PipeDefinition(String tag, EnumPipeType type, int maxSprites, String textureStart, IPipeBehaviourFactory behaviour) {
+    public PipeDefinition(String tag, IPipeType type, int maxSprites, String textureStart, IPipeBehaviourFactory behaviour) {
         this(tag, type, maxSprites, 0, textureStart, behaviour);
     }
 
@@ -39,8 +39,11 @@ public final class PipeDefinition extends ObjectDefinition {
      * @param itemSpriteIndex
      * @param textureStart
      * @param factory */
-    public PipeDefinition(String tag, EnumPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IPipeBehaviourFactory factory) {
+    public PipeDefinition(String tag, IPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IPipeBehaviourFactory factory) {
         super(tag);
+        if (type.createTransport() == null) {
+            throw new IllegalArgumentException("You cannot create a pipe definition with an IPipeType that returns a null transport!");
+        }
         this.type = type;
         this.maxSprites = maxSprites;
         this.itemSpriteIndex = itemSpriteIndex;

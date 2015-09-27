@@ -17,7 +17,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.gates.IGateExpansion;
-import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.BuildCraftCore.RenderMode;
@@ -28,17 +27,13 @@ import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.PipeTransport;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.internal.pipes.PipeRenderState;
-import buildcraft.transport.internal.pipes.PipeTransportFluids;
-import buildcraft.transport.internal.pipes.PipeTransportItems;
-import buildcraft.transport.internal.pipes.PipeTransportPower;
 import buildcraft.transport.internal.pipes.TileGenericPipe;
 
 public class PipeRendererTESR extends TileEntitySpecialRenderer {
     public PipeRendererTESR() {}
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f, int argumentthatisalwaysminusone) {
+    public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float partialTicks, int argumentthatisalwaysminusone) {
         if (BuildCraftCore.render == RenderMode.NoDynamic) {
             return;
         }
@@ -55,17 +50,12 @@ public class PipeRendererTESR extends TileEntitySpecialRenderer {
 
         renderPluggables(pipe, x, y, z);
 
-        EnumPipeType pipeType = pipe.getPipeType();
+        PipeTransport transport = pipe.getPipe().getTransport();
 
-        PipeTransport transport = pipe.getTransportForRender();
-
-        if (pipeType == EnumPipeType.ITEM) {
-            PipeRendererItems.renderItemPipe(pipe.getPipe(), (PipeTransportItems) transport, x, y, z, f);
-        } else if (pipeType == EnumPipeType.FLUID) {
-            PipeRendererFluids.renderFluidPipe(pipe.getPipe(), (PipeTransportFluids) transport, x, y, z);
-        } else if (pipeType == EnumPipeType.POWER) {
-            PipeRendererPower.renderPowerPipe(pipe.getPipe(), (PipeTransportPower) transport, x, y, z);
-        } /* else if (pipeType == PipeType.STRUCTURE) { // no object to render in a structure pipe; } */
+        GL11.glPushMatrix();
+        GL11.glTranslated(x, y, z);
+        transport.renderTransport(partialTicks);
+        GL11.glPopMatrix();
     }
 
     private void renderPluggables(TileGenericPipe pipe, double x, double y, double z) {

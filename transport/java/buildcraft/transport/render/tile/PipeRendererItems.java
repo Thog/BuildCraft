@@ -63,13 +63,12 @@ public class PipeRendererItems {
         LIGHT_HEX.put(EnumDyeColor.WHITE, 0xe4e4e4);
     }
 
-    static void renderItemPipe(IPipe pipe, PipeTransportItems transport, double x, double y, double z, float f) {
+    public static void renderItemPipe(IPipe pipe, PipeTransportItems transport, float f) {
         GL11.glPushMatrix();
 
         float light = pipe.getTile().getWorld().getLightBrightness(pipe.getTile().getPos());
 
         int count = 0;
-        GL11.glTranslated(x, y, z);
         for (TravelingItem item : transport.items) {
             if (count >= MAX_ITEMS_TO_RENDER) {
                 break;

@@ -15,6 +15,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -25,17 +26,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.gates.IGate;
 import buildcraft.api.statements.ActionState;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementSlot;
-import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeProperty;
 import buildcraft.api.transport.PipeWire;
+import buildcraft.api.transport.event.IPipeEvent;
 import buildcraft.core.internal.IDropControlInventory;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.utils.Utils;
@@ -44,6 +46,7 @@ import buildcraft.transport.Gate;
 import buildcraft.transport.LensFilterHandler;
 import buildcraft.transport.PipeTransport;
 import buildcraft.transport.PipeTransportStructure;
+import buildcraft.transport.event.PipeEventUpdateProperty;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.statements.ActionValve.ValveState;
 
@@ -78,7 +81,7 @@ final class Pipe implements IDropControlInventory, IPipe {
             throw new RuntimeException("Found a definition that created a behaviour without linking itself back to it!"
                 + " (definition.behaviourFactory.createNew().definition is null) [defintion = " + definition + "]");
         }
-        transport = getTransport(definition.type);
+        transport = definition.type.createTransport();
         for (PipeProperty<?> property : transport.getAllProperties()) {
             dirtyProperties.add(property);
             properties.put(property, property.getDefault());
@@ -87,21 +90,13 @@ final class Pipe implements IDropControlInventory, IPipe {
 
         // TODO (PASS 0: Move this into the lens + filter gates!
         eventBus.register(new LensFilterHandler());
-    }
 
-    private static PipeTransport getTransport(EnumPipeType type) {
-        switch (type) {
-            case FLUID:
-                return new PipeTransportFluids();
-            case ITEM:
-                return new PipeTransportItems();
-            case POWER:
-                return new PipeTransportPower();
-            case STRUCTURE:
-                return new PipeTransportStructure();
-            default:
-                return null;
-        }
+        eventBus.register(new Object() {
+            @Subscribe
+            public void onEvent(Object event) {
+                BCLog.logger.info("onEvent " + event);
+            }
+        });
     }
 
     void setTile(TileEntity tile) {
@@ -150,6 +145,13 @@ final class Pipe implements IDropControlInventory, IPipe {
                     gate.tick();
                 }
             }
+        }
+    }
+
+    @Override
+    public void postEvent(IPipeEvent event) {
+        if (event != null) {
+            eventBus.post(event);
         }
     }
 
@@ -563,6 +565,11 @@ final class Pipe implements IDropControlInventory, IPipe {
     @Override
     public PipeBehaviour getBehaviour() {
         return behaviour;
+    }
+
+    @Override
+    public PipeTransport getTransport() {
+        return transport;
     }
 
     @Override

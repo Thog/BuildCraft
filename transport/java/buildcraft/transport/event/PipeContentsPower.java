@@ -1,10 +1,10 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.event.IPipeContents.IPipeContentsPower;
 
-class PipeContentsPower implements IPipeContentsPower {
-    double power;
+public class PipeContentsPower implements IPipeContentsPower {
+    public double power;
 
     PipeContentsPower(double power) {
         this.power = power;

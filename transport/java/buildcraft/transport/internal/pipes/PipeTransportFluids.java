@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -23,18 +24,22 @@ import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeDefinition;
+import buildcraft.api.transport.PipeProperty;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.utils.Average;
 import buildcraft.core.lib.utils.MathUtils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeTransport;
+import buildcraft.transport.event.PipeContentsFluid;
+import buildcraft.transport.event.PipeEventMovement;
 import buildcraft.transport.network.PacketFluidUpdate;
 import buildcraft.transport.statements.TriggerPipeContents.PipeContents;
 import buildcraft.transport.utils.FluidRenderData;
 
-public class PipeTransportFluids extends PipeTransport implements IFluidHandler, IDebuggable {
+public final class PipeTransportFluids extends PipeTransport implements IFluidHandler, IDebuggable {
     // public static final Map<PipeDefinition, Integer> fluidCapacities = Maps.newHashMap();
 
     /** The amount of liquid contained by a pipe section. For simplicity, all pipe sections are assumed to be of the
@@ -409,7 +414,8 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
                 }
                 continue;
             }
-            if (!container.pipe.outputOpen(direction)) {
+
+            if (!container.getPipe().outputOpen(direction)) {
                 transferState[ordinal] = TransferState.None;
                 continue;
             }
@@ -670,19 +676,6 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
 
         return tile instanceof IPipeTile;
     }
-    //
-    // static {
-    // fluidCapacities.put(PipeFluidsCobblestone.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsDiamond.class, 8 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsEmerald.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsGold.class, 8 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsIron.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsQuartz.class, 4 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsSandstone.class, 2 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsStone.class, 2 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsVoid.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // fluidCapacities.put(PipeFluidsWood.class, 1 * BuildCraftTransport.pipeFluidsBaseFlowRate);
-    // }
 
     @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
@@ -700,5 +693,14 @@ public class PipeTransportFluids extends PipeTransport implements IFluidHandler,
             line += pipe.amount + "" + EnumChatFormatting.RESET + "/" + LIQUID_IN_PIPE + "mB";
             left.add(line);
         }
+    }
+
+    @Override
+    public List<PipeProperty<?>> getAllProperties() {
+        List<PipeProperty<?>> properties = Lists.newArrayList();
+        properties.add(PipeAPI.FLUID_TYPE);
+        properties.add(PipeAPI.FLUID_AMOUNT);
+        properties.add(PipeAPI.PERCENT_FULL);
+        return properties;
     }
 }

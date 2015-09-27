@@ -1,4 +1,4 @@
-package buildcraft.transport.internal.pipes;
+package buildcraft.transport.event;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -6,11 +6,11 @@ import net.minecraft.util.EnumFacing;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.event.IPipeEventConnection;
 
-abstract class PipeEventConnection extends PipeEvent implements IPipeEventConnection {
+public abstract class PipeEventConnection extends PipeEvent implements IPipeEventConnection {
     private final EnumFacing side;
     private final TileEntity tile;
 
-    PipeEventConnection(IPipe pipe, EnumFacing side, TileEntity tile) {
+    public PipeEventConnection(IPipe pipe, EnumFacing side, TileEntity tile) {
         super(pipe);
         this.side = side;
         this.tile = tile;
