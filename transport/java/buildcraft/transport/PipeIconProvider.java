@@ -19,6 +19,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.IIconProvider;
 
+// Use pipe definitions for icons now
+@Deprecated
 public class PipeIconProvider implements IIconProvider {
 
     public static final PipeIconProvider instance = new PipeIconProvider();

@@ -23,7 +23,7 @@ public enum PipeRegistry implements IPipeRegistry {
         }
         Item item = new ItemPipe(definition);
         item.setUnlocalizedName("pipe_" + definition.modUniqueTag);
-        triMap.put(definition.globalUniqueTag, item, definition);
+        triMap.put(item, definition);
         return item;
     }
 

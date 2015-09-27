@@ -47,6 +47,6 @@ public enum EnumPipeMaterial {
         ingredient2 = stack2;
     }
 
-    public static final EnumPipeMaterial[] STONES = new EnumPipeMaterial[] { COBBLESTONE, STONE, ANDERSITE, ANDERSITE_POLISHED, DIORITE,
-        DIORITE_POLISHED, GRANITE, GRANITE_POLISHED };
+    public static final EnumPipeMaterial[][] STONES = { { COBBLESTONE, STONE }, { ANDERSITE, ANDERSITE_POLISHED }, { DIORITE, DIORITE_POLISHED }, {
+        GRANITE, GRANITE_POLISHED } };
 }

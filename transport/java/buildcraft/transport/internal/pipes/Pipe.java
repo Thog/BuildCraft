@@ -48,15 +48,15 @@ import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.statements.ActionValve.ValveState;
 
 final class Pipe implements IDropControlInventory, IPipe {
-    public final PipeDefinition definition;
-    public final PipeBehaviour behaviour;
-    public final PipeTransport transport;
-    public int[] signalStrength = new int[] { 0, 0, 0, 0 };
-    public TileGenericPipe container;
-    public boolean[] wireSet = new boolean[] { false, false, false, false };
-    public final Gate[] gates = new Gate[EnumFacing.VALUES.length];
+    final PipeDefinition definition;
+    final PipeBehaviour behaviour;
+    final PipeTransport transport;
+    int[] signalStrength = new int[] { 0, 0, 0, 0 };
+    TileGenericPipe container;
+    boolean[] wireSet = new boolean[] { false, false, false, false };
+    final Gate[] gates = new Gate[EnumFacing.VALUES.length];
 
-    public final EventBus eventBus = new EventBus("buildcraft.transport.Pipe");
+    final EventBus eventBus = new EventBus("buildcraft.transport.Pipe");
 
     private boolean internalUpdateScheduled = false;
     private boolean initialized = false;
@@ -65,7 +65,7 @@ final class Pipe implements IDropControlInventory, IPipe {
     Map<PipeProperty<?>, Object> properties = Maps.newHashMap();
     Set<PipeProperty<?>> dirtyProperties = Sets.newHashSet();
 
-    public Pipe(PipeDefinition definition) {
+    Pipe(PipeDefinition definition) {
         this.definition = definition;
         if (definition.behaviourFactory == null) {
             throw new RuntimeException("Found a definition with a null behaviour factory! THIS A MAJOR BUG! (" + definition + ")");
@@ -104,12 +104,12 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public void setTile(TileEntity tile) {
+    void setTile(TileEntity tile) {
         this.container = (TileGenericPipe) tile;
         transport.setTile((TileGenericPipe) tile);
     }
 
-    public void resolveActions() {
+    void resolveActions() {
         for (Gate gate : gates) {
             if (gate != null) {
                 gate.resolveActions();
@@ -117,22 +117,22 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public boolean blockActivated(EntityPlayer entityplayer) {
+    boolean blockActivated(EntityPlayer entityplayer) {
         return false;
     }
 
-    public void onBlockPlaced() {
+    void onBlockPlaced() {
         transport.onBlockPlaced();
     }
 
-    public void onBlockPlacedBy(EntityLivingBase placer) {}
+    void onBlockPlacedBy(EntityLivingBase placer) {}
 
-    public void onNeighborBlockChange(int blockId) {
+    void onNeighborBlockChange(int blockId) {
         transport.onNeighborBlockChange(blockId);
 
     }
 
-    public void update() {
+    void update() {
         transport.updateEntity();
 
         if (internalUpdateScheduled) {
@@ -157,7 +157,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         updateSignalState();
     }
 
-    public void writeToNBT(NBTTagCompound data) {
+    void writeToNBT(NBTTagCompound data) {
         transport.writeToNBT(data);
 
         // Save gate if any
@@ -178,7 +178,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public void readFromNBT(NBTTagCompound data) {
+    void readFromNBT(NBTTagCompound data) {
         transport.readFromNBT(data);
 
         for (int i = 0; i < EnumFacing.VALUES.length; i++) {
@@ -198,11 +198,11 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public boolean isInitialized() {
+    boolean isInitialized() {
         return initialized;
     }
 
-    public void initialize() {
+    void initialize() {
         transport.initialize();
         updateSignalState();
         initialized = true;
@@ -246,7 +246,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public void updateSignalState() {
+    void updateSignalState() {
         for (PipeWire c : PipeWire.values()) {
             updateSignalStateForColor(c);
         }
@@ -312,17 +312,17 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public boolean inputOpen(EnumFacing from) {
+    boolean inputOpen(EnumFacing from) {
         return transport.inputOpen(from);
     }
 
-    public boolean outputOpen(EnumFacing to) {
+    boolean outputOpen(EnumFacing to) {
         return transport.outputOpen(to);
     }
 
-    public void onEntityCollidedWithBlock(Entity entity) {}
+    void onEntityCollidedWithBlock(Entity entity) {}
 
-    public boolean canConnectRedstone() {
+    boolean canConnectRedstone() {
         for (Gate gate : gates) {
             if (gate != null) {
                 return true;
@@ -331,7 +331,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         return false;
     }
 
-    public int getMaxRedstoneOutput(EnumFacing dir) {
+    int getMaxRedstoneOutput(EnumFacing dir) {
         int output = 0;
 
         for (EnumFacing side : EnumFacing.VALUES) {
@@ -356,7 +356,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         return gate != null ? gate.getSidedRedstoneOutput() : 0;
     }
 
-    public int isPoweringTo(EnumFacing side) {
+    int isPoweringTo(EnumFacing side) {
         EnumFacing o = side.getOpposite();
 
         TileEntity tile = container.getTile(o);
@@ -368,11 +368,11 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public int isIndirectlyPoweringTo(EnumFacing l) {
+    int isIndirectlyPoweringTo(EnumFacing l) {
         return isPoweringTo(l);
     }
 
-    public void randomDisplayTick(Random random) {}
+    void randomDisplayTick(Random random) {}
 
     @Override
     public boolean isWired(PipeWire color) {
@@ -385,7 +385,7 @@ final class Pipe implements IDropControlInventory, IPipe {
     }
 
     @Deprecated
-    public boolean hasGate() {
+    boolean hasGate() {
         for (EnumFacing direction : EnumFacing.VALUES) {
             if (hasGate(direction)) {
                 return true;
@@ -412,11 +412,11 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    public void dropItem(ItemStack stack) {
+    void dropItem(ItemStack stack) {
         InvUtils.dropItems(container.getWorld(), stack, container.getPos());
     }
 
-    public ArrayList<ItemStack> computeItemDrop() {
+    ArrayList<ItemStack> computeItemDrop() {
         ArrayList<ItemStack> result = new ArrayList<ItemStack>();
 
         for (PipeWire pipeWire : PipeWire.VALUES) {
@@ -436,7 +436,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         return result;
     }
 
-    public LinkedList<IActionInternal> getActions() {
+    LinkedList<IActionInternal> getActions() {
         LinkedList<IActionInternal> result = new LinkedList<IActionInternal>();
 
         for (ValveState state : ValveState.VALUES) {
@@ -446,7 +446,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         return result;
     }
 
-    public void resetGates() {
+    void resetGates() {
         for (int i = 0; i < gates.length; i++) {
             Gate gate = gates[i];
             if (gate != null) {
@@ -461,11 +461,11 @@ final class Pipe implements IDropControlInventory, IPipe {
 
     protected void actionsActivated(Collection<StatementSlot> actions) {}
 
-    public TileGenericPipe getContainer() {
+    TileGenericPipe getContainer() {
         return container;
     }
 
-    public boolean isWireConnectedTo(TileEntity tile, PipeWire color, EnumFacing dir) {
+    boolean isWireConnectedTo(TileEntity tile, PipeWire color, EnumFacing dir) {
         if (!(tile instanceof IPipeTile)) {
             return false;
         }
@@ -488,16 +488,16 @@ final class Pipe implements IDropControlInventory, IPipe {
                 container, tile);
     }
 
-    public void dropContents() {
+    void dropContents() {
         transport.dropContents();
     }
 
-    public List<ItemStack> getDroppedItems() {
+    List<ItemStack> getDroppedItems() {
         return transport.getDroppedItems();
     }
 
     /** If this pipe is open on one side, return it. */
-    public EnumFacing getOpenOrientation() {
+    EnumFacing getOpenOrientation() {
         int connectionsNum = 0;
 
         EnumFacing targetOrientation = null;
@@ -526,15 +526,15 @@ final class Pipe implements IDropControlInventory, IPipe {
     }
 
     /** Called when TileGenericPipe.invalidate() is called */
-    public void invalidate() {}
+    void invalidate() {}
 
     /** Called when TileGenericPipe.validate() is called */
-    public void validate() {}
+    void validate() {}
 
     /** Called when TileGenericPipe.onChunkUnload is called */
-    public void onChunkUnload() {}
+    void onChunkUnload() {}
 
-    public World getWorld() {
+    World getWorld() {
         return container.getWorld();
     }
 

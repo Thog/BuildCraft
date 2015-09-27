@@ -37,8 +37,8 @@ public class SidedExternalStorage implements IMjExternalStorage {
                 return NonExistantStorage.INSTANCE;
             }
         }
-        if (this.tileGenericPipe.pipe.behaviour instanceof IMjExternalStorage) {
-            return (IMjExternalStorage) this.tileGenericPipe.pipe.behaviour;
+        if (this.tileGenericPipe.getPipe().behaviour instanceof IMjExternalStorage) {
+            return (IMjExternalStorage) this.tileGenericPipe.getPipe().behaviour;
         }
         return NonExistantStorage.INSTANCE;
     }

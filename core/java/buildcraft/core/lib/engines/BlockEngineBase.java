@@ -47,7 +47,7 @@ public abstract class BlockEngineBase extends BlockBuildCraft implements ICustom
             array[0] = Utils.boundingBox(pointA, pointB);
 
             pointA = Utils.vec3(0.25).add(Utils.convert(face, 0.25));
-            pointB = pointB.add(Utils.VEC_HALF);
+            pointB = pointA.add(Utils.VEC_HALF);
             array[1] = Utils.boundingBox(pointA, pointB);
             map.put(face, array);
         }

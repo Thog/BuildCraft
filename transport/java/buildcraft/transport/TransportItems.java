@@ -35,11 +35,11 @@ public class TransportItems {
         for (EnumPipeType type : EnumPipeType.CONTENTS) {
             for (int i = 0; i < 4; i++) {
                 // Don't set the factory as we will set it below
-                EnumPipeMaterial material = EnumPipeMaterial.STONES[i * 2];
+                EnumPipeMaterial material = EnumPipeMaterial.STONES[i][0];
                 // Create the unpolished variant
                 registerDefinition(material, type, createBasicDefinition(type, material, false));
 
-                material = EnumPipeMaterial.STONES[i * 2 + 1];
+                material = EnumPipeMaterial.STONES[i][1];
                 // Create the polished variant
                 registerDefinition(material, type, createPolishedStonesDefinition(type, material));
             }
@@ -53,10 +53,10 @@ public class TransportItems {
                 BehaviourFactoryPolishedStone[] polishedFactories = new BehaviourFactoryPolishedStone[4];
 
                 for (int i = 0; i < 4; i++) {
-                    unpolished[i] = pipes.get(EnumPipeMaterial.STONES[i * 2], type);
+                    unpolished[i] = pipes.get(EnumPipeMaterial.STONES[i][0], type);
                     unpolishedFactories[i] = (BehaviourFactoryBasic) unpolished[i].behaviourFactory;
 
-                    polished[i] = pipes.get(EnumPipeMaterial.STONES[i * 2 + 1], type);
+                    polished[i] = pipes.get(EnumPipeMaterial.STONES[i][1], type);
                     polishedFactories[i] = (BehaviourFactoryPolishedStone) polished[i].behaviourFactory;
                 }
 
