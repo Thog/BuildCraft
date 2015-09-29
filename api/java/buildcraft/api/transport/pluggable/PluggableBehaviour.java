@@ -25,11 +25,6 @@ public abstract class PluggableBehaviour implements INBTStoreable, ISerializable
         this.side = side;
     }
 
-    /** @return True if you want to disable any pipe connections where this pluggable is. */
-    public boolean isBlocking() {
-        return true;
-    }
-
     /** @return True if this pluggable makes the pipe solid on its own side. The only example within buildcraft is a
      *         non-hollow facade. */
     public boolean isSolid() {

@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IBuildCraftMod;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.utils.Utils;
@@ -52,6 +53,7 @@ public class BuildCraftMod implements IBuildCraftMod {
                 // send an empty packet to the receiver
                 return;
             }
+            BCLog.logger.info("");
             editAttributes(channel);
             channel.writeOutbound(packet);
         }

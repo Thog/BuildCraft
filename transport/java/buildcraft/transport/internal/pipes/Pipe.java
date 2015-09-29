@@ -38,6 +38,8 @@ import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeProperty;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.api.transport.event.IPipeEvent;
+import buildcraft.api.transport.event.IPipeEventRandomDisplayTick;
+import buildcraft.api.transport.event.IPipeEventTick;
 import buildcraft.core.internal.IDropControlInventory;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.utils.Utils;
@@ -93,7 +95,13 @@ final class Pipe implements IDropControlInventory, IPipe {
 
         eventBus.register(new Object() {
             @Subscribe
-            public void onEvent(Object event) {
+            public void onEvent(IPipeEvent event) {
+                if (event instanceof IPipeEventTick) {
+                    return;
+                }
+                if (event instanceof IPipeEventRandomDisplayTick) {
+                    return;
+                }
                 BCLog.logger.info("onEvent " + event);
             }
         });
@@ -124,7 +132,6 @@ final class Pipe implements IDropControlInventory, IPipe {
 
     void onNeighborBlockChange(int blockId) {
         transport.onNeighborBlockChange(blockId);
-
     }
 
     void update() {
@@ -584,9 +591,7 @@ final class Pipe implements IDropControlInventory, IPipe {
             eventBus.post(update);
             value = update.getValue();
             properties.put((PipeProperty<Object>) property, value);
-            if (!update.redirty) {
-                dirtyProperties.remove(property);
-            }
+            dirtyProperties.remove(property);
         }
         return value;
     }

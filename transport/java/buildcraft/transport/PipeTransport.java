@@ -22,6 +22,7 @@ import buildcraft.api.transport.PipeProperty;
 import buildcraft.core.lib.utils.BitSetUtils;
 import buildcraft.transport.internal.pipes.TileGenericPipe;
 
+// TODO (PASS 0: Convert this to an interface inside of the API
 public abstract class PipeTransport {
 
     public TileGenericPipe container;

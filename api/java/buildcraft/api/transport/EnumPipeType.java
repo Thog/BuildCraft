@@ -7,6 +7,7 @@ import buildcraft.transport.internal.pipes.PipeTransportItems;
 import buildcraft.transport.internal.pipes.PipeTransportPower;
 
 public enum EnumPipeType implements IPipeType {
+    // TODO (PASS 0): Convert the factories to APIHelper#getInstance() for buildcraft!
     // TODO (JDK1.8): Convert these to lambda!
     ITEM(true, true, new ITransportFactory() {
         @Override

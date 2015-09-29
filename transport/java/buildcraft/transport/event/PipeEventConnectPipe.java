@@ -9,9 +9,8 @@ import buildcraft.api.transport.event.IPipeEventConnectPipe;
 public class PipeEventConnectPipe extends PipeEventConnect implements IPipeEventConnectPipe {
     private final IPipe connectingPipe;
 
-    public PipeEventConnectPipe(IPipe pipe, EnumFacing side, TileEntity tile, boolean askedForConnection, boolean isCorrectType,
-            IPipe connectingPipe) {
-        super(pipe, side, tile, askedForConnection, isCorrectType);
+    public PipeEventConnectPipe(IPipe pipe, EnumFacing side, TileEntity tile, IPipe connectingPipe) {
+        super(pipe, side, tile);
         this.connectingPipe = connectingPipe;
     }
 

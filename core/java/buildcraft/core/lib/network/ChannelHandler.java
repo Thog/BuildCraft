@@ -4,10 +4,18 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.core.lib.network;
 
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.FMLIndexedMessageToMessageCodec;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.api.core.BCLog;
 import buildcraft.core.lib.network.command.PacketCommand;
@@ -46,11 +54,46 @@ public class ChannelHandler extends FMLIndexedMessageToMessageCodec<Packet> {
     public void encodeInto(ChannelHandlerContext ctx, Packet packet, ByteBuf data) throws Exception {
         INetHandler handler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
         EntityPlayer player = CoreProxy.proxy.getPlayerFromNetHandler(handler);
-        if (player != null) {
-            packet.writeData(data, player);
-        } else {
-            BCLog.logger.warn("The player was null! (Encode) (Message = " + packet + ")");
+        if (player == null) {
+            INetHandler h1 = ctx.attr(NetworkRegistry.NET_HANDLER).get();
+            if (h1 != null) {
+                EntityPlayer p1 = CoreProxy.proxy.getPlayerFromNetHandler(h1);
+                handler = h1;
+                player = p1;
+                BCLog.logger.warn("Had to get the player via the context rather than the channel!");
+            }
         }
+        if (player == null) {
+            switch (FMLCommonHandler.instance().getEffectiveSide()) {
+                case CLIENT: {
+                    // ok, WTF?
+                    player = getMinecraftPlayer();
+                    BCLog.logger.warn("Had to get the player via MINECRAFT rather than the channel!");
+                    break;
+                }
+                case SERVER: {
+                    MinecraftServer server = MinecraftServer.getServer();
+                    for (WorldServer world : server.worldServers) {
+                        for (EntityPlayer p2 : (List<EntityPlayer>) world.playerEntities) {
+                            player = p2;
+                            BCLog.logger.warn("Had to manually search the server for the first available player! THIS IS BAD!!!");
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if (player == null) {
+            throw new Exception("The player was null! (Encode)");
+        } else {
+            packet.writeData(data, player);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private EntityPlayer getMinecraftPlayer() {
+        return Minecraft.getMinecraft().thePlayer;
     }
 
     @Override

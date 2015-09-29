@@ -36,6 +36,7 @@ import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.*;
 import buildcraft.api.transport.IPipeConnection.ConnectOverride;
+import buildcraft.api.transport.event.IPipeEventAttemptConnectPipe;
 import buildcraft.api.transport.pluggable.IFacadePluggable;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
@@ -55,9 +56,7 @@ import buildcraft.transport.Gate;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipePluggableState;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.event.PipeEventConnect;
-import buildcraft.transport.event.PipeEventConnectBlock;
-import buildcraft.transport.event.PipeEventConnectPipe;
+import buildcraft.transport.event.PipeEventAttemptConnect;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.item.ItemFacade.FacadeState;
@@ -262,10 +261,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 refreshRenderState = false;
             }
 
-            if (sendClientUpdate) {
-                sendClientUpdate = false;
-                BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
-            }
+            // if (sendClientUpdate) {
+            sendClientUpdate = false;
+            BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
+            // }
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException(t);
@@ -541,7 +540,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     protected boolean canPipeConnect_internal(TileEntity with, EnumFacing side) {
-        PipeEventConnect event;
         boolean askedForConnection = false;
 
         if (with instanceof IPipeConnection) {
@@ -554,38 +552,29 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             }
         }
 
-        if (with instanceof TileGenericPipe) {
-            IPipeTile other = (IPipeTile) with;
+        boolean isRightType = pipe.transport.canPipeConnect(with, side);
+        PipeEventAttemptConnect event = PipeEventAttemptConnect.createEvent(pipe, side, with, askedForConnection, isRightType);
 
-            if (other.hasBlockingPluggable(side.getOpposite())) {
+        if (event instanceof IPipeEventAttemptConnectPipe) {
+            // Now ask the other pipe
+
+            // This pipe will never ask to override the connection
+            askedForConnection = false;
+
+            IPipe otherPipe = ((IPipeTile) with).getPipe();
+            isRightType = otherPipe.getTransport().canPipeConnect(this, side.getOpposite());
+
+            PipeEventAttemptConnect otherEvent = PipeEventAttemptConnect.createEvent(otherPipe, side.getOpposite(), this, askedForConnection,
+                    isRightType);
+            otherPipe.postEvent(otherEvent);
+            if (!otherEvent.isAllowed()) {
                 return false;
             }
-
-            if (other.getPipeColor() >= 0 && glassColor >= 0 && other.getPipeColor() != glassColor) {
-                return false;
-            }
-
-            IPipe otherPipe = other.getPipe();
-
-            if (!BlockGenericPipe.isValid(otherPipe)) {
-                return false;
-            }
-
-            boolean isRightType = pipe.transport.canPipeConnect(with, side);
-
-            PipeEventConnectPipe otherPipeEvent = new PipeEventConnectPipe(otherPipe, side.getOpposite(), this, false, isRightType, getPipe());
-            ((Pipe) other.getPipe()).eventBus.post(otherPipeEvent);
-
-            if (!otherPipeEvent.allowed) {
-                return false;
-            }
-            event = new PipeEventConnectPipe(pipe, side, with, askedForConnection, isRightType, otherPipe);
-        } else {
-            event = new PipeEventConnectBlock(pipe, side, with, askedForConnection, pipe.transport.canPipeConnect(with, side));
         }
-        pipe.eventBus.post(event);
 
-        return event.allowed;
+        pipe.postEvent(event);
+
+        return event.isAllowed();
     }
 
     /** Checks if this tile can connect to another tile
@@ -614,6 +603,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         return canPipeConnect_internal(with, side);
     }
 
+    @Deprecated
     public boolean hasBlockingPluggable(EnumFacing side) {
         PipePluggable pluggable = getPipePluggable(side);
         if (pluggable == null) {
@@ -636,20 +626,22 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     protected void computeConnections() {
+        if (worldObj.isRemote) {
+            return;
+        }
         TileBuffer[] cache = getTileCache();
         if (cache == null) {
             return;
         }
 
         for (EnumFacing side : EnumFacing.VALUES) {
-            // TileBuffer t = cache[side.ordinal()];
+            TileBuffer t = cache[side.ordinal()];
             // For blocks which are not loaded, keep the old connection value.
-            // if (t.exists() || !initialized) {
-            // t.refresh();
+            if (t.exists() || !initialized) {
+                t.refresh();
 
-            pipeConnectionsBuffer[side.ordinal()] = canPipeConnect(worldObj.getTileEntity(pos.offset(side))/* t.getTile(
-                                                                                                            * ) */, side);
-            // }
+                pipeConnectionsBuffer[side.ordinal()] = canPipeConnect(worldObj.getTileEntity(pos.offset(side)), side);
+            }
         }
     }
 

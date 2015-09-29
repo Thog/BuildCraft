@@ -4,8 +4,6 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.utils;
 
-import java.util.Set;
-
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.pluggable.IConnectionMatrix;
@@ -15,16 +13,6 @@ import io.netty.buffer.ByteBuf;
 public class ConnectionMatrix implements IConnectionMatrix {
     private int mask = 0;
     private boolean dirty = false;
-
-    private Set s;
-
-    public ConnectionMatrix() {
-        s = getSet();
-    }
-
-    public static Set getSet() {
-        return null;
-    }
 
     @Override
     public boolean isConnected(EnumFacing direction) {
@@ -38,13 +26,6 @@ public class ConnectionMatrix implements IConnectionMatrix {
             mask ^= 1 << direction.ordinal();
             dirty = true;
         }
-    }
-
-    /** Return a mask representing the connectivity for all sides.
-     *
-     * @return mask in EnumFacing order, least significant bit = first entry */
-    public int getMask() {
-        return mask;
     }
 
     public boolean isDirty() {
