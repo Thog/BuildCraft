@@ -11,6 +11,8 @@ import java.util.Set;
 import com.google.common.collect.ForwardingSet;
 import com.google.common.collect.Sets;
 
+import net.minecraft.tileentity.TileEntity;
+
 import buildcraft.transport.TravelingItem;
 
 public class TravelerSet extends ForwardingSet<TravelingItem> {
@@ -38,7 +40,7 @@ public class TravelerSet extends ForwardingSet<TravelingItem> {
         if (iterating) {
             return toAdd.add(item);
         }
-        item.setContainer(transport.container);
+        item.setContainer((TileEntity) transport.container);
         items.add(item);
         return true;
     }

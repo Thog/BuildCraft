@@ -52,8 +52,9 @@ public class PipeRenderState implements ISerializable, IPipeRenderState {
     }
 
     public boolean needsRenderUpdate() {
-        return glassColorDirty || pipeConnectionMatrix.isDirty() || pipeConnectionBanned.isDirty() || pipeConnectionExtensions.isDirty()
-            || textureMatrix.isDirty() || wireMatrix.isDirty();
+        return true;
+//        return glassColorDirty || pipeConnectionMatrix.isDirty() || pipeConnectionBanned.isDirty() || pipeConnectionExtensions.isDirty()
+//            || textureMatrix.isDirty() || wireMatrix.isDirty();
     }
 
     public void setExtension(EnumFacing direction, float extension) {

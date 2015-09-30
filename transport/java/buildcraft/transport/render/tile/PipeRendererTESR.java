@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.gates.IGateExpansion;
+import buildcraft.api.transport.PipeTransport;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.BuildCraftCore.RenderMode;
@@ -24,7 +25,6 @@ import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.EntityResizableCuboid;
 import buildcraft.core.lib.render.RenderResizableCuboid;
 import buildcraft.core.lib.utils.MatrixTranformations;
-import buildcraft.transport.PipeTransport;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.internal.pipes.PipeRenderState;
 import buildcraft.transport.internal.pipes.TileGenericPipe;

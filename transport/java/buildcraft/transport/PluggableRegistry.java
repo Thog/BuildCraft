@@ -20,8 +20,7 @@ public enum PluggableRegistry implements IPluggableRegistry {
         if (definition == null || item == null) {
             throw new IllegalArgumentException("Cannot register a null pluggable or item!");
         }
-        String tag = definition.globalUniqueTag;
-        triMap.put(tag, item, definition);
+        triMap.put(item, definition);
     }
 
     @Override

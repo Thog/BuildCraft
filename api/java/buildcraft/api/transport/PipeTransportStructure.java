@@ -2,7 +2,7 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.transport;
+package buildcraft.api.transport;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,13 +10,10 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import buildcraft.api.transport.EnumPipeType;
-import buildcraft.api.transport.IPipe;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.PipeProperty;
-import buildcraft.transport.internal.pipes.BlockGenericPipe;
-
 public class PipeTransportStructure extends PipeTransport {
+    public PipeTransportStructure(IPipeTile tile) {
+        super(tile);
+    }
 
     @Override
     public EnumPipeType getPipeType() {
@@ -28,11 +25,7 @@ public class PipeTransportStructure extends PipeTransport {
         if (tile instanceof IPipeTile) {
             IPipe pipe2 = ((IPipeTile) tile).getPipe();
 
-            if (BlockGenericPipe.isValid(pipe2) && !(pipe2.getTransport() instanceof PipeTransportStructure)) {
-                return false;
-            }
-
-            return true;
+            return pipe2.getTransport() instanceof PipeTransportStructure;
         }
 
         return false;

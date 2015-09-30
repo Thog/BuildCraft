@@ -11,8 +11,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
+import buildcraft.api.BitSetUtils;
 import buildcraft.core.lib.network.PacketCoordinates;
-import buildcraft.core.lib.utils.BitSetUtils;
 import buildcraft.core.lib.utils.NetworkUtils;
 import buildcraft.core.network.PacketIds;
 import buildcraft.transport.internal.pipes.PipeTransportFluids;

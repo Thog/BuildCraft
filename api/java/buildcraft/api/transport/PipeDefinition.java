@@ -41,17 +41,11 @@ public final class PipeDefinition extends ObjectDefinition {
      * @param factory */
     public PipeDefinition(String tag, IPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IPipeBehaviourFactory factory) {
         super(tag);
-        if (type.createTransport() == null) {
-            throw new IllegalArgumentException("You cannot create a pipe definition with an IPipeType that returns a null transport!");
-        }
         this.type = type;
         this.maxSprites = maxSprites;
         this.itemSpriteIndex = itemSpriteIndex;
         this.textureLocationStart = textureStart.endsWith("/") ? textureStart : (textureStart + "/");
         this.spriteLocations = new String[maxSprites];
-        for (int i = 0; i < spriteLocations.length; i++) {
-            spriteLocations[i] = textureLocationStart + tag + factory.createNew().getIconSuffix(i);
-        }
         this.behaviourFactory = factory;
     }
 
@@ -66,6 +60,9 @@ public final class PipeDefinition extends ObjectDefinition {
     @SideOnly(Side.CLIENT)
     public void registerSprites(TextureMap map) {
         sprites = new TextureAtlasSprite[maxSprites];
+        for (int i = 0; i < spriteLocations.length; i++) {
+            spriteLocations[i] = textureLocationStart + modUniqueTag + behaviourFactory.createNew().getIconSuffix(i);
+        }
         for (int i = 0; i < spriteLocations.length; i++) {
             String string = spriteLocations[i];
             ResourceLocation location = new ResourceLocation(string);

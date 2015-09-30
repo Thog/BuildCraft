@@ -36,12 +36,13 @@ import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeProperty;
+import buildcraft.api.transport.PipeTransport;
 import buildcraft.core.DefaultProps;
+import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.Transactor;
 import buildcraft.core.lib.utils.BlockUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.PipeTransport;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.event.PipeContentsEditableItem;
@@ -63,6 +64,10 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
     public static final int MAX_PIPE_ITEMS = 1024;
     public boolean allowBouncing = false;
     public final TravelerSet items = new TravelerSet(this);
+
+    public PipeTransportItems(IPipeTile tile) {
+        super(tile);
+    }
 
     @Override
     public EnumPipeType getPipeType() {
@@ -109,7 +114,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         PipeEventMovementEnter enter = new PipeEventMovementEnter(container.getPipe(), contents, inputOrientation);
         container.getPipe().postEvent(enter);
 
-        item.setItemStack(contents.stack);
+        item.setItemStack(contents.getStack());
 
         if (item.getItemStack() == null || item.getItemStack().stackSize <= 0) {
             return;
@@ -176,8 +181,8 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         PipeEventMovementEnter enter = new PipeEventMovementEnter(container.getPipe(), contents, item.input);
         container.getPipe().postEvent(enter);
 
-        item.setItemStack(contents.stack);
-        item.color = contents.colour;
+        item.setItemStack(contents.getStack());
+        item.color = contents.getColor();
 
         if (item.getItemStack() == null || item.getItemStack().stackSize <= 0) {
             return;
@@ -185,7 +190,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
         PipeEventAdjustSpeed speed = new PipeEventAdjustSpeed(container.getPipe(), contents.uneditable(), item.getSpeed());
         container.getPipe().postEvent(speed);
-        item.setSpeed(speed.speed);
+        item.setSpeed(speed.getRawSpeed());
 
         readjustPosition(item);
 
@@ -220,7 +225,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
         sides.remove(null);
 
         for (EnumFacing o : sides) {
-            if (container.getPipe().outputOpen(o) && canReceivePipeObjects(o, item)) {
+            if (container.getPipe().getTransport().outputOpen(o) && canReceivePipeObjects(o, item)) {
                 potentialDestinations.put(o, container.getNeighborTile(o));
                 destinations.add(o);
             }
@@ -244,7 +249,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
     }
 
     private boolean canReceivePipeObjects(EnumFacing o, TravelingItem item) {
-        TileEntity entity = container.getTile(o);
+        TileEntity entity = container.getNeighborTile(o);
 
         if (!container.isPipeConnected(o)) {
             return false;
@@ -252,16 +257,12 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
         if (entity instanceof IPipeTile) {
             Pipe pipe = (Pipe) ((IPipeTile) entity).getPipe();
-            if (pipe == null || pipe.transport == null) {
-                return false;
-            }
-
-            if (pipe == null || pipe.transport == null) {
+            if (pipe == null) {
                 return false;
             }
 
             // return !pipe.pipe.isClosed() && pipe.pipe.transport instanceof PipeTransportItems;
-            return pipe.inputOpen(o.getOpposite()) && pipe.transport instanceof PipeTransportItems;
+            return pipe.getTransport().inputOpen(o.getOpposite()) && pipe.getTransport() instanceof PipeTransportItems;
         } else if (entity instanceof IInventory && item.getInsertionHandler().canInsertItem(item, (IInventory) entity)) {
             if (Transactor.getTransactorFor(entity).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) {
                 return true;
@@ -318,7 +319,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
                     continue;
                 }
 
-                TileEntity tile = container.getTile(item.output, true);
+                // TileEntity tile = container.getNeighborTile(item.output, true);
 
                 PipeContentsEditableItem contents = new PipeContentsEditableItem(item.getItemStack(), item.color);
                 PipeEventMovementExit exit = new PipeEventMovementExit(container.getPipe(), contents, item.output);
@@ -340,8 +341,8 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
     private boolean passToNextPipe(TravelingItem item, TileEntity tile) {
         if (tile instanceof IPipeTile) {
             Pipe pipe = (Pipe) ((IPipeTile) tile).getPipe();
-            if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof PipeTransportItems) {
-                ((PipeTransportItems) pipe.transport).injectItem(item, item.output);
+            if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof PipeTransportItems) {
+                ((PipeTransportItems) pipe.getTransport()).injectItem(item, item.output);
                 return true;
             }
         }
@@ -515,7 +516,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
         if (tile instanceof IPipeTile) {
             Pipe pipe2 = (Pipe) ((IPipeTile) tile).getPipe();
-            if (BlockGenericPipe.isValid(pipe2) && !(pipe2.transport instanceof PipeTransportItems)) {
+            if (BlockGenericPipe.isValid(pipe2) && !(pipe2.getTransport() instanceof PipeTransportItems)) {
                 return false;
             }
         }
@@ -549,7 +550,7 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
         for (TravelingItem item : items) {
             if (!item.isCorrupted()) {
-                container.getPipe().dropItem(item.getItemStack());
+                InvUtils.dropItems(getWorld(), item.getItemStack(), container.getPos());
             }
         }
 

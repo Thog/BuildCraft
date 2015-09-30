@@ -10,8 +10,8 @@ import java.util.Random;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 
+import buildcraft.api.BitSetUtils;
 import buildcraft.api.core.ISerializable;
-import buildcraft.core.lib.utils.BitSetUtils;
 import buildcraft.core.lib.utils.NetworkUtils;
 
 import io.netty.buffer.ByteBuf;

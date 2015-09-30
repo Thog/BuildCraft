@@ -1,12 +1,9 @@
-package buildcraft.core.lib.utils;
+package buildcraft.api;
 
 import java.util.BitSet;
 
-public final class BitSetUtils {
-
-    private BitSetUtils() {
-
-    }
+public enum BitSetUtils {
+    INSTANCE;
 
     public static BitSet fromByteArray(byte[] bytes) {
         BitSet bits = new BitSet(bytes.length * 8);

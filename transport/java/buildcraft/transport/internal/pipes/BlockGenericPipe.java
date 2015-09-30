@@ -451,12 +451,10 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         }
 
         if (pipe != null) {
-            if (pipe.definition != null) {
-                Item item = PipeAPI.REGISTRY.getItem(pipe.definition);
-                list.add(new ItemStack(item, 1, pipe.container.getItemMetadata()));
-                list.addAll(pipe.computeItemDrop());
-                list.addAll(pipe.getDroppedItems());
-            }
+            Item item = PipeAPI.REGISTRY.getItem(pipe.getBehaviour().definition);
+            list.add(new ItemStack(item, 1, pipe.container.getItemMetadata()));
+            list.addAll(pipe.getAllDroppedItems());
+            list.addAll(pipe.getDroppedItems());
         }
         return list;
     }
@@ -478,11 +476,11 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         }
 
         if (pipe != null) {
-            Item k1 = PipeAPI.REGISTRY.getItem(pipe.definition);
+            Item k1 = PipeAPI.REGISTRY.getItem(pipe.getBehaviour().definition);
 
             if (k1 != null) {
                 pipe.dropContents();
-                for (ItemStack is : pipe.computeItemDrop()) {
+                for (ItemStack is : pipe.getAllDroppedItems()) {
                     spawnAsEntity(world, pos, is);
                 }
                 spawnAsEntity(world, pos, new ItemStack(k1, 1, pipe.container.getItemMetadata()));
@@ -512,7 +510,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
                     }
                 }
                 case Pipe:
-                    return new ItemStack(PipeAPI.REGISTRY.getItem(getPipe(world, pos).definition), 1, getPipe(world, pos).container
+                    return new ItemStack(PipeAPI.REGISTRY.getItem(getPipe(world, pos).getBehaviour().definition), 1, getPipe(world, pos).container
                             .getItemMetadata());
             }
         }

@@ -41,7 +41,7 @@ public class TransportGuiHandler implements IGuiHandler {
 
             TileGenericPipe pipe = (TileGenericPipe) tile;
 
-            if (pipe.pipe == null) {
+            if (pipe.getPipe() == null) {
                 return null;
             }
 
@@ -92,7 +92,7 @@ public class TransportGuiHandler implements IGuiHandler {
 
             TileGenericPipe pipe = (TileGenericPipe) tile;
 
-            if (pipe.pipe == null) {
+            if (pipe.getPipe() == null) {
                 return null;
             }
 

@@ -9,17 +9,20 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.event.IPipeContentsEditable;
+import buildcraft.api.transport.event.IPipeContentsEditable.IPipeContentsEditableItem;
+import buildcraft.api.transport.event.IPipeEventMovementEnter;
+import buildcraft.api.transport.event.IPipeEventMovementExit;
 import buildcraft.api.transport.pluggable.IPluggableStaticRenderer;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.lib.utils.MatrixTranformations;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.TravelingItem;
 import buildcraft.transport.render.LensPluggableRenderer;
 
 import io.netty.buffer.ByteBuf;
 
 public class LensPluggable extends PipePluggable {
-    public int color;
+    public EnumDyeColor color;
     public boolean isFilter;
     protected IPipeTile container;
     private EnumFacing side;
@@ -107,23 +110,23 @@ public class LensPluggable extends PipePluggable {
         return other.color != color || other.isFilter != isFilter;
     }
 
-    private void color(TravelingItem item) {
-        if ((item.toCenter && item.input.getOpposite() == side) || (!item.toCenter && item.output == side)) {
-            item.color = EnumDyeColor.fromId(color);
+    private void color(IPipeContentsEditable editable) {
+        if (editable instanceof IPipeContentsEditableItem) {
+            ((IPipeContentsEditableItem) editable).setColor(color);
         }
     }
 
     @Subscribe
-    public void onReachedEnd(PipeEventItem.ReachedEnd event) {
-        if (!isFilter) {
-            color(event.item);
+    public void onReachedEnd(IPipeEventMovementExit event) {
+        if (!isFilter && event.getDestination() == side) {
+            color(event.getContents());
         }
     }
 
     @Subscribe
-    public void onEntered(PipeEventItem.Entered event) {
-        if (!isFilter) {
-            color(event.item);
+    public void onEntered(IPipeEventMovementEnter event) {
+        if (!isFilter && event.getOrigin() == side) {
+            color(event.getContents());
         }
     }
 }

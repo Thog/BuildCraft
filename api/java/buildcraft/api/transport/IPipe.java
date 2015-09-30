@@ -4,12 +4,18 @@
  * should be located as "LICENSE.API" in the BuildCraft source code distribution. */
 package buildcraft.api.transport;
 
+import java.util.List;
+
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.gates.IGate;
 import buildcraft.api.transport.event.IPipeEvent;
-import buildcraft.transport.PipeTransport;
 
+/** SUBCLASSER NOTES: Across ALL buildcraft code {@link #getBehaviour()} and {@link #getTransport()} are always assumed
+ * to not be null. You should disallow objects to be made that have a null behaviour or transport object. If you don't
+ * implement any behaviour inside of a behaviour object or a transport object, return a generic behaviour object and a
+ * generic transport object that does nothing. */
 public interface IPipe {
     IPipeTile getTile();
 
@@ -19,8 +25,10 @@ public interface IPipe {
 
     void postEvent(IPipeEvent event);
 
+    @Deprecated
     IGate getGate(EnumFacing side);
 
+    @Deprecated
     boolean hasGate(EnumFacing side);
 
     boolean isWired(PipeWire wire);
@@ -32,4 +40,6 @@ public interface IPipe {
     <T> boolean hasProperty(PipeProperty<T> property);
 
     void dirtyProperty(PipeProperty<Object> property);
+
+    List<ItemStack> getAllDroppedItems();
 }

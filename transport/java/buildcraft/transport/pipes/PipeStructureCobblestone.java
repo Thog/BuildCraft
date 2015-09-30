@@ -15,9 +15,9 @@ import buildcraft.api.core.IIconProvider;
 import buildcraft.api.transport.IPipe;
 import buildcraft.api.transport.IPipeFactory;
 import buildcraft.api.transport.PipeAPI;
+import buildcraft.api.transport.PipeTransportStructure;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.PipeIconProvider;
-import buildcraft.transport.PipeTransportStructure;
 
 public class PipeStructureCobblestone extends Pipe<PipeTransportStructure> {
     private final PipeInfo info;

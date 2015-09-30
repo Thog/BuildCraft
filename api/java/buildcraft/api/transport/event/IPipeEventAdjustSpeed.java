@@ -6,7 +6,7 @@ public interface IPipeEventAdjustSpeed extends IPipeEvent {
     /** @return The current contents of the pipe. */
     IPipeContentsItem getContents();
 
-    /** @return The current speed */
+    /** @return The current (normalised) speed */
     float getSpeed();
 
     /** @param newSpeed The new speed to set (MUST be more than 0.01) */

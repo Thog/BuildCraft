@@ -1,8 +1,17 @@
 package buildcraft.api.transport;
 
-import buildcraft.transport.PipeTransport;
-
 public interface IPipeType {
-    // TODO (PASS 0): Convert this to an interface inside the API
-    PipeTransport createTransport();
+    PipeTransport createTransport(IPipeTile tile);
+
+    /** @return True if this transport actually carries something. Structure is the only one within buildcraft that
+     *         returns false. */
+    boolean carriesAnything();
+
+    /** @return True if this pipe can carry different, unique things, specifically contents that cannot be merged
+     *         together (Only structure and power returns false) */
+    boolean carriesUniqueThings();
+
+    float normaliseSpeed(float raw);
+
+    float denormaliseSpeed(float normalised);
 }

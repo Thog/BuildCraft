@@ -8,7 +8,7 @@ import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
-import buildcraft.api.transport.event.IPipeEventConnectPipe;
+import buildcraft.api.transport.event.IPipeEventAttemptConnectPipe;
 import buildcraft.transport.pipes.BehaviourFactoryBasic.EnumListStatus;
 
 public class BehaviourBasic extends PipeBehaviour {
@@ -35,15 +35,15 @@ public class BehaviourBasic extends PipeBehaviour {
     }
 
     @Subscribe
-    public void pipeConnectEvent(IPipeEventConnectPipe connect) {
+    public void pipeConnectEvent(IPipeEventAttemptConnectPipe connect) {
         boolean contains = connectionList.contains(connect.getConnectingPipe().getBehaviour().definition);
         if (blacklist == EnumListStatus.BLACKLIST) {
             if (contains) {
-                connect.setAllowed(false);
+                connect.disallow();
             }
         } else {// Must be a whitelist
             if (!contains) {
-                connect.setAllowed(false);
+                connect.disallow();
             }
         }
     }

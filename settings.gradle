@@ -1,1 +1,1 @@
-include "api", "core", "builders","energy", "factory", "silicon"//, "transport", "robotics"
+include "api", "core", "builders","energy", "factory", "silicon", "transport", "robotics"

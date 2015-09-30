@@ -9,6 +9,9 @@ public abstract class PipeBehaviour {
     public final PipeDefinition definition;
 
     public PipeBehaviour(PipeDefinition definition) {
+        if (definition == null) {
+            throw new IllegalArgumentException("You cannot pass a null pipe definition!");
+        }
         this.definition = definition;
     }
 

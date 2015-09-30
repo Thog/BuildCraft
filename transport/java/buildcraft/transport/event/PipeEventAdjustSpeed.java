@@ -8,10 +8,10 @@ public class PipeEventAdjustSpeed extends PipeEvent implements IPipeEventAdjustS
     private final IPipeContentsItem contents;
     private float speed;
 
-    PipeEventAdjustSpeed(IPipe pipe, IPipeContentsItem contents, float speed) {
+    public PipeEventAdjustSpeed(IPipe pipe, IPipeContentsItem contents, float rawSpeed) {
         super(pipe);
         this.contents = contents;
-        this.speed = speed;
+        this.speed = pipe.getTransport().getPipeType().normaliseSpeed(rawSpeed);
     }
 
     @Override
@@ -22,6 +22,10 @@ public class PipeEventAdjustSpeed extends PipeEvent implements IPipeEventAdjustS
     @Override
     public float getSpeed() {
         return speed;
+    }
+
+    public float getRawSpeed() {
+        return getPipe().getTransport().getPipeType().denormaliseSpeed(speed);
     }
 
     @Override

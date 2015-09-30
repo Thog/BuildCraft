@@ -11,7 +11,7 @@ import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.event.IPipeEvent;
-import buildcraft.api.transport.event.IPipeEventConnectPipe;
+import buildcraft.api.transport.event.IPipeEventAttemptConnectPipe;
 import buildcraft.api.transport.event.IPipeEventPlayerUseItem;
 import buildcraft.api.transport.event.IPipeEventPowered;
 import buildcraft.api.transport.event.IPipeEventTick;
@@ -60,11 +60,11 @@ public class PipeBehaviourWood extends PipeBehaviour {
     }
 
     @Subscribe
-    public void onPipeConnect(IPipeEventConnectPipe connect) {
+    public void onPipeConnect(IPipeEventAttemptConnectPipe connect) {
         PipeBehaviour other = connect.getConnectingPipe().getBehaviour();
         if (other instanceof PipeBehaviourWood) {
             // Emerald extends wood, so its fine.
-            connect.setAllowed(false);
+            connect.disallow();
         }
     }
 

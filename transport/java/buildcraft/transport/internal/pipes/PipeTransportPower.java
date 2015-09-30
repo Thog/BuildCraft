@@ -31,10 +31,10 @@ import buildcraft.api.transport.EnumPipeType;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeProperty;
+import buildcraft.api.transport.PipeTransport;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
-import buildcraft.transport.PipeTransport;
 import buildcraft.transport.network.PacketPowerUpdate;
 import buildcraft.transport.pipes.PipeBehaviourWood;
 

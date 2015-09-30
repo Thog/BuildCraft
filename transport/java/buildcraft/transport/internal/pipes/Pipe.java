@@ -36,8 +36,11 @@ import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeProperty;
+import buildcraft.api.transport.PipeTransport;
+import buildcraft.api.transport.PipeTransportStructure;
 import buildcraft.api.transport.PipeWire;
 import buildcraft.api.transport.event.IPipeEvent;
+import buildcraft.api.transport.event.IPipeEventAttemptConnect;
 import buildcraft.api.transport.event.IPipeEventRandomDisplayTick;
 import buildcraft.api.transport.event.IPipeEventTick;
 import buildcraft.core.internal.IDropControlInventory;
@@ -46,18 +49,15 @@ import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
 import buildcraft.transport.LensFilterHandler;
-import buildcraft.transport.PipeTransport;
-import buildcraft.transport.PipeTransportStructure;
 import buildcraft.transport.event.PipeEventUpdateProperty;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.statements.ActionValve.ValveState;
 
 final class Pipe implements IDropControlInventory, IPipe {
-    final PipeDefinition definition;
-    final PipeBehaviour behaviour;
-    final PipeTransport transport;
+    private final PipeBehaviour behaviour;
+    private final PipeTransport transport;
     int[] signalStrength = new int[] { 0, 0, 0, 0 };
-    TileGenericPipe container;
+    final TileGenericPipe container;
     boolean[] wireSet = new boolean[] { false, false, false, false };
     final Gate[] gates = new Gate[EnumFacing.VALUES.length];
 
@@ -70,8 +70,7 @@ final class Pipe implements IDropControlInventory, IPipe {
     Map<PipeProperty<?>, Object> properties = Maps.newHashMap();
     Set<PipeProperty<?>> dirtyProperties = Sets.newHashSet();
 
-    Pipe(PipeDefinition definition) {
-        this.definition = definition;
+    Pipe(PipeDefinition definition, TileGenericPipe tile) {
         if (definition.behaviourFactory == null) {
             throw new RuntimeException("Found a definition with a null behaviour factory! THIS A MAJOR BUG! (" + definition + ")");
         }
@@ -83,7 +82,11 @@ final class Pipe implements IDropControlInventory, IPipe {
             throw new RuntimeException("Found a definition that created a behaviour without linking itself back to it!"
                 + " (definition.behaviourFactory.createNew().definition is null) [defintion = " + definition + "]");
         }
-        transport = definition.type.createTransport();
+        this.container = tile;
+        transport = definition.type.createTransport(tile);
+        if (transport == null) {
+            throw new RuntimeException("Found a definition that did not create a transport object! THIS IS A MAJOR BUG! (" + definition + ")");
+        }
         for (PipeProperty<?> property : transport.getAllProperties()) {
             dirtyProperties.add(property);
             properties.put(property, property.getDefault());
@@ -102,14 +105,12 @@ final class Pipe implements IDropControlInventory, IPipe {
                 if (event instanceof IPipeEventRandomDisplayTick) {
                     return;
                 }
+                if (event instanceof IPipeEventAttemptConnect) {
+                    return;
+                }
                 BCLog.logger.info("onEvent " + event);
             }
         });
-    }
-
-    void setTile(TileEntity tile) {
-        this.container = (TileGenericPipe) tile;
-        transport.setTile((TileGenericPipe) tile);
     }
 
     void resolveActions() {
@@ -169,6 +170,11 @@ final class Pipe implements IDropControlInventory, IPipe {
     void writeToNBT(NBTTagCompound data) {
         transport.writeToNBT(data);
 
+        NBTTagCompound behaviourNBT = behaviour.writeToNBT();
+        if (behaviourNBT != null) {
+            data.setTag("behaviour", behaviourNBT);
+        }
+
         // Save gate if any
         for (int i = 0; i < EnumFacing.VALUES.length; i++) {
             final String key = "Gate[" + i + "]";
@@ -190,16 +196,13 @@ final class Pipe implements IDropControlInventory, IPipe {
     void readFromNBT(NBTTagCompound data) {
         transport.readFromNBT(data);
 
+        if (data.hasKey("behaviour")) {
+            behaviour.readFromNBT(data.getCompoundTag("behaviour"));
+        }
+
         for (int i = 0; i < EnumFacing.VALUES.length; i++) {
             final String key = "Gate[" + i + "]";
             gates[i] = data.hasKey(key) ? GateFactory.makeGate(this, data.getCompoundTag(key)) : null;
-        }
-
-        // Legacy support
-        if (data.hasKey("Gate")) {
-            transport.container.setGate(GateFactory.makeGate(this, data.getCompoundTag("Gate")), 0);
-
-            data.removeTag("Gate");
         }
 
         for (int i = 0; i < 4; ++i) {
@@ -321,14 +324,6 @@ final class Pipe implements IDropControlInventory, IPipe {
         }
     }
 
-    boolean inputOpen(EnumFacing from) {
-        return transport.inputOpen(from);
-    }
-
-    boolean outputOpen(EnumFacing to) {
-        return transport.outputOpen(to);
-    }
-
     void onEntityCollidedWithBlock(Entity entity) {}
 
     boolean canConnectRedstone() {
@@ -425,8 +420,9 @@ final class Pipe implements IDropControlInventory, IPipe {
         InvUtils.dropItems(container.getWorld(), stack, container.getPos());
     }
 
-    ArrayList<ItemStack> computeItemDrop() {
-        ArrayList<ItemStack> result = new ArrayList<ItemStack>();
+    @Override
+    public List<ItemStack> getAllDroppedItems() {
+        List<ItemStack> result = new ArrayList<ItemStack>();
 
         for (PipeWire pipeWire : PipeWire.VALUES) {
             if (wireSet[pipeWire.ordinal()]) {

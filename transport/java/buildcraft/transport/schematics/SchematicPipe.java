@@ -4,9 +4,8 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.schematics;
 
-import java.nio.channels.Pipe;
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,7 +23,10 @@ import buildcraft.api.blueprints.SchematicTile;
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.statements.StatementManager;
+import buildcraft.api.transport.IPipe;
+import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeAPI;
+import buildcraft.api.transport.PipeDefinition;
 import buildcraft.transport.Gate;
 import buildcraft.transport.internal.pipes.BlockGenericPipe;
 import buildcraft.transport.internal.pipes.SideProperties;
@@ -35,13 +37,14 @@ public class SchematicPipe extends SchematicTile {
 
     @Override
     public boolean isAlreadyBuilt(IBuilderContext context, BlockPos pos) {
-        Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
-
-        if (BlockGenericPipe.isValid(pipe)) {
-            return pipe.definition == PipeAPI.REGISTRY.getDefinition(this.tileNBT.getString("pipeTag"));
-        } else {
-            return false;
+        TileEntity tile = context.world().getTileEntity(pos);
+        if (tile instanceof IPipeTile) {
+            IPipe pipe = ((IPipeTile) tile).getPipe();
+            PipeDefinition def = pipe.getBehaviour().definition;
+            Item item = Item.getItemById(this.tileNBT.getInteger("pipeId"));
+            return def == PipeAPI.REGISTRY.getDefinition(item);
         }
+        return false;
     }
 
     @Override
@@ -157,13 +160,15 @@ public class SchematicPipe extends SchematicTile {
     @Override
     public void initializeFromObjectAt(IBuilderContext context, BlockPos pos) {
         TileEntity tile = context.world().getTileEntity(pos);
-        Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
+        IPipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
             tile.writeToNBT(tileNBT);
 
-            // remove all pipe contents
+            // Remove all pipe connections
+            tileNBT.removeTag("connections");
 
+            // remove all pipe contents
             tileNBT.removeTag("travelingEntities");
 
             for (EnumFacing direction : EnumFacing.values()) {
@@ -182,14 +187,16 @@ public class SchematicPipe extends SchematicTile {
 
     @Override
     public void storeRequirements(IBuilderContext context, BlockPos pos) {
-        Pipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
+        IPipe pipe = BlockGenericPipe.getPipe(context.world(), pos);
 
         if (BlockGenericPipe.isValid(pipe)) {
-            ArrayList<ItemStack> items = pipe.computeItemDrop();
+            List<ItemStack> items = pipe.getAllDroppedItems();
             storedRequirements = new ItemStack[items.size() + 1];
             items.toArray(storedRequirements);
-            Item pipeItem = PipeAPI.REGISTRY.getItem(pipe.definition);
-            storedRequirements[storedRequirements.length - 1] = new ItemStack(pipeItem, 1, pipe.container.getItemMetadata());
+            Item pipeItem = PipeAPI.REGISTRY.getItem(pipe.getBehaviour().definition);
+            int pipeColor = pipe.getTile().getPipeColor();
+            int itemMeta = pipeColor + 1;
+            storedRequirements[storedRequirements.length - 1] = new ItemStack(pipeItem, 1, itemMeta);
         }
     }
 

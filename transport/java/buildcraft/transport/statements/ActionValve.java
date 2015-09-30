@@ -4,7 +4,6 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.statements;
 
-import java.nio.channels.Pipe;
 import java.util.Locale;
 
 import net.minecraft.util.EnumFacing;
@@ -14,11 +13,11 @@ import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.IStatementParameter;
 import buildcraft.api.transport.IPipe;
+import buildcraft.api.transport.PipeTransport;
 import buildcraft.core.lib.utils.StringUtils;
 import buildcraft.core.statements.BCStatement;
 import buildcraft.core.statements.StatementParameterDirection;
 import buildcraft.transport.Gate;
-import buildcraft.transport.PipeTransport;
 
 public class ActionValve extends BCStatement implements IActionInternal {
 
@@ -70,8 +69,8 @@ public class ActionValve extends BCStatement implements IActionInternal {
     public void actionActivate(IStatementContainer container, IStatementParameter[] parameters) {
         IPipe pipe = ((Gate) container).getPipe();
 
-        if (pipe != null && pipe instanceof Pipe) {
-            PipeTransport transport = ((Pipe) pipe).transport;
+        if (pipe != null) {
+            PipeTransport transport = pipe.getTransport();
             if (parameters[0] != null && parameters[0] instanceof StatementParameterDirection) {
                 EnumFacing side = ((StatementParameterDirection) parameters[0]).direction;
 

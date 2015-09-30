@@ -35,6 +35,8 @@ import buildcraft.transport.gui.ContainerGateInterface;
 import buildcraft.transport.item.ItemGate;
 import buildcraft.transport.statements.ActionValve;
 
+// Move to GatePluggable
+@Deprecated
 public final class Gate implements IGate, ISidedStatementContainer, IRedstoneStatementContainer {
 
     public static int MAX_STATEMENTS = 8;
@@ -95,10 +97,10 @@ public final class Gate implements IGate, ISidedStatementContainer, IRedstoneSta
     public void setAction(int position, IStatement action) {
         // HUGE HACK! TODO - Remove in an API rewrite by adding
         // ways for actions to fix their state on removal.
-        if (actions[position] instanceof ActionValve && pipe != null && pipe.transport != null) {
+        if (actions[position] instanceof ActionValve && pipe != null && pipe.getTransport() != null) {
             for (EnumFacing side : EnumFacing.VALUES) {
-                pipe.transport.allowInput(side, true);
-                pipe.transport.allowOutput(side, true);
+                pipe.getTransport().allowInput(side, true);
+                pipe.getTransport().allowOutput(side, true);
             }
         }
 

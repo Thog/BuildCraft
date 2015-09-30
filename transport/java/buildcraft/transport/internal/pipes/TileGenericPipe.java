@@ -4,6 +4,7 @@
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
 package buildcraft.transport.internal.pipes;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.logging.log4j.Level;
@@ -57,6 +58,8 @@ import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipePluggableState;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.event.PipeEventAttemptConnect;
+import buildcraft.transport.event.PipeEventConnect;
+import buildcraft.transport.event.PipeEventDisconnect;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.item.ItemFacade.FacadeState;
@@ -70,7 +73,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public final PipeRenderState renderState = new PipeRenderState();
     public final PipePluggableState pluggableState = new PipePluggableState();
     public final CoreState coreState = new CoreState();
-    public boolean[] pipeConnectionsBuffer = new boolean[6];
+
+    private final EnumSet<EnumFacing> pipeConnections = EnumSet.noneOf(EnumFacing.class);
 
     Pipe pipe;
     public int redstoneInput;
@@ -104,7 +108,13 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             nbt.setByte(key, (byte) redstoneInputSide[i]);
         }
 
-        nbt.setInteger("pipeId", Item.getIdFromItem(PipeAPI.REGISTRY.getItem(pipe.definition)));
+        NBTTagCompound connections = new NBTTagCompound();
+        for (EnumFacing face : EnumFacing.values()) {
+            connections.setBoolean(face.name(), pipeConnections.contains(face));
+        }
+        nbt.setTag("connections", connections);
+
+        nbt.setInteger("pipeId", Item.getIdFromItem(PipeAPI.REGISTRY.getItem(pipe.getBehaviour().definition)));
 
         sideProperties.writeToNBT(nbt);
     }
@@ -129,6 +139,15 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 redstoneInputSide[i] = 0;
             }
         }
+
+        NBTTagCompound connections = nbt.getCompoundTag("connections");
+        pipeConnections.clear();
+        for (EnumFacing face : EnumFacing.values()) {
+            if (connections.getBoolean(face.name())) {
+                pipeConnections.add(face);
+            }
+        }
+
         int id = nbt.getInteger("pipeId");
         PipeDefinition definition = PipeAPI.REGISTRY.getDefinition(Item.getItemById(id));
 
@@ -139,7 +158,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
             coreState.pipeId = Item.getIdFromItem(PipeAPI.REGISTRY.getItem(definition));
 
-            pipe = new Pipe(definition);
+            pipe = new Pipe(definition, this);
             bindPipe();
 
             if (pipe != null) {
@@ -205,7 +224,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 }
 
                 if (!initialized) {
-                    initialize(pipe.definition);
+                    initialize(pipe.getBehaviour().definition);
                 }
             }
 
@@ -243,7 +262,15 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             }
 
             if (blockNeighborChange) {
-                computeConnections();
+                if (computeConnections()) {
+                    BCLog.logger.info("Pipe @ " + getPos() + " changed a connection!");
+                    for (EnumFacing face : EnumFacing.values()) {
+                        TileEntity tile = worldObj.getTileEntity(getPos().offset(face));
+                        if (tile instanceof TileGenericPipe) {
+                            ((TileGenericPipe) tile).scheduleNeighborChange();
+                        }
+                    }
+                }
                 pipe.onNeighborBlockChange(0);
                 blockNeighborChange = false;
                 refreshRenderState = true;
@@ -251,9 +278,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
             if (refreshRenderState) {
                 if (refreshRenderState()) {
+                    BCLog.logger.info("Pipe @ " + getPos() + " refreshed its render state");
                     for (EnumFacing face : EnumFacing.values()) {
                         TileEntity tile = worldObj.getTileEntity(getPos().offset(face));
-                        if (tile != null && tile instanceof TileGenericPipe) {
+                        if (tile instanceof TileGenericPipe) {
                             ((TileGenericPipe) tile).scheduleRenderUpdate();
                         }
                     }
@@ -261,10 +289,11 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 refreshRenderState = false;
             }
 
-            // if (sendClientUpdate) {
-            sendClientUpdate = false;
-            BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
-            // }
+            if (sendClientUpdate) {
+                BCLog.logger.info("Pipe @ " + getPos() + " sent a client update");
+                sendClientUpdate = false;
+                BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
+            }
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException(t);
@@ -283,6 +312,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         return getPipeColor() >= 0 ? (1 + getPipeColor()) : 0;
     }
 
+    @Override
     public int getPipeColor() {
         return worldObj.isRemote ? renderState.getGlassColor() : this.glassColor;
     }
@@ -306,8 +336,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
         // Pipe connections;
         for (EnumFacing o : EnumFacing.VALUES) {
-            renderState.pipeConnectionMatrix.setConnected(o, this.pipeConnectionsBuffer[o.ordinal()]);
-            if (pipeConnectionsBuffer[o.ordinal()]) {
+            renderState.pipeConnectionMatrix.setConnected(o, pipeConnections.contains(o));
+            if (pipeConnections.contains(o)) {
                 BlockPos connected = getPos().offset(o);
                 IBlockState state = worldObj.getBlockState(connected);
                 Block block = state.getBlock();
@@ -319,7 +349,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         // Pipe Textures
         for (int i = 0; i < 7; i++) {
             EnumFacing o = EnumFacing.getFront(i);
-            renderState.textureMatrix.setIconIndex(o, pipe.behaviour.getIconIndex(o));
+            renderState.textureMatrix.setIconIndex(o, pipe.getBehaviour().getIconIndex(o));
         }
 
         // WireState
@@ -377,9 +407,10 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     public void initialize(PipeDefinition definition) {
+        BCLog.logger.info("Init pipe @" + getPos());
         this.blockType = getBlockType();
 
-        pipe = new Pipe(definition);
+        pipe = new Pipe(definition, this);
 
         for (EnumFacing o : EnumFacing.VALUES) {
             TileEntity tile = getTile(o);
@@ -394,7 +425,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
         bindPipe();
 
-        computeConnections();
         scheduleNeighborChange();
         scheduleRenderUpdate();
 
@@ -403,12 +433,12 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         initialized = true;
+        BCLog.logger.info("...finished init");
     }
 
     private void bindPipe() {
         if (!pipeBound && pipe != null) {
-            pipe.setTile(this);
-            coreState.setDefinition(pipe.definition);
+            coreState.setDefinition(pipe.getBehaviour().definition);
             pipeBound = true;
         }
     }
@@ -431,14 +461,15 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public int injectItem(ItemStack payload, boolean doAdd, EnumFacing from, EnumDyeColor color) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof PipeTransportItems && isPipeConnected(from) && pipe.inputOpen(from)) {
+        if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof PipeTransportItems && isPipeConnected(from) && pipe.getTransport()
+                .inputOpen(from)) {
 
             if (doAdd) {
                 Vec3 itemPos = Utils.convertMiddle(getPos()).add(Utils.convert(from, 0.4));
 
                 TravelingItem pipedItem = TravelingItem.make(itemPos, payload);
                 pipedItem.color = color;
-                ((PipeTransportItems) pipe.transport).injectItem(pipedItem, from.getOpposite());
+                ((PipeTransportItems) pipe.getTransport()).injectItem(pipedItem, from.getOpposite());
             }
             return payload.stackSize;
         }
@@ -449,7 +480,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     @Override
     public IPipeType getPipeType() {
         if (BlockGenericPipe.isValid(pipe)) {
-            return pipe.transport.getPipeType();
+            return pipe.getTransport().getPipeType();
         }
         return null;
     }
@@ -460,22 +491,22 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         bindPipe();
         updateCoreState();
 
-        if (pipe == null || pipe.definition == null || pipe.behaviour == null) {
-            // If ANY of these are null it will cause major problems for the client, so lets just not send them
+        if (pipe == null) {
+            // If the pipe is null it will cause major problems for the client, so lets just not send it
             return null;
         }
         PacketTileState packet = new PacketTileState(getPos());
 
-        if (pipe != null && pipe.transport != null) {
-            pipe.transport.sendDescriptionPacket();
+        if (pipe != null && pipe.getTransport() != null) {
+            pipe.getTransport().sendDescriptionPacket();
         }
 
         packet.addStateForSerialization((byte) 0, coreState);
         packet.addStateForSerialization((byte) 1, renderState);
         packet.addStateForSerialization((byte) 2, pluggableState);
 
-        if (pipe != null && pipe.behaviour instanceof ISerializable) {
-            packet.addStateForSerialization((byte) 3, (ISerializable) pipe.behaviour);
+        if (pipe != null && pipe.getBehaviour() instanceof ISerializable) {
+            packet.addStateForSerialization((byte) 3, (ISerializable) pipe.getBehaviour());
         }
 
         return packet;
@@ -502,7 +533,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     public TileBuffer[] getTileCache() {
         if (tileBuffer == null && pipe != null) {
-            tileBuffer = TileBuffer.makeBuffer(worldObj, getPos(), pipe.transport.delveIntoUnloadedChunks());
+            tileBuffer = TileBuffer.makeBuffer(worldObj, getPos(), pipe.getTransport().delveIntoUnloadedChunks());
         }
         return tileBuffer;
     }
@@ -543,7 +574,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         boolean askedForConnection = false;
 
         if (with instanceof IPipeConnection) {
-            IPipeConnection.ConnectOverride override = ((IPipeConnection) with).overridePipeConnection(pipe.transport.getPipeType(), side
+            IPipeConnection.ConnectOverride override = ((IPipeConnection) with).overridePipeConnection(pipe.getTransport().getPipeType(), side
                     .getOpposite());
             if (override == ConnectOverride.DISCONNECT) {
                 return false;
@@ -552,7 +583,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             }
         }
 
-        boolean isRightType = pipe.transport.canPipeConnect(with, side);
+        boolean isRightType = pipe.getTransport().canPipeConnect(with, side);
         PipeEventAttemptConnect event = PipeEventAttemptConnect.createEvent(pipe, side, with, askedForConnection, isRightType);
 
         if (event instanceof IPipeEventAttemptConnectPipe) {
@@ -625,24 +656,40 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         return pluggable.isBlocking(this, side);
     }
 
-    protected void computeConnections() {
+    protected boolean computeConnections() {
         if (worldObj.isRemote) {
-            return;
+            return false;
         }
         TileBuffer[] cache = getTileCache();
         if (cache == null) {
-            return;
+            return false;
         }
 
+        boolean changed = false;
+        BCLog.logger.info("Computing connections:");
         for (EnumFacing side : EnumFacing.VALUES) {
-            TileBuffer t = cache[side.ordinal()];
+            // TileBuffer t = cache[side.ordinal()];
             // For blocks which are not loaded, keep the old connection value.
-            if (t.exists() || !initialized) {
-                t.refresh();
+            // if (t.exists() || !initialized) {
+            // t.refresh();
+            TileEntity with = worldObj.getTileEntity(pos.offset(side));
 
-                pipeConnectionsBuffer[side.ordinal()] = canPipeConnect(worldObj.getTileEntity(pos.offset(side)), side);
+            boolean before = pipeConnections.contains(side);
+            boolean now = canPipeConnect(with, side);
+            if (before != now) {
+                if (now) {
+                    pipe.postEvent(PipeEventConnect.create(pipe, side, with));
+                    pipeConnections.add(side);
+                } else {
+                    pipe.postEvent(new PipeEventDisconnect(pipe, side, with));
+                    pipeConnections.remove(side);
+                }
+                changed = true;
+                BCLog.logger.info("  " + side.getName() + " changed from " + before + " to " + now);
             }
+            // }
         }
+        return changed;
     }
 
     @Override
@@ -650,7 +697,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         if (worldObj.isRemote) {
             return renderState.pipeConnectionMatrix.isConnected(with);
         }
-        return pipeConnectionsBuffer[with.ordinal()];
+        return pipeConnections.contains(with);
     }
 
     @Override
@@ -672,8 +719,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     /** ITankContainer implementation * */
     @Override
     public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof IFluidHandler && !hasBlockingPluggable(from)) {
-            return ((IFluidHandler) pipe.transport).fill(from, resource, doFill);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof IFluidHandler && !hasBlockingPluggable(from)) {
+            return ((IFluidHandler) pipe.getTransport()).fill(from, resource, doFill);
         } else {
             return 0;
         }
@@ -681,8 +728,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof IFluidHandler && !hasBlockingPluggable(from)) {
-            return ((IFluidHandler) pipe.transport).drain(from, maxDrain, doDrain);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof IFluidHandler && !hasBlockingPluggable(from)) {
+            return ((IFluidHandler) pipe.getTransport()).drain(from, maxDrain, doDrain);
         } else {
             return null;
         }
@@ -690,8 +737,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof IFluidHandler && !hasBlockingPluggable(from)) {
-            return ((IFluidHandler) pipe.transport).drain(from, resource, doDrain);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof IFluidHandler && !hasBlockingPluggable(from)) {
+            return ((IFluidHandler) pipe.getTransport()).drain(from, resource, doDrain);
         } else {
             return null;
         }
@@ -699,8 +746,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public boolean canFill(EnumFacing from, Fluid fluid) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof IFluidHandler && !hasBlockingPluggable(from)) {
-            return ((IFluidHandler) pipe.transport).canFill(from, fluid);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof IFluidHandler && !hasBlockingPluggable(from)) {
+            return ((IFluidHandler) pipe.getTransport()).canFill(from, fluid);
         } else {
             return false;
         }
@@ -708,8 +755,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public boolean canDrain(EnumFacing from, Fluid fluid) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.transport instanceof IFluidHandler && !hasBlockingPluggable(from)) {
-            return ((IFluidHandler) pipe.transport).canDrain(from, fluid);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getTransport() instanceof IFluidHandler && !hasBlockingPluggable(from)) {
+            return ((IFluidHandler) pipe.getTransport()).canDrain(from, fluid);
         } else {
             return false;
         }
@@ -793,7 +840,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             case 2:
                 return pluggableState;
             case 3:
-                return (ISerializable) pipe.behaviour;
+                return (ISerializable) pipe.getBehaviour();
         }
         throw new RuntimeException("Unknown state requested: " + stateId + " this is a bug!");
     }
@@ -822,9 +869,11 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 break;
 
             case 1: {
+                BCLog.logger.info("Recieved a render state update @ " + getPos());
                 if (renderState.needsRenderUpdate()) {
-                    worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
                     renderState.clean();
+                    worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
+                    BCLog.logger.info("Marked pipe @ " + getPos() + " for an update");
                 }
                 break;
             }
@@ -908,8 +957,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             return true;
         }
 
-        if (BlockGenericPipe.isValid(pipe) && pipe.behaviour instanceof ISolidSideTile) {
-            if (((ISolidSideTile) pipe.behaviour).isSolidOnSide(side)) {
+        if (BlockGenericPipe.isValid(pipe) && pipe.getBehaviour() instanceof ISolidSideTile) {
+            if (((ISolidSideTile) pipe.getBehaviour()).isSolidOnSide(side)) {
                 return true;
             }
         }
@@ -949,15 +998,15 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public void writeGuiData(ByteBuf data) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.behaviour instanceof IGuiReturnHandler) {
-            ((IGuiReturnHandler) pipe.behaviour).writeGuiData(data);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getBehaviour() instanceof IGuiReturnHandler) {
+            ((IGuiReturnHandler) pipe.getBehaviour()).writeGuiData(data);
         }
     }
 
     @Override
     public void readGuiData(ByteBuf data, EntityPlayer sender) {
-        if (BlockGenericPipe.isValid(pipe) && pipe.behaviour instanceof IGuiReturnHandler) {
-            ((IGuiReturnHandler) pipe.behaviour).readGuiData(data, sender);
+        if (BlockGenericPipe.isValid(pipe) && pipe.getBehaviour() instanceof IGuiReturnHandler) {
+            ((IGuiReturnHandler) pipe.getBehaviour()).readGuiData(data, sender);
         }
     }
 
@@ -988,7 +1037,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
-        if (pipe == null || pipe.transport == null) {
+        if (pipe == null) {
             return;
         }
 
@@ -997,11 +1046,11 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             left.add(face.getName() + " = " + isPipeConnected(face));
         }
 
-        if (pipe.behaviour instanceof IDebuggable) {
-            ((IDebuggable) pipe.behaviour).getDebugInfo(left, right, side);
+        if (pipe.getBehaviour() instanceof IDebuggable) {
+            ((IDebuggable) pipe.getBehaviour()).getDebugInfo(left, right, side);
         }
-        if (pipe.transport instanceof IDebuggable) {
-            ((IDebuggable) pipe.transport).getDebugInfo(left, right, side);
+        if (pipe.getTransport() instanceof IDebuggable) {
+            ((IDebuggable) pipe.getTransport()).getDebugInfo(left, right, side);
         }
         if (getPipePluggable(side) != null && getPipePluggable(side) instanceof IDebuggable) {
             ((IDebuggable) getPipePluggable(side)).getDebugInfo(left, right, side);

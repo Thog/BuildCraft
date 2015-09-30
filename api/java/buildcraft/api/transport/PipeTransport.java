@@ -2,7 +2,7 @@
  *
  * BuildCraft is distributed under the terms of the Minecraft Mod Public License 1.0, or MMPL. Please check the contents
  * of the license located in http://www.mod-buildcraft.com/MMPL-1.0.txt */
-package buildcraft.transport;
+package buildcraft.api.transport;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -16,21 +16,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import buildcraft.api.transport.EnumPipeType;
-import buildcraft.api.transport.PipeDefinition;
-import buildcraft.api.transport.PipeProperty;
-import buildcraft.core.lib.utils.BitSetUtils;
-import buildcraft.transport.internal.pipes.TileGenericPipe;
+import buildcraft.api.BitSetUtils;
 
-// TODO (PASS 0: Convert this to an interface inside of the API
 public abstract class PipeTransport {
-
-    public TileGenericPipe container;
+    public final IPipeTile container;
 
     protected boolean[] inputsOpen = new boolean[EnumFacing.VALUES.length];
     protected boolean[] outputsOpen = new boolean[EnumFacing.VALUES.length];
 
-    public PipeTransport() {
+    public PipeTransport(IPipeTile tile) {
+        this.container = tile;
         for (int b = 0; b < EnumFacing.VALUES.length; b++) {
             inputsOpen[b] = true;
             outputsOpen[b] = true;
@@ -80,10 +75,6 @@ public abstract class PipeTransport {
     public void initFromPipe(PipeDefinition definition) {}
 
     public void updateEntity() {}
-
-    public void setTile(TileGenericPipe tile) {
-        this.container = tile;
-    }
 
     public boolean canPipeConnect(TileEntity tile, EnumFacing side) {
         return true;
