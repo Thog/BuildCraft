@@ -14,14 +14,19 @@ public abstract class PipeBehaviour {
     }
 
     public final PipeDefinition definition;
+    public final IPipeTile pipe;
     public final int id;
 
-    public PipeBehaviour(PipeDefinition definition) {
+    public PipeBehaviour(PipeDefinition definition, IPipeTile pipe) {
         this.id = nextId();
         if (definition == null) {
             throw new IllegalArgumentException("You cannot pass a null pipe definition!");
         }
         this.definition = definition;
+        if (pipe == null) {
+            throw new IllegalArgumentException("YOu cannot pass a null pipe tile!");
+        }
+        this.pipe = pipe;
     }
 
     public abstract NBTTagCompound writeToNBT();
@@ -35,13 +40,5 @@ public abstract class PipeBehaviour {
     /** Return the index for the icon for items. Override this if getIconIndex(null) does NOT return the item icon */
     public int getIconIndexForItem() {
         return getIconIndex(null);
-    }
-
-    /** Get the suffix for the icon of the pipe. This will be appended to the mod-unique tag of the pipe. (So, if this
-     * had a mod-unique tag of "cobblestone", and this returned "_north" the resulting location would be
-     * "cobblestone_north". The index is guaranteed to be between 0 (inclusive) and your definition's maxSprites number
-     * (exclusive). */
-    public String getIconSuffix(int index) {
-        return "";
     }
 }

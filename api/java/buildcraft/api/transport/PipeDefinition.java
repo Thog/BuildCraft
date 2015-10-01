@@ -16,8 +16,9 @@ public final class PipeDefinition extends ObjectDefinition {
     public final String textureLocationStart;
     /** An array containing the end locations of each pipe texture. This array have a length equal to maxSprites. It is
      * up to each indervidual pipe to determine which sprite to use for locations though. By default all of them will be
-     * initialised to {@link #textureLocationStart}+{@link #globalUniqueTag} */
-    public final String[] spriteLocations;
+     * initialised to {@link #textureLocationStart}+{@link #modUniqueTag}+{The texture suffixes given to the
+     * constructor} */
+    private final String[] spriteLocations;
     /** A factory the creates the behaviour of this definition. */
     public final IPipeBehaviourFactory behaviourFactory;
     /** The type of this pipe. This determines how the pipe should be rendered and how the pipe should act. */
@@ -26,11 +27,10 @@ public final class PipeDefinition extends ObjectDefinition {
     /** An array containing the actual sprites, where the positions are determined by {@link #spriteLocations} */
     @SideOnly(Side.CLIENT)
     private TextureAtlasSprite[] sprites;
-
     public final int itemSpriteIndex;
 
-    public PipeDefinition(String tag, IPipeType type, int maxSprites, String textureStart, IPipeBehaviourFactory behaviour) {
-        this(tag, type, maxSprites, 0, textureStart, behaviour);
+    public PipeDefinition(String tag, IPipeType type, String textureStart, String[] textureSuffixes, IPipeBehaviourFactory behaviour) {
+        this(tag, type, 0, textureStart, textureSuffixes, behaviour);
     }
 
     /** @param tag A MOD-unique tag for the pipe
@@ -39,13 +39,17 @@ public final class PipeDefinition extends ObjectDefinition {
      * @param itemSpriteIndex
      * @param textureStart
      * @param factory */
-    public PipeDefinition(String tag, IPipeType type, int maxSprites, int itemSpriteIndex, String textureStart, IPipeBehaviourFactory factory) {
+    public PipeDefinition(String tag, IPipeType type, int itemSpriteIndex, String textureStart, String[] textureSuffixes,
+            IPipeBehaviourFactory factory) {
         super(tag);
         this.type = type;
-        this.maxSprites = maxSprites;
+        this.maxSprites = textureSuffixes.length;
         this.itemSpriteIndex = itemSpriteIndex;
         this.textureLocationStart = textureStart.endsWith("/") ? textureStart : (textureStart + "/");
         this.spriteLocations = new String[maxSprites];
+        for (int i = 0; i < maxSprites; i++) {
+            spriteLocations[i] = textureLocationStart + modUniqueTag + textureSuffixes[i];
+        }
         this.behaviourFactory = factory;
     }
 
@@ -60,9 +64,6 @@ public final class PipeDefinition extends ObjectDefinition {
     @SideOnly(Side.CLIENT)
     public void registerSprites(TextureMap map) {
         sprites = new TextureAtlasSprite[maxSprites];
-        for (int i = 0; i < spriteLocations.length; i++) {
-            spriteLocations[i] = textureLocationStart + modUniqueTag + behaviourFactory.createNew().getIconSuffix(i);
-        }
         for (int i = 0; i < spriteLocations.length; i++) {
             String string = spriteLocations[i];
             ResourceLocation location = new ResourceLocation(string);

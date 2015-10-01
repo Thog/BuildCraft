@@ -74,7 +74,7 @@ final class Pipe implements IDropControlInventory, IPipe {
         if (definition.behaviourFactory == null) {
             throw new RuntimeException("Found a definition with a null behaviour factory! THIS A MAJOR BUG! (" + definition + ")");
         }
-        behaviour = definition.behaviourFactory.createNew();
+        behaviour = definition.behaviourFactory.createNew(tile);
         if (behaviour == null) {
             throw new RuntimeException("Found a definition that did not create a pipe behaviour object! THIS IS A MAJOR BUG! (" + definition + ")");
         }

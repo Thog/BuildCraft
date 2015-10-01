@@ -38,8 +38,11 @@ import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeProperty;
 import buildcraft.api.transport.PipeTransport;
 import buildcraft.core.DefaultProps;
+import buildcraft.core.lib.inventory.ITransactor;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.Transactor;
+import buildcraft.core.lib.inventory.filters.IStackFilter;
+import buildcraft.core.lib.inventory.filters.StackFilter;
 import buildcraft.core.lib.utils.BlockUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
@@ -59,7 +62,7 @@ import buildcraft.transport.render.tile.PipeRendererItems;
 import buildcraft.transport.utils.TransportUtils;
 
 public final class PipeTransportItems extends PipeTransport implements IDebuggable {
-
+    public static final double ITEM_EXTRACT_COST = 10;
     public static final int MAX_PIPE_STACKS = 64;
     public static final int MAX_PIPE_ITEMS = 1024;
     public boolean allowBouncing = false;

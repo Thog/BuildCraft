@@ -32,7 +32,7 @@ public abstract class PipeTransport {
         }
     }
 
-    public abstract EnumPipeType getPipeType();
+    public abstract IPipeType getPipeType();
 
     public World getWorld() {
         return container.getWorld();

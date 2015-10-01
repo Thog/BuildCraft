@@ -141,14 +141,19 @@ public class TransportItems {
 
     private static PipeDefinition createWoodenDefinition(EnumPipeType type) {
         BehaviourFactoryWooden factory = new BehaviourFactoryWooden();
-        PipeDefinition definition = createDefinition(type, EnumPipeMaterial.WOOD, factory);
+        String[] suffixes = { "_clear", "_filled" };
+        PipeDefinition definition = createDefinition(type, EnumPipeMaterial.WOOD, suffixes, factory);
         factory.setDefinition(definition);
         return definition;
     }
 
     private static PipeDefinition createDefinition(EnumPipeType type, EnumPipeMaterial material, IPipeBehaviourFactory factory) {
+        return createDefinition(type, material, new String[] { "" }, factory);
+    }
+
+    private static PipeDefinition createDefinition(EnumPipeType type, EnumPipeMaterial material, String[] suffixes, IPipeBehaviourFactory factory) {
         String name = material.name().toLowerCase(Locale.ROOT) + "_" + type.name().toLowerCase(Locale.ROOT);
-        PipeDefinition definition = new PipeDefinition(name, type, material.maxSprites, "buildcrafttransport:pipes/", factory);
+        PipeDefinition definition = new PipeDefinition(name, type, material.maxSprites, "buildcrafttransport:pipes/", suffixes, factory);
         return definition;
     }
 

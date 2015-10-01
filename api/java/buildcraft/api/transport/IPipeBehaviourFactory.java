@@ -1,5 +1,5 @@
 package buildcraft.api.transport;
 
 public interface IPipeBehaviourFactory {
-    PipeBehaviour createNew();
+    PipeBehaviour createNew(IPipeTile pipe);
 }

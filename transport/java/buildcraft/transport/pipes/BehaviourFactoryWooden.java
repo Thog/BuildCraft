@@ -1,6 +1,7 @@
 package buildcraft.transport.pipes;
 
 import buildcraft.api.transport.IPipeBehaviourFactory;
+import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 
@@ -14,7 +15,7 @@ public class BehaviourFactoryWooden implements IPipeBehaviourFactory {
     }
 
     @Override
-    public PipeBehaviour createNew() {
-        return new BehaviourWood(definition);
+    public PipeBehaviour createNew(IPipeTile pipe) {
+        return new BehaviourWood(definition, pipe);
     }
 }

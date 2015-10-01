@@ -6,6 +6,7 @@ import com.google.common.eventbus.Subscribe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
+import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.event.IPipeEventAttemptConnectPipe;
@@ -15,8 +16,8 @@ public class BehaviourBasic extends PipeBehaviour {
     public final ImmutableList<PipeDefinition> connectionList;
     public final EnumListStatus blacklist;
 
-    public BehaviourBasic(PipeDefinition definition, ImmutableList<PipeDefinition> connectionList, EnumListStatus blacklist) {
-        super(definition);
+    public BehaviourBasic(PipeDefinition definition, IPipeTile tile, ImmutableList<PipeDefinition> connectionList, EnumListStatus blacklist) {
+        super(definition, tile);
         this.connectionList = connectionList;
         this.blacklist = blacklist;
     }

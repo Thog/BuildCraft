@@ -3,6 +3,7 @@ package buildcraft.transport.pipes;
 import com.google.common.collect.ImmutableList;
 
 import buildcraft.api.transport.IPipeBehaviourFactory;
+import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 
@@ -25,7 +26,7 @@ public class BehaviourFactoryBasic implements IPipeBehaviourFactory {
     }
 
     @Override
-    public PipeBehaviour createNew() {
-        return new BehaviourBasic(definition, connectionList, blacklist);
+    public PipeBehaviour createNew(IPipeTile tile) {
+        return new BehaviourBasic(definition, tile, connectionList, blacklist);
     }
 }
