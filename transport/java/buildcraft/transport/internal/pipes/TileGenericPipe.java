@@ -155,7 +155,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             this.deletePipe = true;
             new RuntimeException("Definition was null! (id = " + id + ", item = " + Item.getItemById(id) + ")").printStackTrace();;
         } else {
-
             coreState.pipeId = Item.getIdFromItem(PipeAPI.REGISTRY.getItem(definition));
 
             pipe = new Pipe(definition, this);
@@ -263,7 +262,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
             if (blockNeighborChange) {
                 if (computeConnections()) {
-                    BCLog.logger.info("Pipe @ " + getPos() + " changed a connection!");
                     for (EnumFacing face : EnumFacing.values()) {
                         TileEntity tile = worldObj.getTileEntity(getPos().offset(face));
                         if (tile instanceof TileGenericPipe) {
@@ -278,7 +276,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
             if (refreshRenderState) {
                 if (refreshRenderState()) {
-                    BCLog.logger.info("Pipe @ " + getPos() + " refreshed its render state");
                     for (EnumFacing face : EnumFacing.values()) {
                         TileEntity tile = worldObj.getTileEntity(getPos().offset(face));
                         if (tile instanceof TileGenericPipe) {
@@ -290,9 +287,9 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             }
 
             if (sendClientUpdate) {
-                BCLog.logger.info("Pipe @ " + getPos() + " sent a client update");
                 sendClientUpdate = false;
-                BuildCraftCore.instance.sendToPlayersNear(getBCDescriptionPacket(), this);
+                Packet packet = getBCDescriptionPacket();
+                BuildCraftCore.instance.sendToPlayersNear(packet, this);
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -407,7 +404,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     }
 
     public void initialize(PipeDefinition definition) {
-        BCLog.logger.info("Init pipe @" + getPos());
         this.blockType = getBlockType();
 
         pipe = new Pipe(definition, this);
@@ -433,7 +429,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         initialized = true;
-        BCLog.logger.info("...finished init");
     }
 
     private void bindPipe() {
@@ -495,7 +490,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             // If the pipe is null it will cause major problems for the client, so lets just not send it
             return null;
         }
-        PacketTileState packet = new PacketTileState(getPos());
+        PacketTileState packet = new PacketTileState(this);
+        packet.tempWorld = worldObj;
 
         if (pipe != null && pipe.getTransport() != null) {
             pipe.getTransport().sendDescriptionPacket();
@@ -514,11 +510,9 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
 
     @Override
     public net.minecraft.network.Packet getDescriptionPacket() {
-        Packet bcPacket = getBCDescriptionPacket();
-        if (bcPacket == null) {
-            return null;
-        }
-        return BuildCraftTransport.instance.channels.get(Side.SERVER).generatePacketFrom(bcPacket);
+        // Bit nasty, but this ensures that we only have one way of writing packets
+        sendNetworkUpdate();
+        return null;
     }
 
     @Override
@@ -666,7 +660,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         }
 
         boolean changed = false;
-        BCLog.logger.info("Computing connections:");
         for (EnumFacing side : EnumFacing.VALUES) {
             // TileBuffer t = cache[side.ordinal()];
             // For blocks which are not loaded, keep the old connection value.
@@ -685,7 +678,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                     pipeConnections.remove(side);
                 }
                 changed = true;
-                BCLog.logger.info("  " + side.getName() + " changed from " + before + " to " + now);
             }
             // }
         }
@@ -850,7 +842,6 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         if (!worldObj.isRemote) {
             return;
         }
-
         switch (stateId) {
             case 0:
                 if (pipe != null) {
@@ -869,11 +860,9 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 break;
 
             case 1: {
-                BCLog.logger.info("Recieved a render state update @ " + getPos());
                 if (renderState.needsRenderUpdate()) {
                     renderState.clean();
                     worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
-                    BCLog.logger.info("Marked pipe @ " + getPos() + " for an update");
                 }
                 break;
             }

@@ -21,7 +21,6 @@ import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
 import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.FMLOutboundHandler.OutboundTarget;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -30,32 +29,47 @@ import buildcraft.api.core.IBuildCraftMod;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.utils.Utils;
 
+import io.netty.util.AttributeKey;
+
 public class BuildCraftMod implements IBuildCraftMod {
     private static final Executor packetSender;
 
     public EnumMap<Side, FMLEmbeddedChannel> channels;
     protected Map<String, Property> options = Maps.newHashMap();
+    private static volatile int ids = 0;
+
+    private static synchronized int nextId() {
+        return ids++;
+    }
 
     abstract class SendRequest implements Runnable {
         final Packet packet;
         final BuildCraftMod source;
+        final int id;
 
         SendRequest(Packet packet) {
+            id = nextId();
             this.packet = packet;
+            packet.unique_packet_id = id;
             this.source = BuildCraftMod.this;
         }
 
         @Override
-        public void run() {
-            FMLEmbeddedChannel channel = source.channels.get(Side.SERVER);
-            if (channel.attr(NetworkRegistry.NET_HANDLER).get() == null) {
+        public final void run() {
+            try {
+                FMLEmbeddedChannel channel = source.channels.get(Side.SERVER);
+                // if (channel.attr(NetworkRegistry.NET_HANDLER).get() == null) {
                 // If the net handler has not been sent then don't write it out -it will just fail on the sender and
                 // send an empty packet to the receiver
-                return;
+                // BCLog.logger.info("Dropping " + id + " as the net handler was null");
+                // return;
+                // }
+                BCLog.logger.info("Sending " + id);
+                editAttributes(channel);
+                channel.writeOutbound(packet);
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-            BCLog.logger.info("");
-            editAttributes(channel);
-            channel.writeOutbound(packet);
         }
 
         abstract void editAttributes(FMLEmbeddedChannel channel);
@@ -136,11 +150,12 @@ public class BuildCraftMod implements IBuildCraftMod {
     }
 
     private static void addSendRequest(SendRequest request) {
+        BCLog.logger.info("Added a send request (" + request.id + ")");
         packetSender.execute(request);
     }
 
     public void sendToPlayers(Packet packet, World world, BlockPos pos, int maxDistance) {
-        addSendRequest(new LocationSendRequest(packet, packet.dimensionId, Utils.convertMiddle(pos), maxDistance));
+        addSendRequest(new LocationSendRequest(packet, world.provider.getDimensionId(), Utils.convertMiddle(pos), maxDistance));
     }
 
     public void sendToPlayersNear(Packet packet, TileEntity tile, int maxDistance) {

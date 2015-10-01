@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.core.lib.network.PacketHandler;
 import buildcraft.core.proxy.CoreProxy;
 
@@ -85,6 +87,14 @@ public class TickHandlerCore {
 
         for (PacketHandler packetHandler : packetHandlers) {
             packetHandler.tick(event.world);
+        }
+    }
+
+    @SubscribeEvent
+    public void worldUnload(WorldEvent.Unload unload) {
+        BCLog.logger.info("World Unload event");
+        for (PacketHandler packetHandler : packetHandlers) {
+            packetHandler.unload(unload.world);
         }
     }
 }

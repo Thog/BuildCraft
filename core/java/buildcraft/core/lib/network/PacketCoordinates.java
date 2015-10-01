@@ -6,6 +6,7 @@ package buildcraft.core.lib.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 import io.netty.buffer.ByteBuf;
 
@@ -16,14 +17,15 @@ public abstract class PacketCoordinates extends Packet {
 
     public PacketCoordinates() {}
 
-    public PacketCoordinates(int id, BlockPos pos) {
+    public PacketCoordinates(int id, int dimId, BlockPos pos) {
         this.id = id;
+        this.dimensionId = id;
         this.pos = pos;
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         data.writeByte(id);
         data.writeInt(pos.getX());
         data.writeInt(pos.getY());
@@ -31,8 +33,8 @@ public abstract class PacketCoordinates extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         id = data.readByte();
         pos = new BlockPos(data.readInt(), data.readInt(), data.readInt());
     }

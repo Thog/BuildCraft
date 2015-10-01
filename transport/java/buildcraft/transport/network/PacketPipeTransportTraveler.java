@@ -40,8 +40,8 @@ public class PacketPipeTransportTraveler extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         data.writeFloat((float) item.pos.xCoord);
         data.writeFloat((float) item.pos.yCoord);
         data.writeFloat((float) item.pos.zCoord);
@@ -61,8 +61,8 @@ public class PacketPipeTransportTraveler extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         itemPos = new Vec3(data.readFloat(), data.readFloat(), data.readFloat());
 
         pos = Utils.convertFloor(itemPos);

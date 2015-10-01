@@ -42,16 +42,16 @@ public class PacketFluidUpdate extends PacketCoordinates {
     public PacketFluidUpdate() {}
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
 
         int length = data.readInt();
         payloadData = data.readBytes(length);
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
 
         ByteBuf payloadData = Unpooled.buffer();
 

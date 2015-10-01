@@ -20,23 +20,23 @@ public class PacketSlotChange extends PacketCoordinates {
 
     public PacketSlotChange() {}
 
-    public PacketSlotChange(int id, BlockPos pos, int slot, ItemStack stack) {
-        super(id, pos);
+    public PacketSlotChange(int id, int dimId, BlockPos pos, int slot, ItemStack stack) {
+        super(id, dimId, pos);
         this.slot = slot;
         this.stack = stack;
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
 
         data.writeShort(slot);
         NetworkUtils.writeStack(data, stack);
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
 
         this.slot = data.readUnsignedShort();
         stack = NetworkUtils.readStack(data);

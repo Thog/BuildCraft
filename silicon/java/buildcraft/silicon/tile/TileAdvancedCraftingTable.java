@@ -376,7 +376,8 @@ public class TileAdvancedCraftingTable extends TileLaserTableBase implements IIn
         updateRecipe();
 
         if (worldObj.isRemote) {
-            PacketSlotChange packet = new PacketSlotChange(PacketIds.ADVANCED_WORKBENCH_SETSLOT, getPos(), slot, stack);
+            PacketSlotChange packet = new PacketSlotChange(PacketIds.ADVANCED_WORKBENCH_SETSLOT, worldObj.provider.getDimensionId(), getPos(), slot,
+                    stack);
             BuildCraftSilicon.instance.sendToServer(packet);
         }
     }

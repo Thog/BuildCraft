@@ -9,9 +9,9 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
+import buildcraft.api.core.BCLog;
 import buildcraft.api.core.ISerializable;
 import buildcraft.core.network.PacketIds;
 
@@ -51,8 +51,8 @@ public class PacketTileState extends PacketCoordinates {
     /** Constructor for outgoing packets
      *
      * @param pos - the coordinates the tile to sync */
-    public PacketTileState(BlockPos pos) {
-        super(PacketIds.STATE_UPDATE, pos);
+    public PacketTileState(TileEntity tile) {
+        super(PacketIds.STATE_UPDATE, tile.getWorld().provider.getDimensionId(), tile.getPos());
         isChunkDataPacket = true;
     }
 
@@ -66,8 +66,8 @@ public class PacketTileState extends PacketCoordinates {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
 
         ByteBuf tmpState = Unpooled.buffer();
 
@@ -82,8 +82,8 @@ public class PacketTileState extends PacketCoordinates {
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
 
         state = Unpooled.buffer();
         int length = data.readUnsignedShort();
@@ -102,6 +102,8 @@ public class PacketTileState extends PacketCoordinates {
                 tile1.getStateInstance(stateId).readData(state);
                 tile1.afterStateUpdated(stateId);
             }
+        } else {
+            BCLog.logger.info("ignored the packet @ " + pos + " as (" + tile + " instanceof ISyncedTile) was false!");
         }
     }
 

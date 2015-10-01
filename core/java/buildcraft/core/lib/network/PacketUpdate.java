@@ -5,6 +5,7 @@
 package buildcraft.core.lib.network;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
 import buildcraft.api.core.ISerializable;
 
@@ -31,8 +32,8 @@ public abstract class PacketUpdate extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         data.writeByte(packetId);
         writeIdentificationData(data);
 
@@ -48,8 +49,8 @@ public abstract class PacketUpdate extends Packet {
     public abstract void writeIdentificationData(ByteBuf data);
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         packetId = data.readByte();
         readIdentificationData(data);
         int length = data.readInt();

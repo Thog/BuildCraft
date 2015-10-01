@@ -400,6 +400,7 @@ public class BuildCraftCore extends BuildCraftMod {
         FMLCommonHandler.instance().bus().register(new TickHandlerCore());
         MinecraftForge.EVENT_BUS.register(TabletManagerClient.INSTANCE);
         MinecraftForge.EVENT_BUS.register(TabletManagerServer.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(new TickHandlerCore());
 
         TabletAPI.registerProgram(new TabletProgramMenuFactory());
     }

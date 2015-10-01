@@ -50,13 +50,20 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
         }
     }
 
+    public void unload(World world) {
+        Side side = world.isRemote ? Side.CLIENT : Side.SERVER;
+        int dimId = world.provider.getDimensionId();
+        Queue<Packet> queue = getQueue(side, dimId);
+        queue.clear();
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) {
         Side side = ctx.channel().attr(NetworkRegistry.CHANNEL_SOURCE).get();
         if (side != null) {
             getQueue(side, packet.dimensionId).add(packet);
         } else {
-            BCLog.logger.error("Found a message without a side! THIS IS VERY BAD, MAJOR ERRORS COULD OCCOUR!");
+            BCLog.logger.error("Found a message without a side! THIS IS VERY BAD, MAJOR ERRORS COULD OCCOUR! (" + packet.unique_packet_id + ")");
         }
     }
 
@@ -66,6 +73,5 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
             map.put(dimId, Queues.<Packet> newConcurrentLinkedQueue());
         }
         return map.get(dimId);
-
     }
 }

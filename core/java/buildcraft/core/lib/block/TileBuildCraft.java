@@ -20,7 +20,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.tiles.IControllable;
@@ -42,6 +41,7 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
 
     private int init = 0;
     private String owner = "[BuildCraft]";
+    private boolean sendNetworkUpdate = false;
     // private RFBattery battery;
 
     // private int receivedTick, extractedTick;
@@ -78,6 +78,13 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
             init = 2;
         }
 
+        if (sendNetworkUpdate) {
+            if (worldObj != null && !worldObj.isRemote) {
+                BuildCraftCore.instance.sendToPlayers(getPacketUpdate(), worldObj, pos, DefaultProps.NETWORK_UPDATE_RANGE);
+                sendNetworkUpdate = false;
+            }
+        }
+
         /* if (battery != null) { // receivedTick = 0; // extractedTick = 0; if (!worldObj.isRemote) { int prePower =
          * ledPower; int stored = battery.getEnergyStored(); int max = battery.getMaxEnergyStored(); ledPower = 0; if
          * (stored != 0) { ledPower = stored * 2 / max + 1; } if (prePower != ledPower) { sendNetworkUpdate(); } } } */
@@ -110,14 +117,13 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
 
     @Override
     public net.minecraft.network.Packet getDescriptionPacket() {
-        return BuildCraftCore.instance.channels.get(Side.SERVER).generatePacketFrom(getPacketUpdate());
+        sendNetworkUpdate();
+        return null;
     }
 
     @Override
     public void sendNetworkUpdate() {
-        if (worldObj != null && !worldObj.isRemote) {
-            BuildCraftCore.instance.sendToPlayers(getPacketUpdate(), worldObj, pos, DefaultProps.NETWORK_UPDATE_RANGE);
-        }
+        sendNetworkUpdate = true;
     }
 
     public void writeData(ByteBuf stream) {

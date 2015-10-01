@@ -54,8 +54,8 @@ public class PacketCommand extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         NetworkUtils.writeUTF(data, command);
         data.writeByte(targets.indexOf(handler));
         handler.write(data, target);
@@ -65,8 +65,8 @@ public class PacketCommand extends Packet {
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         command = NetworkUtils.readUTF(data);
         handler = targets.get(data.readUnsignedByte());
         stream = data; // for further reading

@@ -13,15 +13,19 @@ public abstract class Packet {
 
     protected boolean isChunkDataPacket = false;
     public int dimensionId;
+    public World tempWorld;
+    public int unique_packet_id = -1;
 
     public abstract int getID();
 
-    public void readData(ByteBuf data, EntityPlayer player) {
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        unique_packet_id = data.readInt();
         dimensionId = data.readInt();
     }
 
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        data.writeInt(player.worldObj.provider.getDimensionId());
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        data.writeInt(unique_packet_id);
+        data.writeInt(world.provider.getDimensionId());
     }
 
     /** Called in the main world tick to apply any data that cannot be applied in a different thread. So, everything. */

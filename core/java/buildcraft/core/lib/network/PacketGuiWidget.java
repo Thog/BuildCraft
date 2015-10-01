@@ -28,16 +28,16 @@ public class PacketGuiWidget extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         data.writeByte(windowId);
         data.writeByte(widgetId);
         data.writeBytes(payload);
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         windowId = data.readByte();
         widgetId = data.readByte();
 

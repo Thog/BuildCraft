@@ -5,6 +5,7 @@
 package buildcraft.transport.network;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.network.PacketIds;
@@ -27,14 +28,14 @@ public class PacketPipeTransportItemStackRequest extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         data.writeShort(travelerID);
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         travelerID = data.readShort();
         TravelingItem.TravelingItemCache cache = TravelingItem.serverCache;
         item = cache.get(travelerID);

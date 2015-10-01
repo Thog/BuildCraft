@@ -25,8 +25,8 @@ public class PacketPowerUpdate extends PacketCoordinates {
     }
 
     @Override
-    public void readData(ByteBuf stream, EntityPlayer player) {
-        super.readData(stream, player);
+    public void readData(ByteBuf stream, World world, EntityPlayer player) {
+        super.readData(stream, world, player);
         power = new byte[6];
         flow = new byte[6];
         for (int i = 0; i < 6; i++) {
@@ -36,8 +36,8 @@ public class PacketPowerUpdate extends PacketCoordinates {
     }
 
     @Override
-    public void writeData(ByteBuf stream, EntityPlayer player) {
-        super.writeData(stream, player);
+    public void writeData(ByteBuf stream, World world, EntityPlayer player) {
+        super.writeData(stream, world, player);
         for (int i = 0; i < 6; i++) {
             stream.writeByte(power[i]);
             stream.writeByte(flow[i]);

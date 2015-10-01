@@ -28,15 +28,15 @@ public class PacketPipeTransportItemStack extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf data, EntityPlayer player) {
-        super.writeData(data, player);
+    public void writeData(ByteBuf data, World world, EntityPlayer player) {
+        super.writeData(data, world, player);
         data.writeInt(entityId);
         NetworkUtils.writeStack(data, stack);
     }
 
     @Override
-    public void readData(ByteBuf data, EntityPlayer player) {
-        super.readData(data, player);
+    public void readData(ByteBuf data, World world, EntityPlayer player) {
+        super.readData(data, world, player);
         this.entityId = data.readInt();
         stack = NetworkUtils.readStack(data);
         TravelingItem item = TravelingItem.clientCache.get(entityId);
