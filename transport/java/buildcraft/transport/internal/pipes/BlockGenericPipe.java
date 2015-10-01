@@ -57,6 +57,7 @@ import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.PipeWire;
+import buildcraft.api.transport.event.IPipeEventPart.PipePart;
 import buildcraft.api.transport.pluggable.IPipePluggableItem;
 import buildcraft.api.transport.pluggable.PipePluggable;
 import buildcraft.core.BCCreativeTab;
@@ -72,6 +73,7 @@ import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipePluggableState;
+import buildcraft.transport.event.PipeEventPlayerInteract;
 import buildcraft.transport.event.PipeEventRandomDisplayTick;
 import buildcraft.transport.gates.GatePluggable;
 import buildcraft.transport.item.ItemGateCopier;
@@ -590,6 +592,24 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
 
         if (isValid(pipe)) {
             ItemStack currentItem = player.getCurrentEquippedItem();
+            RaytraceResult result = doRayTrace(world, pos, player);
+            EnumFacing pipeSide = result == null ? null : result.sideHit;
+            PipePart part;
+            if (result == null) {
+                part = null;
+            } else if (result.hitPart == Part.Pipe) {
+                if (pipeSide == null) {
+                    part = PipePart.PIPE_CENTER;
+                } else {
+                    part = PipePart.CONNECTION;
+                }
+            } else if (result.hitPart == Part.Pluggable) {
+                part = PipePart.PLUGGABLE;
+            } else {
+                part = PipePart.WIRE;
+            }
+            PipeWire wire = null;
+            pipe.postEvent(PipeEventPlayerInteract.create(pipe, pipeSide, part, wire, player));
 
             // Right click while sneaking with empty hand to strip equipment
             // from the pipe.
@@ -607,6 +627,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
             } else if (currentItem.getItem() instanceof ItemGateCopier) {
                 return false;
             } else if (currentItem.getItem() instanceof IToolWrench) {
+
                 // Only check the instance at this point. Call the IToolWrench
                 // interface callbacks for the individual pipe/logic calls
                 return pipe.blockActivated(player);
@@ -660,6 +681,7 @@ public class BlockGenericPipe extends BlockBuildCraft implements IColorRemovable
         }
 
         return false;
+
     }
 
     private boolean addOrStripPipePluggable(World world, BlockPos pos, ItemStack stack, EntityPlayer player, EnumFacing side, Pipe pipe) {

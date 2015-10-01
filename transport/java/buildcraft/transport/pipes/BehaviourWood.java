@@ -6,18 +6,25 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
+import buildcraft.api.core.BCLog;
+import buildcraft.api.core.ISerializable;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.api.transport.PipeBehaviour;
 import buildcraft.api.transport.PipeDefinition;
 import buildcraft.api.transport.event.IPipeEvent;
 import buildcraft.api.transport.event.IPipeEventAttemptConnectPipe;
-import buildcraft.api.transport.event.IPipeEventPlayerUseItem;
+import buildcraft.api.transport.event.IPipeEventConnectBlock;
+import buildcraft.api.transport.event.IPipeEventDisconnect;
+import buildcraft.api.transport.event.IPipeEventPlayerWrench;
 import buildcraft.api.transport.event.IPipeEventPowered;
 import buildcraft.api.transport.event.IPipeEventTick;
 import buildcraft.core.lib.utils.NBTUtils;
+import buildcraft.core.lib.utils.NetworkUtils;
 
-public class PipeBehaviourWood extends PipeBehaviour {
+import io.netty.buffer.ByteBuf;
+
+public class BehaviourWood extends PipeBehaviour implements ISerializable {
     private static final String[] textureSuffix = { "_clear", "_filled" };
     private static final double POWER_EXTRACT_SINGLE = 10;
     private static final double MAX_POWER = POWER_EXTRACT_SINGLE * 64;
@@ -25,10 +32,10 @@ public class PipeBehaviourWood extends PipeBehaviour {
     protected static final double POWER_MULTIPLIER = 0;
     protected static final int FLUID_MULTIPLIER = 100;
 
-    private EnumFacing extractionDirection = EnumFacing.UP;
+    private EnumFacing extractionDirection = null;
     protected final DefaultMjInternalStorage internalStorage;
 
-    public PipeBehaviourWood(PipeDefinition definition) {
+    public BehaviourWood(PipeDefinition definition) {
         super(definition);
         internalStorage = new DefaultMjInternalStorage(MAX_POWER, POWER_EXTRACT_SINGLE, LOSS_DELAY, 1);
     }
@@ -38,6 +45,7 @@ public class PipeBehaviourWood extends PipeBehaviour {
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setTag("extractionDirection", NBTUtils.writeEnum(extractionDirection));
         nbt.setTag("internalStorage", internalStorage.writeToNBT());
+        BCLog.logger.info("DSK|EXTRACT|WRITE|" + id + "|" + extractionDirection);
         return nbt;
     }
 
@@ -45,6 +53,19 @@ public class PipeBehaviourWood extends PipeBehaviour {
     public void readFromNBT(NBTTagCompound nbt) {
         extractionDirection = NBTUtils.readEnum(nbt.getTag("extractionDirection"), EnumFacing.class);
         internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
+        BCLog.logger.info("DSK|EXTRACT|READ|" + id + "|" + extractionDirection);
+    }
+
+    @Override
+    public void writeData(ByteBuf stream) {
+        NetworkUtils.writeEnum(stream, extractionDirection);
+        BCLog.logger.info("NET|EXTRACT|WRITE|" + id + "|" + extractionDirection);
+    }
+
+    @Override
+    public void readData(ByteBuf stream) {
+        extractionDirection = NetworkUtils.readEnum(stream, EnumFacing.class);
+        BCLog.logger.info("NET|EXTRACT|READ|" + id + "|" + extractionDirection);
     }
 
     @Override
@@ -60,9 +81,9 @@ public class PipeBehaviourWood extends PipeBehaviour {
     }
 
     @Subscribe
-    public void onPipeConnect(IPipeEventAttemptConnectPipe connect) {
+    public void onPipeAttemptConnect(IPipeEventAttemptConnectPipe connect) {
         PipeBehaviour other = connect.getConnectingPipe().getBehaviour();
-        if (other instanceof PipeBehaviourWood) {
+        if (other instanceof BehaviourWood) {
             // Emerald extends wood, so its fine.
             connect.disallow();
         }
@@ -84,28 +105,47 @@ public class PipeBehaviourWood extends PipeBehaviour {
     }
 
     @Subscribe
-    public void onWrench(IPipeEventPlayerUseItem wrench) {
+    public void disconnectBlock(IPipeEventDisconnect disconnect) {
+        if (disconnect.getConnectingSide() == extractionDirection) {
+            selectNewDirection(disconnect);
+        }
+    }
+
+    @Subscribe
+    public void connectBlock(IPipeEventConnectBlock connect) {
+        if (extractionDirection == null) {
+            selectNewDirection(connect);
+        }
+    }
+
+    @Subscribe
+    public void onWrench(IPipeEventPlayerWrench wrench) {
         selectNewDirection(wrench);
     }
 
     private void selectNewDirection(IPipeEvent event) {
-        int currentIndex = extractionDirection.getIndex();
+        if (event.getPipe().getTile().getWorld().isRemote) {
+            return;
+        }
+        int currentIndex = extractionDirection == null ? -1 : extractionDirection.getIndex();
         for (int i = 1; i < 7; i++) {
             EnumFacing toTest = EnumFacing.values()[(currentIndex + i) % 6];
             if (isValidExtraction(event, toTest)) {
                 extractionDirection = toTest;
 
                 event.getPipe().getTile().scheduleRenderUpdate();
-                break;
+                return;
             }
         }
+        extractionDirection = null;
     }
 
     protected boolean isValidExtraction(IPipeEvent event, EnumFacing face) {
-        if (!event.getPipe().getTile().isPipeConnected(face)) {
+        IPipeTile pipe = event.getPipe().getTile();
+        if (!pipe.isPipeConnected(face)) {
             return false;
         }
-        TileEntity tile = event.getPipe().getTile().getWorld().getTileEntity(event.getPipe().getTile().getPos());
+        TileEntity tile = pipe.getWorld().getTileEntity(pipe.getPos().offset(face));
         if (tile instanceof IPipeTile) {
             return false;
         }

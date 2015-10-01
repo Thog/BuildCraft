@@ -36,7 +36,7 @@ import buildcraft.core.DefaultProps;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.network.PacketPowerUpdate;
-import buildcraft.transport.pipes.PipeBehaviourWood;
+import buildcraft.transport.pipes.BehaviourWood;
 
 public final class PipeTransportPower extends PipeTransport implements IDebuggable, IMjExternalStorage {
     public static final byte POWER_STAGES = 32;
@@ -86,7 +86,7 @@ public final class PipeTransportPower extends PipeTransport implements IDebuggab
 
         // TODO (PASS 0): Move this out into _something_
         if (tile instanceof IMjHandler) {
-            if (container.getPipe().getBehaviour() instanceof PipeBehaviourWood) {
+            if (container.getPipe().getBehaviour() instanceof BehaviourWood) {
                 IMjExternalStorage storage = ((IMjHandler) tile).getMjStorage();
                 return storage.getDeviceType(side.getOpposite()).givesPowerTo(EnumMjDevice.TRANSPORT);
             }

@@ -6,9 +6,18 @@ import net.minecraft.util.EnumFacing;
 /** An instance is created by instance of IBehaviourFactory per pipe block in world, and is registered with the pipe
  * event bus to listen and respond to events. */
 public abstract class PipeBehaviour {
+    // Debugging id
+    private static volatile int ids = 0;
+
+    private static synchronized int nextId() {
+        return ids++;
+    }
+
     public final PipeDefinition definition;
+    public final int id;
 
     public PipeBehaviour(PipeDefinition definition) {
+        this.id = nextId();
         if (definition == null) {
             throw new IllegalArgumentException("You cannot pass a null pipe definition!");
         }

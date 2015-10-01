@@ -81,7 +81,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public int[] redstoneInputSide = new int[EnumFacing.VALUES.length];
 
     protected boolean deletePipe = false;
-    protected boolean sendClientUpdate = false;
+    protected int sendClientUpdate = 0;
     protected boolean blockNeighborChange = false;
     protected boolean refreshRenderState = false;
     protected boolean pipeBound = false;
@@ -115,6 +115,8 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         nbt.setTag("connections", connections);
 
         nbt.setInteger("pipeId", Item.getIdFromItem(PipeAPI.REGISTRY.getItem(pipe.getBehaviour().definition)));
+
+        pipe.writeToNBT(nbt);
 
         sideProperties.writeToNBT(nbt);
     }
@@ -155,7 +157,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             this.deletePipe = true;
             new RuntimeException("Definition was null! (id = " + id + ", item = " + Item.getItemById(id) + ")").printStackTrace();;
         } else {
-            coreState.pipeId = Item.getIdFromItem(PipeAPI.REGISTRY.getItem(definition));
+            coreState.pipeId = id;
 
             pipe = new Pipe(definition, this);
             bindPipe();
@@ -170,6 +172,7 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
             sideProperties.readFromNBT(nbt);
             attachPluggables = true;
         }
+        initialized = true;
     }
 
     @Override
@@ -286,11 +289,14 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
                 refreshRenderState = false;
             }
 
-            if (sendClientUpdate) {
-                sendClientUpdate = false;
+            if (sendClientUpdate == 1) {
                 Packet packet = getBCDescriptionPacket();
                 BuildCraftCore.instance.sendToPlayersNear(packet, this);
             }
+            if (sendClientUpdate > 0) {
+                sendClientUpdate--;
+            }
+            markDirty();
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException(t);
@@ -406,6 +412,9 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     public void initialize(PipeDefinition definition) {
         this.blockType = getBlockType();
 
+        if (pipe != null) {
+            return;
+        }
         pipe = new Pipe(definition, this);
 
         for (EnumFacing o : EnumFacing.VALUES) {
@@ -493,15 +502,13 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
         PacketTileState packet = new PacketTileState(this);
         packet.tempWorld = worldObj;
 
-        if (pipe != null && pipe.getTransport() != null) {
-            pipe.getTransport().sendDescriptionPacket();
-        }
+        pipe.getTransport().sendDescriptionPacket();
 
         packet.addStateForSerialization((byte) 0, coreState);
         packet.addStateForSerialization((byte) 1, renderState);
         packet.addStateForSerialization((byte) 2, pluggableState);
 
-        if (pipe != null && pipe.getBehaviour() instanceof ISerializable) {
+        if (pipe.getBehaviour() instanceof ISerializable) {
             packet.addStateForSerialization((byte) 3, (ISerializable) pipe.getBehaviour());
         }
 
@@ -511,13 +518,13 @@ public class TileGenericPipe extends TileEntity implements IUpdatePlayerListBox,
     @Override
     public net.minecraft.network.Packet getDescriptionPacket() {
         // Bit nasty, but this ensures that we only have one way of writing packets
-        sendNetworkUpdate();
+        sendClientUpdate = 4;
         return null;
     }
 
     @Override
     public void sendNetworkUpdate() {
-        sendClientUpdate = true;
+        sendClientUpdate = 1;
     }
 
     @Override

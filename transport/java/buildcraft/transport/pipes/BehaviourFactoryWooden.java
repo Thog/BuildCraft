@@ -15,6 +15,6 @@ public class BehaviourFactoryWooden implements IPipeBehaviourFactory {
 
     @Override
     public PipeBehaviour createNew() {
-        return new PipeBehaviourWood(definition);
+        return new BehaviourWood(definition);
     }
 }

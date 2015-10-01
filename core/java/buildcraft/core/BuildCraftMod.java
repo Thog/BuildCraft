@@ -24,12 +24,9 @@ import net.minecraftforge.fml.common.network.FMLOutboundHandler.OutboundTarget;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 
-import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IBuildCraftMod;
 import buildcraft.core.lib.network.Packet;
 import buildcraft.core.lib.utils.Utils;
-
-import io.netty.util.AttributeKey;
 
 public class BuildCraftMod implements IBuildCraftMod {
     private static final Executor packetSender;
@@ -64,7 +61,6 @@ public class BuildCraftMod implements IBuildCraftMod {
                 // BCLog.logger.info("Dropping " + id + " as the net handler was null");
                 // return;
                 // }
-                BCLog.logger.info("Sending " + id);
                 editAttributes(channel);
                 channel.writeOutbound(packet);
             } catch (Throwable t) {
@@ -150,7 +146,6 @@ public class BuildCraftMod implements IBuildCraftMod {
     }
 
     private static void addSendRequest(SendRequest request) {
-        BCLog.logger.info("Added a send request (" + request.id + ")");
         packetSender.execute(request);
     }
 
