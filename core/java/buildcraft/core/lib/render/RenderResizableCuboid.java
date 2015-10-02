@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -37,6 +38,11 @@ public class RenderResizableCuboid extends Render {
     @Override
     protected ResourceLocation getEntityTexture(Entity entity) {
         return null;
+    }
+
+    @Override
+    public boolean shouldRender(Entity entity, ICamera camera, double camX, double camY, double camZ) {
+        return true;
     }
 
     @Override
