@@ -91,7 +91,8 @@ public class ItemPaintbrush extends ItemBuildCraft {
         String base = super.getItemStackDisplayName(stack);
         int dye = getColor(stack);
         if (dye >= 0) {
-            return base + " (" + StatCollector.translateToLocal(EnumDyeColor.byMetadata(dye).getUnlocalizedName()) + ")";
+            String unlocalised = "item.fireworksCharge." + EnumDyeColor.byMetadata(dye).getUnlocalizedName();
+            return base + " (" + StatCollector.translateToLocal(unlocalised) + ")";
         } else {
             return base;
         }

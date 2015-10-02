@@ -16,6 +16,7 @@ import buildcraft.core.lib.block.BlockBuildCraftBase;
 public class BlockDecoration extends BlockBuildCraftBase {
     public BlockDecoration() {
         super(Material.iron, DECORATED_TYPE);
+        setCreativeTab(null);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
