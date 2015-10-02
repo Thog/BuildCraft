@@ -2,13 +2,9 @@ package buildcraft.transport.pipes;
 
 import com.google.common.eventbus.Subscribe;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import buildcraft.api.core.BCLog;
@@ -27,12 +23,9 @@ import buildcraft.api.transport.event.IPipeEventConnectBlock;
 import buildcraft.api.transport.event.IPipeEventDisconnect;
 import buildcraft.api.transport.event.IPipeEventPlayerWrench;
 import buildcraft.api.transport.event.IPipeEventTick;
-import buildcraft.core.lib.inventory.InvUtils;
-import buildcraft.core.lib.inventory.InventoryWrapper;
+import buildcraft.core.lib.inventory.filters.StackFilter;
 import buildcraft.core.lib.utils.NBTUtils;
 import buildcraft.core.lib.utils.NetworkUtils;
-import buildcraft.core.lib.utils.Utils;
-import buildcraft.transport.TravelingItem;
 import buildcraft.transport.internal.pipes.PipeTransportItems;
 
 import io.netty.buffer.ByteBuf;
@@ -57,7 +50,6 @@ public class BehaviourWood extends PipeBehaviour implements ISerializable, IMjEx
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setTag("extractionDirection", NBTUtils.writeEnum(extractionFace));
         nbt.setTag("internalStorage", internalStorage.writeToNBT());
-        BCLog.logger.info("DSK|EXTRACT|WRITE|" + id + "|" + extractionFace);
         return nbt;
     }
 
@@ -65,19 +57,16 @@ public class BehaviourWood extends PipeBehaviour implements ISerializable, IMjEx
     public void readFromNBT(NBTTagCompound nbt) {
         extractionFace = NBTUtils.readEnum(nbt.getTag("extractionDirection"), EnumFacing.class);
         internalStorage.readFromNBT(nbt.getCompoundTag("internalStorage"));
-        BCLog.logger.info("DSK|EXTRACT|READ|" + id + "|" + extractionFace);
     }
 
     @Override
     public void writeData(ByteBuf stream) {
         NetworkUtils.writeEnum(stream, extractionFace);
-        BCLog.logger.info("NET|EXTRACT|WRITE|" + id + "|" + extractionFace);
     }
 
     @Override
     public void readData(ByteBuf stream) {
         extractionFace = NetworkUtils.readEnum(stream, EnumFacing.class);
-        BCLog.logger.info("NET|EXTRACT|READ|" + id + "|" + extractionFace);
     }
 
     @Override
@@ -91,9 +80,11 @@ public class BehaviourWood extends PipeBehaviour implements ISerializable, IMjEx
     public void onPipeAttemptConnect(IPipeEventAttemptConnectPipe connect) {
         PipeBehaviour other = connect.getConnectingPipe().getBehaviour();
         if (other instanceof BehaviourWood) {
-            // Emerald extends wood, so its fine.
             connect.disallow();
         }
+        // if (other instanceof BehaviourEmerald) {
+        // connect.disallow();
+        // }
     }
     //
     // @Subscribe
@@ -107,8 +98,7 @@ public class BehaviourWood extends PipeBehaviour implements ISerializable, IMjEx
         internalStorage.tick(tick.getPipe().getTile().getWorld());
         if (internalStorage.hasActivated() && extractionFace != null) {
             double power = internalStorage.extractPower(tick.getPipe().getTile().getWorld(), POWER_EXTRACT_SINGLE, MAX_POWER, false);
-            TileEntity extractFrom = tick.getPipe().getTile().getNeighborTile(extractionFace);
-            double leftOver = tick.getPipe().getTransport().extractFromTile(extractFrom, extractionFace, power);
+            double leftOver = tick.getPipe().getTransport().extractFromTile(power, extractionFace, StackFilter.ALL);
             internalStorage.insertPower(tick.getPipe().getTile().getWorld(), leftOver, false);
         }
     }
@@ -159,85 +149,6 @@ public class BehaviourWood extends PipeBehaviour implements ISerializable, IMjEx
             return false;
         }
         return true;
-    }
-
-    // Extraction- Items
-
-    private void extractItems() {
-        TileEntity tile = pipe.getNeighborTile(extractionFace);
-
-        if (tile instanceof IInventory) {
-            IInventory inventory = (IInventory) tile;
-
-            ItemStack[] extracted = checkExtract(inventory, true, extractionFace.getOpposite());
-            if (extracted == null) {
-                return;
-            }
-
-            tile.markDirty();
-
-            for (ItemStack stack : extracted) {
-                if (stack == null || stack.stackSize == 0) {
-                    // battery.useEnergy(10, 10, false);
-
-                    continue;
-                }
-
-                Vec3 entPos = Utils.convertMiddle(tile.getPos()).add(Utils.convert(side, -0.6));
-
-                TravelingItem entity = makeItem(entPos, stack);
-                entity.setSpeed((float) (entity.getSpeed() * speedMultiplier));
-                pipe.getPipe().getTransport().injectItem(entity, extractionFace.getOpposite());
-            }
-        }
-    }
-
-    protected TravelingItem makeItem(Vec3 pos, ItemStack stack) {
-        return TravelingItem.make(pos, stack);
-    }
-
-    /** Return the itemstack that can be if something can be extracted from this inventory, null if none. On certain
-     * cases, the extractable slot depends on the position of the pipe. */
-    public ItemStack[] checkExtract(IInventory inventory, boolean doRemove, EnumFacing from) {
-        IInventory inv = InvUtils.getInventory(inventory);
-        ItemStack result = checkExtractGeneric(inv, doRemove, from);
-
-        if (result != null) {
-            return new ItemStack[] { result };
-        }
-
-        return null;
-    }
-
-    public ItemStack checkExtractGeneric(IInventory inventory, boolean doRemove, EnumFacing from) {
-        return checkExtractGeneric(InventoryWrapper.getWrappedInventory(inventory), doRemove, from);
-    }
-
-    public ItemStack checkExtractGeneric(ISidedInventory inventory, boolean doRemove, EnumFacing from) {
-        if (inventory == null) {
-            return null;
-        }
-
-        for (int k : inventory.getSlotsForFace(from)) {
-            ItemStack slot = inventory.getStackInSlot(k);
-
-            if (slot != null && slot.stackSize > 0 && inventory.canExtractItem(k, slot, from)) {
-                if (doRemove) {
-                    int maxStackSize = slot.stackSize;
-                    int stackSize = Math.min(maxStackSize, (int) storage.currentPower());
-                    // TODO: Look into the Speed Multiplier again someday.
-                    // speedMultiplier = Math.min(4.0F, battery.getEnergyStored() * 10 / stackSize);
-                    int energyUsed = (int) (stackSize * speedMultiplier);
-                    storage.extractPower(getWorld(), 0, energyUsed, false);
-
-                    return inventory.decrStackSize(k, stackSize);
-                } else {
-                    return slot;
-                }
-            }
-        }
-
-        return null;
     }
 
     // IMjExternalStorage

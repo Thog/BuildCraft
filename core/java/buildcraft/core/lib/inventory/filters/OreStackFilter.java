@@ -7,6 +7,8 @@ package buildcraft.core.lib.inventory.filters;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
+import buildcraft.api.transport.IStackFilter;
+
 /** Returns true if the stack matches any one one of the filter stacks. */
 public class OreStackFilter implements IStackFilter {
 

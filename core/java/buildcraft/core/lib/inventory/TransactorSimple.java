@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import buildcraft.api.core.IInvSlot;
-import buildcraft.core.lib.inventory.filters.IStackFilter;
+import buildcraft.api.transport.IStackFilter;
 
 public class TransactorSimple extends Transactor {
 

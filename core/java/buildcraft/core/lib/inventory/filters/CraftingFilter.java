@@ -6,6 +6,7 @@ package buildcraft.core.lib.inventory.filters;
 
 import net.minecraft.item.ItemStack;
 
+import buildcraft.api.transport.IStackFilter;
 import buildcraft.core.lib.inventory.StackHelper;
 
 /** Returns true if the stack matches any one one of the filter stacks. Checks the OreDictionary and wildcards. */

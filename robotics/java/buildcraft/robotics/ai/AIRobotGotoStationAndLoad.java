@@ -6,7 +6,7 @@ package buildcraft.robotics.ai;
 
 import buildcraft.api.robots.AIRobot;
 import buildcraft.api.robots.EntityRobotBase;
-import buildcraft.core.lib.inventory.filters.IStackFilter;
+import buildcraft.api.transport.IStackFilter;
 
 public class AIRobotGotoStationAndLoad extends AIRobot {
 

@@ -18,10 +18,10 @@ import buildcraft.api.recipes.CraftingResult;
 import buildcraft.api.recipes.IFlexibleCrafter;
 import buildcraft.api.recipes.IFlexibleRecipe;
 import buildcraft.api.recipes.IFlexibleRecipeViewable;
+import buildcraft.api.transport.IStackFilter;
 import buildcraft.core.lib.inventory.SimpleInventory;
 import buildcraft.core.lib.inventory.StackHelper;
 import buildcraft.core.lib.inventory.filters.ArrayStackFilter;
-import buildcraft.core.lib.inventory.filters.IStackFilter;
 
 public class FlexibleRecipe<T> implements IFlexibleRecipe<T>, IFlexibleRecipeViewable {
     private class PreviewCrafter implements IFlexibleCrafter {

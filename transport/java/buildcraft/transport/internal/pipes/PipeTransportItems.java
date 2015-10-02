@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -33,16 +34,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.transport.EnumPipeType;
+import buildcraft.api.transport.IFilter;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.api.transport.IStackFilter;
 import buildcraft.api.transport.PipeAPI;
 import buildcraft.api.transport.PipeProperty;
 import buildcraft.api.transport.PipeTransport;
 import buildcraft.core.DefaultProps;
-import buildcraft.core.lib.inventory.ITransactor;
 import buildcraft.core.lib.inventory.InvUtils;
+import buildcraft.core.lib.inventory.InventoryWrapper;
 import buildcraft.core.lib.inventory.Transactor;
-import buildcraft.core.lib.inventory.filters.IStackFilter;
-import buildcraft.core.lib.inventory.filters.StackFilter;
 import buildcraft.core.lib.utils.BlockUtils;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
@@ -315,6 +316,24 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
                     container.getPipe().postEvent(reachCenter);
                     item.setItemStack(contents.getStack());
                     item.color = contents.getColor();
+
+                    Map<EnumFacing, TileEntity> potentialDestinations = Maps.newHashMap();
+                    for (EnumFacing test : EnumFacing.values()) {
+                        if (container.isPipeConnected(test) && test != face) {
+                            TileEntity tile = container.getNeighborTile(test);
+                            if (tile != null) {
+                                potentialDestinations.put(test, tile);
+                            }
+                        }
+                    }
+
+                    PipeEventFindDestination dest = new PipeEventFindDestination(container.getPipe(), contents.uneditable(), face,
+                            potentialDestinations, MAX_PIPE_ITEMS);
+                    container.getPipe().postEvent(dest);
+
+                    // TODO: Refactor to allow for multiple destinations and splitting!
+                    EnumFacing[] destinations = dest.getDestinations().toArray(new EnumFacing[dest.getDestinations().size()]);
+                    item.output = destinations[new Random().nextInt(destinations.length)];
                 }
             } else if (!item.toCenter && endReached(item)) {
                 if (item.isCorrupted()) {
@@ -417,6 +436,90 @@ public final class PipeTransportItems extends PipeTransport implements IDebuggab
 
     public Vec3 getPosition() {
         return Utils.convert(container.getPos());
+    }
+
+    @Override
+    public double extractFromTile(double mj, EnumFacing side, IFilter filter) throws IllegalArgumentException {
+        if (filter instanceof IStackFilter) {
+            IStackFilter stackFilter = (IStackFilter) filter;
+            return extractItems(mj, side, stackFilter);
+
+        } else if (filter != null) {
+            throw new IllegalArgumentException("Passed a non-item filter!");
+        }
+        return mj;
+    }
+
+    // Extraction
+
+    /** @return The power left over after extraction */
+    private double extractItems(double availablePower, EnumFacing extractionFace, IStackFilter filter) {
+        TileEntity tile = container.getNeighborTile(extractionFace);
+
+        if (tile instanceof IInventory) {
+            IInventory inventory = (IInventory) tile;
+
+            int extractableItems = (int) (availablePower / ITEM_EXTRACT_COST);
+            BCLog.logger.info("Extracting up to " + extractableItems + " items");
+            while (extractableItems > 0) {
+                ItemStack extracted = checkExtract(inventory, extractableItems, extractionFace.getOpposite(), filter);
+                if (extracted != null) {
+                    tile.markDirty();
+
+                    Vec3 entPos = Utils.convertMiddle(tile.getPos()).add(Utils.convert(extractionFace, -0.6));
+
+                    TravelingItem entity = makeItem(entPos, extracted);
+                    injectItem(entity, extractionFace);
+
+                    extractableItems -= extracted.stackSize;
+                    availablePower -= extracted.stackSize * ITEM_EXTRACT_COST;
+                } else {
+                    break;
+                }
+            }
+
+        }
+        return availablePower;
+    }
+
+    protected TravelingItem makeItem(Vec3 pos, ItemStack stack) {
+        return TravelingItem.make(pos, stack);
+    }
+
+    /** Return the itemstack that can be if something can be extracted from this inventory, null if none. On certain
+     * cases, the extractable slot depends on the position of the pipe. */
+    public ItemStack checkExtract(IInventory inventory, int maxRemovable, EnumFacing from, IStackFilter filter) {
+        IInventory inv = InvUtils.getInventory(inventory);
+        ItemStack result = checkExtractGeneric(inv, maxRemovable, from, filter);
+        return result;
+    }
+
+    public ItemStack checkExtractGeneric(IInventory inventory, int maxRemove, EnumFacing from, IStackFilter filter) {
+        return checkExtractGeneric(InventoryWrapper.getWrappedInventory(inventory), maxRemove, from, filter);
+    }
+
+    public ItemStack checkExtractGeneric(ISidedInventory inventory, int maxRemove, EnumFacing from, IStackFilter filter) {
+        if (inventory == null) {
+            return null;
+        }
+
+        for (int k : inventory.getSlotsForFace(from)) {
+            ItemStack slot = inventory.getStackInSlot(k);
+            if (slot == null || slot.stackSize == 0 || !inventory.canExtractItem(k, slot, from)) {
+                continue;
+            }
+            if (!filter.matches(slot)) {
+                continue;
+            }
+
+            int maxStackSize = slot.stackSize;
+            int stackSize = Math.min(maxStackSize, maxRemove);
+            // TODO: Look into the Speed Multiplier again someday.
+            // speedMultiplier = Math.min(4.0F, battery.getEnergyStored() * 10 / stackSize);
+            return inventory.decrStackSize(k, stackSize);
+        }
+
+        return null;
     }
 
     @Override

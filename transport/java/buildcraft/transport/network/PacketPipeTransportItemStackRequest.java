@@ -51,4 +51,9 @@ public class PacketPipeTransportItemStackRequest extends Packet {
     public int getID() {
         return PacketIds.PIPE_ITEMSTACK_REQUEST;
     }
+
+    @Override
+    public void applyData(World world) {
+        
+    }
 }

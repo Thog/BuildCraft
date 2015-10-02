@@ -6,6 +6,8 @@ package buildcraft.core.lib.inventory.filters;
 
 import net.minecraft.item.ItemStack;
 
+import buildcraft.api.transport.IStackFilter;
+
 /** Returns true if the stack matches any one one of the filter stacks. */
 public class CompositeFilter implements IStackFilter {
 

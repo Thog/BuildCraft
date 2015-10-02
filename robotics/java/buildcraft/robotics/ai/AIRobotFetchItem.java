@@ -10,8 +10,8 @@ import net.minecraft.entity.item.EntityItem;
 import buildcraft.api.core.IZone;
 import buildcraft.api.robots.AIRobot;
 import buildcraft.api.robots.EntityRobotBase;
+import buildcraft.api.transport.IStackFilter;
 import buildcraft.core.lib.inventory.TransactorSimple;
-import buildcraft.core.lib.inventory.filters.IStackFilter;
 import buildcraft.core.lib.utils.Utils;
 import buildcraft.robotics.boards.BoardRobotPicker;
 

@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import buildcraft.api.core.IInvSlot;
-import buildcraft.core.lib.inventory.filters.IStackFilter;
+import buildcraft.api.transport.IStackFilter;
 
 public final class InvUtils {
 

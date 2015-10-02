@@ -92,15 +92,12 @@ public class PacketHandlerTransport extends PacketHandler {
         }
 
         TileGenericPipe pipe = (TileGenericPipe) entity;
-        if (pipe.pipe == null) {
+
+        if (!(pipe.getPipe().getTransport() instanceof PipeTransportItems)) {
             return;
         }
 
-        if (!(pipe.pipe.transport instanceof PipeTransportItems)) {
-            return;
-        }
-
-        ((PipeTransportItems) pipe.pipe.transport).handleTravelerPacket(packet);
+        ((PipeTransportItems) pipe.getPipe().getTransport()).handleTravelerPacket(packet);
     }
 
     /** Updates the display power on a power pipe
@@ -118,15 +115,12 @@ public class PacketHandlerTransport extends PacketHandler {
         }
 
         TileGenericPipe pipe = (TileGenericPipe) entity;
-        if (pipe.pipe == null) {
+
+        if (!(pipe.getPipe().getTransport() instanceof PipeTransportPower)) {
             return;
         }
 
-        if (!(pipe.pipe.transport instanceof PipeTransportPower)) {
-            return;
-        }
-
-        ((PipeTransportPower) pipe.pipe.transport).handlePowerPacket(packetPower);
+        ((PipeTransportPower) pipe.getPipe().getTransport()).handlePowerPacket(packetPower);
 
     }
 

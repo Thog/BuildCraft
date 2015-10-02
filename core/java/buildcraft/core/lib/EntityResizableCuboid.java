@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-// TODO (PASS 0): Rewrite to allow for specifying texture for each side + dimensions, to + from etc...
+// TODO (PASS 2): Rewrite to allow for specifying texture for each side + dimensions, to + from etc...
 public class EntityResizableCuboid extends Entity {
 
     public float shadowSize = 0;
@@ -144,4 +144,17 @@ public class EntityResizableCuboid extends Entity {
     public int getBrightnessForRender(float par1) {
         return brightness > 0 ? brightness : super.getBrightnessForRender(par1);
     }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean isInRangeToRender3d(double x, double y, double z) {
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean isInRangeToRenderDist(double distance) {
+        return true;
+    }
+
 }

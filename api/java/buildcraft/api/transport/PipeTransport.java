@@ -118,6 +118,10 @@ public abstract class PipeTransport {
         return false;
     }
 
+    public double extractFromTile(double mj, EnumFacing side, IFilter filter) throws IllegalArgumentException {
+        return mj;
+    }
+
     public abstract List<PipeProperty<?>> getAllProperties();
 
     @SideOnly(Side.CLIENT)

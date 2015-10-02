@@ -49,6 +49,7 @@ import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BuildCraftTransport;
 import buildcraft.transport.Gate;
 import buildcraft.transport.LensFilterHandler;
+import buildcraft.transport.event.PipeEventTick;
 import buildcraft.transport.event.PipeEventUpdateProperty;
 import buildcraft.transport.gates.GateFactory;
 import buildcraft.transport.statements.ActionValve.ValveState;
@@ -137,6 +138,8 @@ final class Pipe implements IDropControlInventory, IPipe {
 
     void update() {
         transport.updateEntity();
+
+        postEvent(new PipeEventTick(this));
 
         if (internalUpdateScheduled) {
             internalUpdate();

@@ -7,6 +7,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import buildcraft.api.core.BCLog;
+
 /** Contains all of the definitions of a pipe. */
 public final class PipeDefinition extends ObjectDefinition {
     /** The number of sprites to register related to this definition. */
@@ -56,6 +58,7 @@ public final class PipeDefinition extends ObjectDefinition {
     @SideOnly(Side.CLIENT)
     public TextureAtlasSprite getSprite(int index) {
         if (sprites == null || index < 0 || index >= sprites.length) {
+            BCLog.logger.warn("Tried to get the sprite index " + index + " for " + globalUniqueTag);
             return Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
         }
         return sprites[index];
