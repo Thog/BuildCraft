@@ -161,7 +161,7 @@ public class TileMarker extends TileBuildCraft implements ITileAreaProvider {
             int rangePlus = DefaultProps.MARKER_RANGE + 1;
             int rangeMinus = DefaultProps.MARKER_RANGE - 1;
             if (!origin.isSet() || !origin.vect[0].isSet()) {
-                signals[0] = Utils.createLaser(worldObj, cPos, cPos.addVector(0, rangeMinus, 0), LaserKind.Blue);
+                signals[0] = Utils.createLaser(worldObj, cPos, cPos.addVector(rangeMinus, 0, 0), LaserKind.Blue);
                 signals[1] = Utils.createLaser(worldObj, cPos.addVector(-rangePlus, 0, 0), cPos, LaserKind.Blue);
             }
 
