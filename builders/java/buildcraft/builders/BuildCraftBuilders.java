@@ -640,7 +640,7 @@ public class BuildCraftBuilders extends BuildCraftMod {
         CoreProxy.proxy.addCraftingRecipe(new ItemStack(libraryBlock, 1), "bbb", "bBb", "bbb", 'b', new ItemStack(blueprintItem), 'B',
                 Blocks.bookshelf);
 
-        CoreProxy.proxy.addCraftingRecipe(new ItemStack(frameSurvivalBlock), "WGO", 'W', "planks", 'G', Blocks.glass, 'O', "dyeOrange");
+        CoreProxy.proxy.addCraftingRecipe(new ItemStack(frameSurvivalBlock), "WGO", 'W', "plankWood", 'G', Blocks.glass, 'O', "dyeOrange");
     }
 
     @Mod.EventHandler
