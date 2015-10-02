@@ -195,7 +195,7 @@ public class FakeWorldManager {
             return;
         }
 
-        if (block.getBlockLayer() != layer) {
+        if (!block.canRenderInLayer(layer)) {
             return;
         }
 

@@ -409,7 +409,7 @@ public final class Utils {
     public static Vec3 convert(EnumFacing face, double size) {
         return multiply(convert(face), size);
     }
-
+    
     public static EnumFacing convertPositive(EnumFacing face) {
         if (face == null) {
             return null;

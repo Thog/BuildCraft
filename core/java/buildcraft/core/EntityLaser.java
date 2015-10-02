@@ -6,10 +6,11 @@ package buildcraft.core;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import buildcraft.core.lib.utils.Utils;
 
@@ -56,6 +57,7 @@ public class EntityLaser extends Entity {
 
     public EntityLaser(World world, Vec3 head, Vec3 tail, ResourceLocation laserTexture) {
         super(world);
+        ignoreFrustumCheck = true;
 
         data.head = head;
         data.tail = tail;
@@ -89,13 +91,18 @@ public class EntityLaser extends Entity {
             updateDataClient();
         }
 
-        // TODO (1.8): Avoid Object Overflow
-        // Err... what?
-        setEntityBoundingBox(new AxisAlignedBB(Math.min(data.head.xCoord, data.tail.xCoord), Math.min(data.head.yCoord, data.tail.yCoord) - 1.0D, Math
-                .min(data.head.zCoord, data.tail.zCoord) - 1.0D, Math.max(data.head.xCoord, data.tail.xCoord) + 1.0D, Math.max(data.head.yCoord,
-                        data.tail.yCoord) + 1.0D, Math.max(data.head.zCoord, data.tail.zCoord) + 1.0D));
+        Vec3 min = Utils.min(data.tail, data.head);
+        Vec3 max = Utils.max(data.tail, data.head).add(Utils.VEC_ONE);
+
+        setEntityBoundingBox(Utils.boundingBox(min, max));
 
         data.update();
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean isInRangeToRenderDist(double distance) {
+        return true;
     }
 
     protected void updateDataClient() {

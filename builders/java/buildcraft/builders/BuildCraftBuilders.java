@@ -64,15 +64,7 @@ import buildcraft.api.filler.FillerManager;
 import buildcraft.api.filler.IFillerPattern;
 import buildcraft.api.library.LibraryAPI;
 import buildcraft.api.statements.StatementManager;
-import buildcraft.builders.block.BlockArchitect;
-import buildcraft.builders.block.BlockBlueprintLibrary;
-import buildcraft.builders.block.BlockBuilder;
-import buildcraft.builders.block.BlockConstructionMarker;
-import buildcraft.builders.block.BlockFiller;
-import buildcraft.builders.block.BlockFrame;
-import buildcraft.builders.block.BlockMarker;
-import buildcraft.builders.block.BlockPathMarker;
-import buildcraft.builders.block.BlockQuarry;
+import buildcraft.builders.block.*;
 import buildcraft.builders.item.ItemBlueprintStandard;
 import buildcraft.builders.item.ItemBlueprintTemplate;
 import buildcraft.builders.item.ItemConstructionMarker;
@@ -123,6 +115,7 @@ public class BuildCraftBuilders extends BuildCraftMod {
     public static BlockUrbanist urbanistBlock;
     public static BlockQuarry quarryBlock;
     public static BlockFrame frameBlock;
+    public static BlockFrameSurvival frameSurvivalBlock;
     public static ItemBlueprintTemplate templateItem;
     public static ItemBlueprintStandard blueprintItem;
 
@@ -554,6 +547,9 @@ public class BuildCraftBuilders extends BuildCraftMod {
         frameBlock = new BlockFrame();
         CoreProxy.proxy.registerBlock(frameBlock.setUnlocalizedName("frameBlock"));
 
+        frameSurvivalBlock = new BlockFrameSurvival();
+        CoreProxy.proxy.registerBlock(frameSurvivalBlock.setUnlocalizedName("frameSurvivalBlock"));
+
         builderBlock = (BlockBuilder) CompatHooks.INSTANCE.getBlock(BlockBuilder.class);
         CoreProxy.proxy.registerBlock(builderBlock.setUnlocalizedName("builderBlock"));
 
@@ -643,6 +639,8 @@ public class BuildCraftBuilders extends BuildCraftMod {
 
         CoreProxy.proxy.addCraftingRecipe(new ItemStack(libraryBlock, 1), "bbb", "bBb", "bbb", 'b', new ItemStack(blueprintItem), 'B',
                 Blocks.bookshelf);
+
+        CoreProxy.proxy.addCraftingRecipe(new ItemStack(frameSurvivalBlock), "WGO", 'W', "planks", 'G', Blocks.glass, 'O', "dyeOrange");
     }
 
     @Mod.EventHandler

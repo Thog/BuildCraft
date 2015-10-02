@@ -70,6 +70,8 @@ public abstract class BlockBuildCraftBase extends Block {
     public static final BuildCraftProperty<Boolean> CONNECTED_SOUTH = BuildCraftProperties.CONNECTED_SOUTH;
 
     public static final Map<EnumFacing, BuildCraftProperty<Boolean>> CONNECTED_MAP = BuildCraftProperties.CONNECTED_MAP;
+    @SuppressWarnings("unchecked")
+    public static final BuildCraftProperty<Boolean>[] CONNECTED_ARRAY = CONNECTED_MAP.values().toArray(new BuildCraftProperty[6]);
 
     protected final BuildCraftProperty<?>[] properties;
     protected final BuildCraftProperty<?>[] nonMetaProperties;
