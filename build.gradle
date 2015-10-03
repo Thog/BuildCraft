@@ -24,7 +24,7 @@ allprojects {
     apply plugin: "net.minecraftforge.gradle.forge"
     apply plugin: "maven"
 
-    version = "alpha-1"
+    version = "0.1"
     group= "com.mod-buildcraft"
 
     minecraft {
@@ -40,7 +40,7 @@ allprojects {
 }
 
 // Only applied for the root buildcraft project
-archivesBaseName = "buildcraft-all"
+archivesBaseName = "buildcraft-all-ALPHA"
 
 sourceSets {
     main {

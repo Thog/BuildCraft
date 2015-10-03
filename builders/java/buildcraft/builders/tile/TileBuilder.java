@@ -40,6 +40,7 @@ import buildcraft.api.robots.RobotManager;
 import buildcraft.api.robots.StackRequest;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
+import buildcraft.builders.block.BlockBuilder;
 import buildcraft.builders.blueprints.RecursiveBlueprintBuilder;
 import buildcraft.builders.item.ItemBlueprint;
 import buildcraft.builders.item.ItemBlueprintStandard;
@@ -326,6 +327,10 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
     }
 
     public void iterateBpt(boolean forceIterate) {
+        if (!(worldObj.getBlockState(getPos()).getBlock() instanceof BlockBuilder)) {
+            return;
+        }
+
         if (getStackInSlot(0) == null || !(getStackInSlot(0).getItem() instanceof ItemBlueprint)) {
             if (box.isInitialized()) {
                 if (currentBuilder != null) {
@@ -567,7 +572,11 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
     public void update() {
         super.update();
 
-        if (worldObj.isRemote || isInvalid()) {
+        if (worldObj.isRemote) {
+            return;
+        }
+
+        if (!(worldObj.getBlockState(getPos()).getBlock() instanceof BlockBuilder)) {
             return;
         }
 
