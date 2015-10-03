@@ -17,7 +17,7 @@ import buildcraft.factory.tile.TileMiningWell;
 
 public class BlockMiningWell extends BlockBuildCraft {
     public BlockMiningWell() {
-        super(Material.ground);
+        super(Material.ground, LED_DONE, LED_POWER);
 
         setHardness(5F);
         setResistance(10F);

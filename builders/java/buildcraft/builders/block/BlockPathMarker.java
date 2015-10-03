@@ -11,7 +11,9 @@ import buildcraft.builders.tile.TilePathMarker;
 
 public class BlockPathMarker extends BlockMarker {
 
-    public BlockPathMarker() {}
+    public BlockPathMarker() {
+        super(true);
+    }
 
     @Override
     public TileEntity createNewTileEntity(World world, int metadata) {

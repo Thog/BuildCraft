@@ -115,6 +115,11 @@ public abstract class BlockBuildCraftBase extends Block {
 
         int total = 1;
         for (BuildCraftProperty<?> prop : properties) {
+            if (prop == null) {
+                /* Used by some blocks (e.g. the filler) if they do or do not want to have a specific property at
+                 * runtime (per block). Is used in the format "wantProperty ? someProp : null" */
+                continue;
+            }
             if (prop instanceof BuildCraftExtendedProperty<?>) {
                 infinites.add((BuildCraftExtendedProperty<?>) prop);
                 hasExtendedProps = true;
@@ -146,6 +151,10 @@ public abstract class BlockBuildCraftBase extends Block {
         boolean canSixRotate = false;
 
         for (BuildCraftProperty<?> prop : properties) {
+            if (prop == null) {
+                continue;
+            }
+
             if (prop instanceof BuildCraftExtendedProperty<?>) {
                 continue;
             }

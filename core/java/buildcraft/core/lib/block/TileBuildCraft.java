@@ -22,6 +22,8 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
 import buildcraft.api.core.ISerializable;
+import buildcraft.api.mj.IMjExternalStorage;
+import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.DefaultProps;
@@ -48,8 +50,8 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
     // private long worldTimeEnergyReceive;
     /** Used at the client for the power LED brightness */
     // TODO: Make LED POWER work... somehow
-    public int ledPower = 0;
-    public boolean ledActive = false;
+    public int ledPower = 0, lastLedPower = 0;
+    public boolean ledDone = false, lastLedDone = false;
 
     public String getOwner() {
         return owner;
@@ -76,6 +78,27 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
             }
             initialize();
             init = 2;
+        }
+
+        if (!worldObj.isRemote) {
+            if (this instanceof IMjHandler) {
+                IMjExternalStorage storage = ((IMjHandler) this).getMjStorage();
+                if (storage.maxPower(null) > 0) {
+                    ledPower = (int) (3 * storage.currentPower(null) / storage.maxPower(null));
+                } else {
+                    ledPower = 0;
+                }
+            }
+        }
+
+        if (lastLedPower != ledPower || lastLedDone != ledDone) {
+            if (worldObj.isRemote) {
+                worldObj.markBlockForUpdate(getPos());
+            } else {
+                sendNetworkUpdate();
+            }
+            lastLedPower = ledPower;
+            lastLedDone = ledDone;
         }
 
         if (sendNetworkUpdate) {
@@ -128,10 +151,12 @@ public abstract class TileBuildCraft extends TileEntity implements ISerializable
 
     public void writeData(ByteBuf stream) {
         stream.writeByte(ledPower);
+        stream.writeBoolean(ledDone);
     }
 
     public void readData(ByteBuf stream) {
         ledPower = stream.readByte();
+        ledDone = stream.readBoolean();
     }
 
     public Packet getPacketUpdate() {

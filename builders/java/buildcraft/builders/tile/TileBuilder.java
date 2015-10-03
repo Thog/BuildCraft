@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import buildcraft.api.blueprints.BuilderAPI;
 import buildcraft.api.core.IInvSlot;
+import buildcraft.api.core.IPathProvider;
 import buildcraft.api.enums.EnumBlueprintType;
 import buildcraft.api.properties.BuildCraftProperties;
 import buildcraft.api.robots.EntityRobotBase;
@@ -39,7 +40,6 @@ import buildcraft.api.robots.RobotManager;
 import buildcraft.api.robots.StackRequest;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
-import buildcraft.builders.BuildCraftBuilders;
 import buildcraft.builders.blueprints.RecursiveBlueprintBuilder;
 import buildcraft.builders.item.ItemBlueprint;
 import buildcraft.builders.item.ItemBlueprintStandard;
@@ -91,8 +91,8 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
     private SimpleInventory inv = new SimpleInventory(28, "Builder", 64);
     private BptBuilderBase currentBuilder;
     private RecursiveBlueprintBuilder recursiveBuilder;
-    private LinkedList<BlockPos> path;
-    private ArrayList<ItemStack> requiredToBuild;
+    private List<BlockPos> path;
+    private List<ItemStack> requiredToBuild;
     private NBTTagCompound initNBT = null;
     private boolean done = true;
     private boolean isBuilding = false;
@@ -253,23 +253,18 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
 
         box.kind = Kind.STRIPES;
 
-        for (int x = pos.getX() - 1; x <= pos.getX() + 1; ++x) {
-            for (int y = pos.getY() - 1; y <= pos.getY() + 1; ++y) {
-                for (int z = pos.getZ() - 1; z <= pos.getZ() + 1; ++z) {
-                    TileEntity tile = worldObj.getTileEntity(pos);
-
-                    if (tile instanceof TilePathMarker) {
-                        path = ((TilePathMarker) tile).getPath();
-
-                        for (BlockPos b : path) {
-                            IBlockState state = worldObj.getBlockState(b);
-                            worldObj.setBlockToAir(b);
-                            BuildCraftBuilders.pathMarkerBlock.dropBlockAsItem(worldObj, b, state, 0);
-                        }
-
-                        break;
-                    }
+        IBlockState state = worldObj.getBlockState(getPos());
+        BlockPos search = getPos().offset(BuildCraftProperties.BLOCK_FACING.getValue(state).getOpposite());
+        TileEntity tileToSearch = worldObj.getTileEntity(search);
+        if (tileToSearch instanceof IPathProvider) {
+            IPathProvider provider = (IPathProvider) tileToSearch;
+            path = provider.getPath();
+            if (path != null && path.size() > 0) {
+                for (BlockPos pos : path) {
+                    worldObj.destroyBlock(pos, true);
                 }
+            } else {
+                path = null;
             }
         }
 
@@ -572,7 +567,7 @@ public class TileBuilder extends TileAbstractBuilder implements IHasWork, IFluid
     public void update() {
         super.update();
 
-        if (worldObj.isRemote) {
+        if (worldObj.isRemote || isInvalid()) {
             return;
         }
 

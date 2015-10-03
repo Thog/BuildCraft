@@ -49,7 +49,7 @@ public abstract class GuiEngine extends GuiBuildCraft {
 
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.energy"), x + 22, y + 8, headerColour);
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.currentOutput") + ":", x + 22, y + 20, subheaderColour);
-            fontRendererObj.drawString(String.format("%d MJ/t", engine.currentOutput), x + 22, y + 32, textColour);
+            fontRendererObj.drawString(String.format("%.2f MJ/t", engine.currentOutput), x + 22, y + 32, textColour);
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.stored") + ":", x + 22, y + 44, subheaderColour);
             fontRendererObj.drawString(String.format("%d MJ", engine.clientEnergy), x + 22, y + 56, textColour);
             fontRendererObj.drawStringWithShadow(StringUtils.localize("gui.heat") + ":", x + 22, y + 68, subheaderColour);

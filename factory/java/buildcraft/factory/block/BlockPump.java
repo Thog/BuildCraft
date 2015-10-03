@@ -22,7 +22,7 @@ import buildcraft.factory.tile.TilePump;
 public class BlockPump extends BlockBuildCraft {
 
     public BlockPump() {
-        super(Material.iron);
+        super(Material.iron, LED_DONE, LED_POWER);
     }
 
     @Override

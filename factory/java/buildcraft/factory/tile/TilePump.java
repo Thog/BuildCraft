@@ -7,6 +7,7 @@ package buildcraft.factory.tile;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -30,6 +31,7 @@ import buildcraft.api.mj.IMjExternalStorage;
 import buildcraft.api.mj.IMjHandler;
 import buildcraft.api.mj.reference.DefaultMjExternalStorage;
 import buildcraft.api.mj.reference.DefaultMjInternalStorage;
+import buildcraft.api.tiles.IDebuggable;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.BuildCraftCore;
 import buildcraft.core.CoreConstants;
@@ -46,8 +48,7 @@ import buildcraft.factory.FactoryProxy;
 
 import io.netty.buffer.ByteBuf;
 
-public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler, IMjHandler {
-
+public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler, IMjHandler, IDebuggable {
     private static final double MAX_POWER = 100;
     private static final double MAX_TRANSFERED = 15;
     private static final double POWER_ACTIVATION = 10;
@@ -406,6 +407,7 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         buf.writeBoolean(powered);
         ledState = ((tick - tickPumped) < 48 ? 16 : 0) | (int) (internalStorage.currentPower() * 4 / internalStorage.maxPower());
         buf.writeByte(ledState);
+        internalStorage.writeData(buf);
     }
 
     @Override
@@ -421,6 +423,8 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
         }
 
         setTubePosition();
+
+        internalStorage.readData(data);
     }
 
     private void setTubePosition() {
@@ -512,5 +516,18 @@ public class TilePump extends TileBuildCraft implements IHasWork, IFluidHandler,
     @Override
     public IMjExternalStorage getMjStorage() {
         return externalStorage;
+    }
+
+    @Override
+    public void getDebugInfo(List<String> left, List<String> right, EnumFacing side) {
+        left.add("");
+        left.add("Internal Storage:");
+        left.add("  - power = " + internalStorage.currentPower() + "Mj");
+        left.add("  - activation = " + internalStorage.activationPower);
+        left.add("  - active = " + internalStorage.hasActivated());
+        left.add("  - operating = " + internalStorage.isOperating());
+        left.add("Tank:");
+        left.add(" - type = " + tank.getTypeString());
+        left.add(" - amount = " + tank.getAmountString());
     }
 }

@@ -24,7 +24,7 @@ allprojects {
     apply plugin: "net.minecraftforge.gradle.forge"
     apply plugin: "maven"
 
-    version = "7.2.0"
+    version = "alpha-1"
     group= "com.mod-buildcraft"
 
     minecraft {

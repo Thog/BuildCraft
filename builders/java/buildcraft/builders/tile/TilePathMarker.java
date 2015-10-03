@@ -7,7 +7,9 @@ package buildcraft.builders.tile;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -17,6 +19,7 @@ import net.minecraft.world.World;
 import buildcraft.api.core.IPathProvider;
 import buildcraft.core.DefaultProps;
 import buildcraft.core.LaserData;
+import buildcraft.core.lib.block.BlockBuildCraft;
 import buildcraft.core.lib.utils.Utils;
 
 import io.netty.buffer.ByteBuf;
@@ -85,7 +88,7 @@ public class TilePathMarker extends TileMarker implements IPathProvider {
 
             distance = pos.distanceSq(available.pos);
 
-            if (distance > DefaultProps.MARKER_RANGE * DefaultProps.MARKER_RANGE) {
+            if (distance > DefaultProps.PATH_RANGE * DefaultProps.PATH_RANGE) {
                 continue;
             }
 
@@ -107,6 +110,9 @@ public class TilePathMarker extends TileMarker implements IPathProvider {
 
         // Allow the user to stop the path marker from searching for new path markers to connect
         tryingToConnect = !tryingToConnect;
+        IBlockState state = worldObj.getBlockState(getPos());
+        state = state.withProperty(BlockBuildCraft.LED_DONE, tryingToConnect);
+        worldObj.setBlockState(getPos(), state);
 
         sendNetworkUpdate();
     }
@@ -127,13 +133,16 @@ public class TilePathMarker extends TileMarker implements IPathProvider {
             }
 
             tryingToConnect = false;
+            IBlockState state = worldObj.getBlockState(getPos());
+            state = state.withProperty(BlockBuildCraft.LED_DONE, tryingToConnect);
+            worldObj.setBlockState(getPos(), state);
 
             sendNetworkUpdate();
             getWorld().markBlockRangeForRenderUpdate(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
         }
     }
 
-    public LinkedList<BlockPos> getPath() {
+    public List<BlockPos> getPath() {
         HashSet<BlockPos> visitedPaths = new HashSet<BlockPos>();
         LinkedList<BlockPos> res = new LinkedList<BlockPos>();
 

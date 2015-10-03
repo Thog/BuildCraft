@@ -12,7 +12,7 @@ public interface IControllable {
         On,
         Off,
         Mode,
-        Loop
+        Loop;
     }
 
     /** Get the current control mode of the Tile Entity.
