@@ -540,7 +540,7 @@ public class BuildCraftCore extends BuildCraftMod {
         CoreProxy.proxy.addCraftingRecipe(new ItemStack(paintbrushItem), " iw", " gi", "s  ", 's', "stickWood", 'g', "gearWood", 'w', new ItemStack(
                 Blocks.wool, 1, 0), 'i', Items.string);
 
-        CoreProxy.proxy.addCraftingRecipe(new ItemStack(guideBook), " G ", "SBS", 'B', Items.book, 'S', Items.stick, 'G', woodenGearItem);
+        CoreProxy.proxy.addCraftingRecipe(new ItemStack(guideBook), "GB", 'B', Items.book, 'G', woodenGearItem);
 
         for (int i = 0; i < 16; i++) {
             ItemStack outputStack = paintbrushItem.getItemStack(EnumDyeColor.values()[i]);
